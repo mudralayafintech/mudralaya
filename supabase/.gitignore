@@ -1,0 +1,6 @@
+# Supabase
+functions/**/.env
+.temp/
+
+# OS
+.DS_Store

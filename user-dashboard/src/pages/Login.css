@@ -1,0 +1,250 @@
+.login-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f0f4f8 0%, #d7e2ea 100%);
+  padding: 1rem;
+}
+
+.login-container {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  padding: 3rem;
+  border-radius: var(--radius);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+  width: 100%;
+  max-width: 420px;
+  text-align: center;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+.login-header {
+  margin-bottom: 2.5rem;
+}
+
+.logo {
+  height: 60px;
+  width: auto;
+  margin-bottom: 1.5rem;
+  object-fit: contain;
+}
+
+.login-header h1 {
+  font-size: 1.75rem;
+  margin-bottom: 0.5rem;
+  color: var(--primary);
+}
+
+.login-header p {
+  color: var(--text-light);
+  font-size: 0.95rem;
+}
+
+.input-group {
+  position: relative;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: stretch;
+}
+
+.phone-prefix {
+  background: #f1f5f9;
+  border: 2px solid #eef2f6;
+  border-right: none;
+  border-radius: var(--radius) 0 0 var(--radius);
+  padding: 0 1rem;
+  display: flex;
+  align-items: center;
+  color: var(--text-main);
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.input-icon {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-light);
+  font-size: 1rem;
+  pointer-events: none;
+}
+
+.input-group input {
+  width: 100%;
+  padding: 1rem;
+  border: 2px solid #eef2f6;
+  border-radius: var(--radius);
+  font-size: 1rem;
+  background: #f8fafc;
+  transition: all 0.2s;
+  color: var(--text-main);
+}
+
+.input-group:has(.phone-prefix) input {
+  border-radius: 0 var(--radius) var(--radius) 0;
+  padding-left: 0.5rem;
+}
+
+.input-group:has(.input-icon) input {
+  padding-left: 3rem;
+}
+
+.input-group input:focus {
+  outline: none;
+  border-color: var(--primary-light);
+  background: var(--white);
+  box-shadow: 0 0 0 4px rgba(26, 156, 107, 0.1);
+}
+
+.btn-primary {
+  width: 100%;
+  background-color: var(--primary);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background-color: var(--primary-light);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(26, 156, 107, 0.2);
+}
+
+.btn-primary:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.btn-text {
+  background: none;
+  color: var(--text-light);
+  font-size: 0.9rem;
+  margin-top: 1.5rem;
+  padding: 0.5rem;
+}
+
+.btn-text:hover {
+  text-decoration: underline;
+  color: var(--primary);
+}
+
+.error-message {
+  background-color: #fef2f2;
+  color: var(--error);
+  padding: 0.75rem;
+  border-radius: var(--radius);
+  margin-bottom: 1.5rem;
+  font-size: 0.9rem;
+  border: 1px solid #fee2e2;
+  animation: shake 0.4s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+.spinner {
+  animation: spin 1s linear infinite;
+}
+
+.login-footer {
+  margin-top: 2rem;
+  font-size: 0.8rem;
+  color: #9ca3af;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes shake {
+  10%,
+  90% {
+    transform: translate3d(-1px, 0, 0);
+  }
+  20%,
+  80% {
+    transform: translate3d(2px, 0, 0);
+  }
+  30%,
+  50%,
+  70% {
+    transform: translate3d(-4px, 0, 0);
+  }
+  40%,
+  60% {
+    transform: translate3d(4px, 0, 0);
+  }
+}
+
+/* New OTP UI Styles */
+.otp-sent-info {
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.otp-sent-text {
+  color: var(--text-main);
+  font-size: 1rem;
+  margin-bottom: 0.25rem;
+}
+
+.otp-delivery-hint {
+  color: var(--text-light);
+  font-size: 0.85rem;
+}
+
+.otp-sent-text strong {
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.otp-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 1rem;
+  min-height: 24px; /* Prevent layout shift */
+}
+
+.timer-text {
+  color: var(--text-light);
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.resend-btn {
+  margin-top: 0;
+  padding: 0;
+  color: var(--primary);
+  font-weight: 500;
+}
+
+.resend-btn:disabled {
+  color: var(--text-light);
+  cursor: not-allowed;
+  text-decoration: none;
+}
+
+.change-phone-btn {
+  width: 100%;
+  margin-top: 1.5rem;
+}
+
+@media (max-width: 480px) {
+  .login-container {
+    padding: 2rem 1.5rem;
+  }
+
+  .logo {
+    height: 40px;
+  }
+
+  .login-header h1 {
+    font-size: 1.5rem;
+  }
+}

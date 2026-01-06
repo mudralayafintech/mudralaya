@@ -1,0 +1,312 @@
+/* Base/Mobile Styles (Scrollable, Roomy) */
+.join-us-success {
+    display: flex;
+    flex-direction: column;
+    padding: 30px;
+    width: 100%;
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    /* Enable scroll on mobile */
+    background: #ffffff;
+    position: relative;
+    scrollbar-width: thin;
+    scrollbar-color: #cbd5e0 #f1f5f9;
+}
+
+.success-close {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: #ccc;
+    cursor: pointer;
+    transition: color 0.3s ease;
+    z-index: 10;
+}
+
+.success-close:hover {
+    color: #666;
+}
+
+.success-header {
+    text-align: left;
+    margin-bottom: 30px;
+    padding-right: 40px;
+}
+
+.success-title {
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: #1a1a2e;
+    margin-bottom: 10px;
+}
+
+.success-subtitle {
+    font-size: 0.9rem;
+    color: #666;
+    line-height: 1.5;
+    max-width: 600px;
+}
+
+.success-subtitle strong {
+    color: #333;
+    font-weight: 600;
+}
+
+.success-content {
+    display: flex;
+    gap: 30px;
+    align-items: flex-start;
+    margin-bottom: 30px;
+    /* On mobile this stacks, see media queries below */
+}
+
+/* Image & Feature Defaults */
+.success-image-container {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.success-image {
+    max-width: 100%;
+    height: auto;
+    object-fit: contain;
+}
+
+.success-features {
+    flex: 1;
+    display: grid;
+    /* On mobile defaults to 1 col usually handled by media query, but base grid here */
+    grid-template-columns: 1fr;
+    gap: 20px;
+}
+
+.feature-item {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.feature-number {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #00a0dc;
+    font-style: italic;
+    background: #fff;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.05);
+    width: fit-content;
+    padding: 4px 12px;
+    border-radius: 4px;
+    margin-bottom: 5px;
+}
+
+.feature-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #1a1a2e;
+}
+
+.feature-description {
+    font-size: 0.85rem;
+    color: #666;
+    line-height: 1.4;
+}
+
+.success-footer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    margin-top: auto;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    /* Extra padding for scrolling ensuring button not cut off */
+}
+
+.footer-text {
+    font-size: 0.95rem;
+    color: #666;
+}
+
+.btn-payment {
+    padding: 12px 30px;
+    background-color: #00b894;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    width: 100%;
+    /* Full width on mobile by default */
+    max-width: 300px;
+}
+
+.btn-payment:hover {
+    background-color: #00a383;
+}
+
+
+/* --- DESKTOP COMPACT OVERRIDE (> 992px) --- */
+/* Forces content to fit without scrolling on larger screens */
+@media (min-width: 992px) {
+    .join-us-success {
+        padding: 20px;
+        overflow-y: hidden;
+        /* No scroll on desktop */
+    }
+
+    .success-header {
+        margin-bottom: 20px;
+    }
+
+    .success-title {
+        font-size: 1.5rem;
+        margin-bottom: 5px;
+    }
+
+    .success-subtitle {
+        font-size: 0.85rem;
+    }
+
+    .success-content {
+        gap: 20px;
+        margin-bottom: 15px;
+    }
+
+    .success-image-container {
+        max-width: 300px;
+    }
+
+    .success-image {
+        max-height: 250px;
+    }
+
+    .success-features {
+        grid-template-columns: 1fr 1fr;
+        /* 2 cols on desktop */
+        gap: 15px;
+        flex: 1.2;
+    }
+
+    .feature-item {
+        gap: 5px;
+    }
+
+    .feature-number {
+        font-size: 1rem;
+        padding: 3px 10px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    }
+
+    .feature-title {
+        font-size: 0.95rem;
+    }
+
+    .feature-description {
+        font-size: 0.75rem;
+        line-height: 1.3;
+    }
+
+    .success-footer {
+        gap: 10px;
+        padding-top: 10px;
+        padding-bottom: 0;
+    }
+
+    .btn-payment {
+        padding: 10px 30px;
+        font-size: 0.95rem;
+        width: auto;
+        /* Allow auto width on desktop */
+    }
+
+    .success-close {
+        top: 15px;
+        right: 15px;
+        font-size: 1.2rem;
+    }
+}
+
+@media (max-width: 900px) {
+    .join-us-success {
+        padding: 20px;
+    }
+
+    .success-header {
+        padding-right: 0;
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+    .success-subtitle {
+        margin: 0 auto;
+    }
+
+    .success-content {
+        flex-direction: column;
+        align-items: center;
+        gap: 30px;
+    }
+
+    .success-image-container {
+        width: 100%;
+        max-width: 400px;
+    }
+
+    .success-features {
+        width: 100%;
+    }
+}
+
+@media (max-width: 600px) {
+    .success-features {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .success-title {
+        font-size: 1.5rem;
+    }
+
+    .success-close {
+        top: 10px;
+        right: 10px;
+    }
+
+    .feature-item {
+        background: #f8f9fa;
+        padding: 15px;
+        border-radius: 8px;
+    }
+
+    .feature-number {
+        font-size: 1rem;
+        padding: 4px 10px;
+    }
+}
+
+@media (max-width: 400px) {
+    .join-us-success {
+        padding: 15px;
+    }
+
+    .success-title {
+        font-size: 1.3rem;
+    }
+
+    .success-subtitle {
+        font-size: 0.85rem;
+    }
+
+    .btn-payment {
+        width: 100%;
+        padding: 12px 20px;
+    }
+}

@@ -1,0 +1,167 @@
+.member-benefits-section {
+    padding: 0;
+    font-family: 'Inter', sans-serif;
+    overflow: hidden;
+    background: #fff;
+}
+
+.member-benefits-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.benefits-box {
+    /* border: 2px solid #00a0dc; Removed as per user request */
+    border-radius: 4px;
+    padding: 40px;
+    background: #fff;
+    position: relative;
+}
+
+/* Connective lines for visual style if needed, kept simple for now */
+
+.benefits-header-area {
+    margin-bottom: 40px;
+}
+
+.benefits-main-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    line-height: 1.2;
+    margin-bottom: 10px;
+}
+
+.strikethrough-price {
+    text-decoration: line-through;
+    color: #999;
+}
+
+.benefits-desc {
+    text-align: justify;
+    color: #666;
+    font-size: 1rem;
+    max-width: 600px;
+}
+
+.benefits-content-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 40px;
+}
+
+/* Left side: Image */
+.benefits-visual-col {
+    flex: 1;
+    min-width: 300px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.benefits-img {
+    max-width: 100%;
+    height: auto;
+    object-fit: contain;
+}
+
+/* Right side: Grid */
+.benefits-grid-col {
+    flex: 1.2;
+    min-width: 300px;
+}
+
+.benefits-grid-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+}
+
+.benefit-card {
+    background: #fff;
+    border-radius: 8px;
+    /* transition: transform 0.2s; */
+}
+
+/* .benefit-card:hover {
+    transform: translateY(-5px);
+} */
+
+.benefit-number-badge {
+    color: #2d8f9f;
+    font-family: cursive, sans-serif;
+    /* Fallback for a handwritten style font */
+    font-size: 1.5rem;
+    font-weight: 700;
+    font-style: italic;
+    margin-bottom: 10px;
+    background: #f8f9fa;
+    display: inline-block;
+    padding: 5px 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.benefit-card h4 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-bottom: 8px;
+}
+
+.benefit-card p {
+    font-size: 0.95rem;
+    color: #666;
+    line-height: 1.5;
+}
+
+.benefits-footer-area {
+    text-align: center;
+    margin-top: 50px;
+}
+
+.join-today-text {
+    font-size: 1.1rem;
+    color: #555;
+    margin-bottom: 15px;
+}
+
+.btn-become-partner {
+    background: #00bfa5;
+    /* Teal color from image */
+    color: #fff;
+    border: none;
+    padding: 12px 30px;
+    font-size: 1rem;
+    font-weight: 700;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn-become-partner:hover {
+    background: #00897b;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .benefits-box {
+        padding: 20px;
+    }
+
+    .benefits-content-row {
+        flex-direction: column;
+    }
+
+    .benefits-grid-layout {
+        grid-template-columns: 1fr;
+        /* Stack definition items on mobile */
+        gap: 20px;
+    }
+
+    .benefits-main-title {
+        font-size: 1.8rem;
+    }
+}

@@ -1,0 +1,18 @@
+# General
+node_modules/
+.env
+.env.*
+! .env.example
+*.log
+.DS_Store
+Thumbs.db
+
+# IDEs
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+mudralya/package-lock.json
