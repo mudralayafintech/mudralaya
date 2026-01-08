@@ -1,0 +1,165 @@
+.timelineWrapper {
+  padding: 2rem 0;
+  background: white;
+  min-height: auto;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.title {
+  font-size: 3rem;
+  font-weight: 800;
+  margin-bottom: 1rem;
+}
+
+.accent {
+  color: var(--primary);
+}
+
+.subtitle {
+  font-size: 1.125rem;
+  color: var(--secondary);
+}
+
+.interactiveArea {
+  position: relative;
+  height: 400px;
+}
+
+.svgWrapper {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  transform: translateY(-50%);
+  height: 200px;
+}
+
+.svg {
+  width: 100%;
+  height: 100%;
+}
+
+.cardsLayout {
+  position: relative;
+  height: 100%;
+}
+
+.cardNode {
+  position: absolute;
+  width: 220px;
+  background: white;
+  padding: 1.5rem;
+  border-radius: var(--radius);
+  border: 1px solid #e2e8f0;
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  transform-origin: center;
+}
+
+.top {
+  bottom: 60%;
+}
+
+.bottom {
+  top: 60%;
+}
+
+.cardIcon {
+  width: 40px;
+  height: 40px;
+  background: rgba(37, 99, 235, 0.1);
+  color: var(--primary);
+  border-radius: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.step {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.cardContent h4 {
+  font-size: 1.125rem;
+  margin: 0.25rem 0;
+}
+
+.cardContent p {
+  font-size: 0.875rem;
+  color: var(--secondary);
+}
+
+@media (max-width: 1024px) {
+  .timelineWrapper {
+    padding: 6rem 0;
+  }
+
+  .header {
+    margin-bottom: 4rem;
+  }
+
+  .interactiveArea {
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 3rem;
+    padding: 0 1rem;
+    position: relative;
+  }
+
+  /* Vertical line for mobile */
+  .interactiveArea::before {
+    content: "";
+    position: absolute;
+    left: 2rem;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: linear-gradient(
+      to bottom,
+      transparent,
+      var(--primary) 10%,
+      var(--primary) 90%,
+      transparent
+    );
+    z-index: 0;
+  }
+
+  .svgWrapper {
+    display: none;
+  }
+
+  .cardNode {
+    position: relative;
+    width: 100%;
+    max-width: 400px;
+    margin-left: 3rem;
+    opacity: 1 !important;
+    scale: 1 !important;
+    transform: none !important;
+    z-index: 1;
+  }
+
+  .cardNode::before {
+    content: "";
+    position: absolute;
+    left: -1.5rem;
+    top: 2rem;
+    width: 1rem;
+    height: 1rem;
+    background: var(--primary);
+    border-radius: 50%;
+    transform: translateX(-100%);
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+  }
+}

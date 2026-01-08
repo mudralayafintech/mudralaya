@@ -1,0 +1,271 @@
+.aboutPage {
+  background: white;
+}
+
+.hero {
+  padding: 8rem 0 5rem;
+  background: var(--gradient-surface);
+  overflow: hidden;
+}
+
+.heroGrid {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 4rem;
+  align-items: center;
+}
+
+.heroTitle {
+  font-size: 4rem;
+  font-weight: 800;
+  margin-bottom: 1.5rem;
+}
+
+.accent {
+  color: var(--primary);
+}
+
+.heroSubtitle {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  color: var(--foreground);
+}
+
+.heroText {
+  font-size: 1.125rem;
+  color: var(--secondary);
+  line-height: 1.6;
+  margin-bottom: 2.5rem;
+}
+
+.heroActions {
+  display: flex;
+  gap: 1.25rem;
+}
+
+.primaryBtn {
+  background: var(--gradient-primary);
+  color: white;
+  padding: 1rem 2rem;
+  border-radius: var(--radius);
+  font-weight: 700;
+  box-shadow: var(--shadow);
+}
+
+.secondaryBtn {
+  padding: 1rem 2rem;
+  border-radius: var(--radius);
+  border: 1px solid #e2e8f0;
+  font-weight: 700;
+  transition: all 0.2s;
+}
+
+.heroImg {
+  width: 100%;
+  height: auto;
+  border-radius: 2rem;
+  box-shadow: var(--shadow-lg);
+}
+
+.sectionHeader {
+  text-align: center;
+  max-width: 700px;
+  margin: 0 auto 3rem;
+}
+
+.sectionHeader h2 {
+  font-size: 3rem;
+  margin-bottom: 1.5rem;
+}
+
+.sectionHeader p {
+  font-size: 1.25rem;
+  color: var(--secondary);
+}
+
+.iconBox {
+  width: 64px;
+  height: 64px;
+  background: rgba(37, 99, 235, 0.08);
+  color: var(--primary);
+  border-radius: 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1.5rem;
+}
+
+.mission {
+  padding: 5rem 0;
+}
+
+.videoWrapper {
+  max-width: 1000px;
+  margin: 0 auto;
+  border-radius: 2rem;
+  overflow: hidden;
+  box-shadow: var(--shadow-lg);
+  background: black;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.video {
+  width: 100%;
+  height: auto;
+  max-height: 600px;
+  object-fit: contain;
+}
+
+.grid2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6rem;
+  align-items: center;
+}
+
+.whatWeDo {
+  padding: 5rem 0;
+  background: #f8fafc;
+}
+
+.sideTitle {
+  font-size: 3rem;
+  margin-bottom: 1.5rem;
+}
+
+.sideDesc {
+  font-size: 1.125rem;
+  color: var(--secondary);
+  line-height: 1.6;
+  margin-bottom: 3rem;
+}
+
+.sideImg {
+  width: 100%;
+  height: auto;
+  border-radius: 2rem;
+}
+
+.benefitList {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.benefitItem {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--foreground);
+}
+
+.benefitIcon {
+  color: var(--primary);
+}
+
+.vision {
+  padding: 5rem 0;
+}
+
+.whyExist {
+  padding: 5rem 0;
+  background: var(--foreground);
+  color: white;
+}
+
+.whyExist .accent {
+  color: var(--primary);
+}
+
+.whyExist p {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.featureGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2rem;
+}
+
+.featureCard {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 3rem 2rem;
+  border-radius: var(--radius-lg);
+  text-align: center;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.3s;
+}
+
+.featureCard:hover {
+  background: rgba(255, 255, 255, 0.08);
+  transform: translateY(-5px);
+  border-color: var(--primary);
+}
+
+.featureIcon {
+  color: var(--primary);
+  margin-bottom: 1.5rem;
+}
+
+@media (max-width: 1024px) {
+  .hero {
+    padding: 6rem 0 4rem;
+  }
+
+  .heroGrid,
+  .grid2 {
+    grid-template-columns: 1fr;
+    gap: 4rem;
+    text-align: center;
+  }
+
+  .heroTitle {
+    font-size: var(--font-size-4xl);
+  }
+
+  .heroActions,
+  .benefitItem {
+    justify-content: center;
+  }
+
+  .featureGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .illustrationCol {
+    order: 2;
+  }
+
+  .contentCol {
+    order: 1;
+  }
+}
+
+@media (max-width: 640px) {
+  .hero {
+    padding: 4rem 0;
+  }
+
+  .featureGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .heroActions {
+    flex-direction: column;
+  }
+
+  .primaryBtn,
+  .secondaryBtn {
+    width: 100%;
+    text-align: center;
+  }
+
+  .videoWrapper {
+    border-radius: 1rem;
+  }
+}

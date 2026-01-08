@@ -1,0 +1,215 @@
+.benefits {
+  padding: 5rem 0;
+  background: #fdfdfd;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 3.5rem;
+}
+
+.title {
+  font-size: 3rem;
+  font-weight: 800;
+  margin-bottom: 1rem;
+}
+
+.subtitle {
+  font-size: 1.125rem;
+  color: var(--secondary);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1.15fr 1fr 1fr; /* Slightly wider for the second card */
+  gap: 2rem;
+  align-items: stretch;
+}
+
+.card {
+  position: relative;
+  background: white;
+  padding: 2.25rem 1.75rem;
+  border-radius: var(--radius-xl);
+  border: 1px solid #eef2f6;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 20px -5px rgba(0, 0, 0, 0.05);
+}
+
+.card:hover {
+  border-color: var(--accent);
+  transform: translateY(-8px);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+.featured {
+  border: 2px solid var(--primary);
+  box-shadow: 0 20px 40px -10px rgba(37, 99, 235, 0.15);
+  transform: scale(1.05);
+  z-index: 10;
+  padding: 3rem 2rem; /* Reduced from 4rem */
+  background: linear-gradient(180deg, #ffffff 0%, #f8faff 100%);
+}
+
+.featuredBadge {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: var(--primary);
+  color: white;
+  padding: 0.5rem 1.25rem;
+  border-radius: var(--radius-full);
+  font-size: 0.75rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.cardHeader {
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.planTitle {
+  font-size: 0.8125rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  color: var(--secondary);
+  text-transform: uppercase;
+  margin-bottom: 0.75rem;
+}
+
+.priceWrapper {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 0.25rem;
+}
+
+.price {
+  font-size: 2.75rem;
+  font-weight: 800;
+  color: var(--foreground); /* Fallback */
+  background: var(--gradient-text);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.priceSub {
+  font-size: 0.875rem;
+  color: var(--secondary);
+}
+
+.laptopOption {
+  margin-bottom: 1.5rem;
+  padding: 0.875rem;
+  background: #f3f7ff;
+  border-radius: var(--radius);
+  border: 1px dashed rgba(37, 99, 235, 0.2);
+}
+
+.checkboxLabel {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+}
+
+.checkbox {
+  width: 1.25rem;
+  height: 1.25rem;
+  cursor: pointer;
+}
+
+.checkboxText {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--foreground);
+}
+
+.laptopHint {
+  margin-top: 0.5rem;
+  font-size: 0.75rem;
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.benefitList {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+  margin-bottom: 2rem;
+  flex-grow: 1;
+}
+
+.benefitItem {
+  display: flex;
+  gap: 0.75rem;
+  font-size: 0.9375rem;
+  color: var(--secondary);
+  line-height: 1.4;
+}
+
+.checkIcon {
+  color: var(--primary);
+  flex-shrink: 0;
+  margin-top: 0.25rem;
+}
+
+.cta {
+  width: 100%;
+  padding: 1rem;
+  border-radius: var(--radius);
+  font-weight: 700;
+  transition: all 0.2s;
+}
+
+.ctaPrimary {
+  background: var(--primary);
+  color: white;
+}
+
+.ctaPrimary:hover {
+  filter: brightness(1.1);
+}
+
+.ctaSecondary {
+  background: white;
+  border: 1px solid #e2e8f0;
+  color: var(--foreground);
+}
+
+.ctaSecondary:hover {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+}
+
+@media (max-width: 1200px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .featured {
+    transform: scale(1.02); /* Keep it slightly larger even in 2-col */
+  }
+}
+
+@media (max-width: 640px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .title {
+    font-size: 2rem;
+  }
+}

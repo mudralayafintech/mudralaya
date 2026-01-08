@@ -1,0 +1,257 @@
+.section {
+  padding: 5rem 0;
+  background: white;
+}
+
+.box {
+  background: #0f172a; /* Deep Dark Blue */
+  border-radius: 2.5rem;
+  padding: 5rem 4rem;
+  color: white;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.4);
+}
+
+/* Background Glow Effect */
+.box::before {
+  content: "";
+  position: absolute;
+  top: -20%;
+  right: -10%;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(
+    circle,
+    rgba(56, 189, 248, 0.15) 0%,
+    transparent 70%
+  );
+  filter: blur(80px);
+  pointer-events: none;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 4rem;
+  position: relative;
+  z-index: 2;
+}
+
+.title {
+  font-size: 3.5rem;
+  font-weight: 800;
+  line-height: 1.2;
+  margin-bottom: 1rem;
+}
+
+.priceHighlight {
+  display: inline-flex;
+  align-items: center;
+  gap: 1rem;
+  color: #38bdf8; /* Cyan/Blue Highlight */
+}
+
+.strike {
+  text-decoration: line-through;
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 2.25rem;
+}
+
+.subtitle {
+  font-size: 1.125rem;
+  color: #94a3b8;
+  line-height: 1.6;
+}
+
+.highlight {
+  color: white;
+  font-weight: 700;
+}
+
+.contentWrapper {
+  display: grid;
+  grid-template-columns: 0.8fr 1.2fr;
+  gap: 4rem;
+  align-items: center;
+  position: relative;
+  z-index: 2;
+}
+
+.illustrationCol {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.mainImage {
+  width: 100%;
+  max-width: 450px;
+  height: auto;
+  filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.3));
+}
+
+.benefitsCol {
+  width: 100%;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+.card {
+  background: rgba(30, 41, 59, 0.6); /* Semi-transparent Slate */
+  border: 1px solid rgba(148, 163, 184, 0.1);
+  padding: 2rem;
+  border-radius: 1.5rem;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+}
+
+.card:hover {
+  background: rgba(30, 41, 59, 0.9);
+  transform: translateY(-5px);
+  border-color: rgba(56, 189, 248, 0.3);
+  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.3);
+}
+
+.cardTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.badge {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #38bdf8;
+  background: rgba(56, 189, 248, 0.1);
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+}
+
+.icon {
+  color: white;
+  opacity: 0.9;
+}
+
+.cardTitle {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+  color: white;
+}
+
+.cardDesc {
+  font-size: 0.9375rem;
+  color: #94a3b8;
+  line-height: 1.6;
+}
+
+.footer {
+  text-align: center;
+  margin-top: 5rem;
+  position: relative;
+  z-index: 2;
+}
+
+.footerText {
+  font-size: 1.125rem;
+  color: #cbd5e1;
+  margin-bottom: 2rem;
+}
+
+.cta {
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  color: white;
+  padding: 1.1rem 3rem;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 1.125rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.5);
+  transition: all 0.3s ease;
+}
+
+.cta:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 20px 35px -5px rgba(37, 99, 235, 0.6);
+  filter: brightness(1.1);
+}
+
+@media (max-width: 1024px) {
+  .section {
+    padding: 2rem 0; /* Reduced external padding */
+  }
+
+  .box {
+    padding: 4rem 2rem;
+    border-radius: 2rem;
+  }
+
+  .contentWrapper {
+    grid-template-columns: 1fr;
+    gap: 4rem;
+  }
+
+  .illustrationCol {
+    order: 2; /* Move image below benefits on tablet */
+  }
+
+  .mainImage {
+    max-width: 350px;
+  }
+
+  .grid {
+    gap: 1.25rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .box {
+    padding: 3rem 1.25rem;
+    border-radius: 1.5rem;
+  }
+
+  .title {
+    font-size: 2rem; /* Smaller title on mobile */
+  }
+
+  .newPrice {
+    font-size: 2.5rem;
+  }
+
+  .oldPrice {
+    font-size: 1.5rem;
+  }
+
+  .contentWrapper {
+    gap: 3rem;
+  }
+
+  .grid {
+    grid-template-columns: 1fr; /* Stack cards on mobile */
+    gap: 1.5rem;
+  }
+
+  .card {
+    padding: 1.5rem;
+  }
+
+  .cta {
+    width: 100%;
+    justify-content: center;
+    padding: 1rem 2rem;
+    font-size: 1rem;
+  }
+
+  .mainImage {
+    max-width: 280px; /* Smaller image on mobile */
+  }
+}
