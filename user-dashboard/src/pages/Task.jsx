@@ -28,6 +28,7 @@ const Task = () => {
     const [sortOption, setSortOption] = useState('newest');
     const [activeTab, setActiveTab] = useState('All Task');
     const [expandedTaskId, setExpandedTaskId] = useState(null);
+    const [showFilters, setShowFilters] = useState(false);
 
     useEffect(() => {
         const fetchTasks = async () => {
@@ -170,57 +171,68 @@ const Task = () => {
             <div className="row">
                 {/* Sidebar */}
                 <div className="col-lg-3 mb-4">
-                    <div className="filters-sidebar" style={{ position: 'sticky', top: '100px' }}>
-                        <div className="d-flex justify-content-between align-items-center mb-4">
-                            <h5 className="mb-0 fw-bold text-dark">Filters</h5>
-                            <button
-                                className="btn btn-link p-0 text-decoration-none small text-muted"
-                                style={{ fontSize: '12px' }}
-                                onClick={() => {
-                                    // Reset logic
-                                    setSelectedProfessions({ 'All': true });
-                                    setSelectedTypes({ 'All': true });
-                                }}
-                            >
-                                Clear All
-                            </button>
+                    <div className={`filters-sidebar ${showFilters ? 'expanded' : 'collapsed'}`} style={{ position: 'sticky', top: '100px' }}>
+                        <div className="filters-sidebar-header" onClick={() => setShowFilters(!showFilters)} style={{ cursor: 'pointer' }}>
+                            <div className="d-flex justify-content-between align-items-center mb-0">
+                                <h5 className="mb-0 fw-bold text-dark">
+                                    Filters
+                                    <MdKeyboardArrowDown className={`filter-toggle-icon ${showFilters ? 'rotated' : ''}`} />
+                                </h5>
+                                {showFilters && (
+                                    <button
+                                        className="btn btn-link p-0 text-decoration-none small text-muted"
+                                        style={{ fontSize: '12px' }}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            setSelectedProfessions({ 'All': true });
+                                            setSelectedTypes({ 'All': true });
+                                        }}
+                                    >
+                                        Clear All
+                                    </button>
+                                )}
+                            </div>
                         </div>
 
-                        <div className="filter-group mb-4">
-                            <h6 className="filter-title">Profession</h6>
-                            {Object.keys(selectedProfessions).map(prof => (
-                                <div className="form-check" key={prof}>
-                                    <input
-                                        className="form-check-input"
-                                        type="checkbox"
-                                        id={`prof-${prof}`}
-                                        checked={selectedProfessions[prof]}
-                                        onChange={() => handleProfessionChange(prof)}
-                                    />
-                                    <label className="form-check-label" htmlFor={`prof-${prof}`}>
-                                        {prof}
-                                    </label>
+                        {showFilters && (
+                            <div className="filter-groups-wrapper">
+                                <div className="filter-group mb-4 mt-4">
+                                    <h6 className="filter-title">Profession</h6>
+                                    {Object.keys(selectedProfessions).map(prof => (
+                                        <div className="form-check" key={prof}>
+                                            <input
+                                                className="form-check-input"
+                                                type="checkbox"
+                                                id={`prof-${prof}`}
+                                                checked={selectedProfessions[prof]}
+                                                onChange={() => handleProfessionChange(prof)}
+                                            />
+                                            <label className="form-check-label" htmlFor={`prof-${prof}`}>
+                                                {prof}
+                                            </label>
+                                        </div>
+                                    ))}
                                 </div>
-                            ))}
-                        </div>
 
-                        <div className="filter-group">
-                            <h6 className="filter-title">Type of Task</h6>
-                            {Object.keys(selectedTypes).map(type => (
-                                <div className="form-check" key={type}>
-                                    <input
-                                        className="form-check-input"
-                                        type="checkbox"
-                                        id={`type-${type}`}
-                                        checked={selectedTypes[type]}
-                                        onChange={() => handleTypeChange(type)}
-                                    />
-                                    <label className="form-check-label" htmlFor={`type-${type}`}>
-                                        {type}
-                                    </label>
+                                <div className="filter-group">
+                                    <h6 className="filter-title">Type of Task</h6>
+                                    {Object.keys(selectedTypes).map(type => (
+                                        <div className="form-check" key={type}>
+                                            <input
+                                                className="form-check-input"
+                                                type="checkbox"
+                                                id={`type-${type}`}
+                                                checked={selectedTypes[type]}
+                                                onChange={() => handleTypeChange(type)}
+                                            />
+                                            <label className="form-check-label" htmlFor={`type-${type}`}>
+                                                {type}
+                                            </label>
+                                        </div>
+                                    ))}
                                 </div>
-                            ))}
-                        </div>
+                            </div>
+                        )}
                     </div>
                 </div>
 

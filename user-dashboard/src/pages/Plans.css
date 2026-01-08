@@ -2,9 +2,11 @@
 @import url("https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap");
 
 .plans-page {
-  padding: 40px 20px;
+  padding: 40px 20px 80px;
+  /* Increased bottom padding for desktop */
   background-color: #fcfcfc;
-  min-height: 100vh;
+  min-height: auto;
+  /* Remove 100vh to avoid extra space on mobile */
   font-family: "Outfit", sans-serif;
   color: #333;
 }
@@ -32,11 +34,10 @@
 
 /* Grid Layout */
 .plans-grid {
-  display: flex;
-  justify-content: center;
-  gap: 24px;
-  flex-wrap: wrap;
-  max-width: 1480px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+  max-width: 1400px;
   margin: 0 auto;
 }
 
@@ -50,7 +51,8 @@
   align-items: center;
   text-align: center;
   color: #fff;
-  width: 280px;
+  width: 100%;
+  /* Flexible width within grid */
   min-height: 520px;
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s ease;
@@ -241,21 +243,17 @@
 }
 
 /* Responsive */
-@media (max-width: 1400px) {
-  .plan-card {
-    width: 260px;
-  }
-}
-
 @media (max-width: 1200px) {
   .plans-grid {
-    justify-content: center;
+    grid-template-columns: repeat(2, 1fr);
+    padding: 0 20px;
   }
 }
 
 @media (max-width: 768px) {
   .plans-page {
-    padding: 20px 10px;
+    padding: 20px 10px 40px;
+    /* Reduced bottom padding */
   }
 
   .plans-header {
@@ -274,8 +272,8 @@
   }
 
   .plans-grid {
-    flex-direction: column;
-    align-items: center;
+    grid-template-columns: 1fr;
+    justify-items: center;
     gap: 20px;
   }
 

@@ -7,7 +7,6 @@ import {
     MdCardMembership,
     MdViewList,
     MdAccountBalanceWallet,
-    MdSettings,
     MdLogout
 } from 'react-icons/md';
 import './Sidebar.css';
@@ -47,10 +46,6 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
                     <NavLink to="/wallet" className="nav-item">
                         <MdAccountBalanceWallet className="nav-icon" />
                         <span>Wallet</span>
-                    </NavLink>
-                    <NavLink to="/settings" className="nav-item">
-                        <MdSettings className="nav-icon" />
-                        <span>Settings</span>
                     </NavLink>
                 </div>
 

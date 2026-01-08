@@ -54,8 +54,39 @@
   border-radius: 16px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
   border: 1px solid rgba(0, 0, 0, 0.03);
-  height: 100%;
-  /* Fill column height if needed */
+  height: auto;
+  transition: all 0.3s ease;
+}
+
+.filter-toggle-icon {
+  margin-left: 8px;
+  transition: transform 0.3s ease;
+  font-size: 20px;
+  color: #666;
+}
+
+.filter-toggle-icon.rotated {
+  transform: rotate(180deg);
+}
+
+.filters-sidebar.collapsed {
+  padding: 15px 24px;
+}
+
+.filter-groups-wrapper {
+  animation: fadeInDown 0.3s ease-out;
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .filter-group {
@@ -104,6 +135,41 @@
 }
 
 /* Sort Select */
+.task-header-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.task-tabs {
+  display: flex;
+  background: #eee;
+  padding: 4px;
+  border-radius: 12px;
+  gap: 4px;
+}
+
+.task-tab {
+  border: none;
+  background: transparent;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #666;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.task-tab.active {
+  background: #fff;
+  color: #000;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
 .sort-select {
   padding: 8px 16px;
   border-radius: 50px;
@@ -195,7 +261,7 @@
 .task-right {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 15px;
 }
 
 /* Info Icon & Tooltip */
@@ -260,14 +326,14 @@
 .reward-btn {
   background: #0d6efd;
   color: white;
-  padding: 6px 20px;
-  border-radius: 6px;
+  padding: 8px 24px;
+  border-radius: 8px;
   border: none;
-  font-weight: 600;
-  font-size: 16px;
-  min-width: 90px;
+  font-weight: 700;
+  font-size: 17px;
+  min-width: 110px;
   cursor: pointer;
-  box-shadow: 0 2px 6px rgba(13, 110, 253, 0.15);
+  box-shadow: 0 4px 12px rgba(13, 110, 253, 0.2);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -455,8 +521,24 @@
     gap: 10px;
   }
 
-  .resource-link {
-    flex-wrap: nowrap;
+  .task-header-controls {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .task-tabs {
+    width: 100%;
+  }
+
+  .task-tab {
+    flex: 1;
+    text-align: center;
+    padding: 10px 5px;
+  }
+
+  .sort-select {
+    width: 100%;
   }
 }
 
@@ -478,8 +560,10 @@
   .filters-sidebar {
     padding: 15px;
     margin-bottom: 20px;
-    height: auto; /* Remove sticky height issue if any */
-    position: static !important; /* Force static on mobile */
+    height: auto;
+    /* Remove sticky height issue if any */
+    position: static !important;
+    /* Force static on mobile */
   }
 
   .task-list {

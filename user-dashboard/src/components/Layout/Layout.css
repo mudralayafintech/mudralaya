@@ -1,7 +1,8 @@
 .layout-container {
   display: flex;
   height: 100vh;
-  background-color: #f8f9fa; /* Light grey background */
+  background-color: #f8f9fa;
+  /* Light grey background */
   overflow: hidden;
 }
 
@@ -10,20 +11,23 @@
   display: flex;
   flex-direction: column;
   height: 100%;
-  overflow: hidden; /* Prevent main wrapper from scrolling */
+  overflow: hidden;
+  /* Prevent main wrapper from scrolling */
   position: relative;
 }
 
 .page-content {
   padding: 20px;
   flex: 1;
-  overflow-y: auto; /* Scroll only the content area */
+  overflow-y: auto;
+  /* Scroll only the content area */
 }
 
 @media (max-width: 768px) {
   .page-content {
     padding: 15px;
-    padding-bottom: 80px; /* Add space for bottom nav or just extra scroll space */
+    padding-bottom: 30px;
+    /* Reduced from 80px to remove extra space */
   }
 
   .main-content {

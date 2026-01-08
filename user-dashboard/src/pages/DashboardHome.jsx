@@ -11,6 +11,7 @@ const DashboardHome = () => {
     const { profile, user } = useUser();
     const [data, setData] = useState({ tasks: [], ongoingTask: null, stats: { approved: 0, pending: 0, total: 0 }, transactions: [] });
     const [loading, setLoading] = useState(true);
+    const [showVideoModal, setShowVideoModal] = useState(false);
 
     const fullName = profile?.full_name || 'User';
 
@@ -120,7 +121,7 @@ const DashboardHome = () => {
                     <h1 className="welcome-title">Welcome Back {fullName}</h1>
                     <p className="welcome-subtitle">Start your task to earn!</p>
                 </div>
-                <button className="guidance-btn">
+                <button className="guidance-btn" onClick={() => setShowVideoModal(true)}>
                     <span>Earning Guidance</span>
                     <div className="play-icon-wrapper">
                         <MdPlayArrow />
@@ -284,6 +285,18 @@ const DashboardHome = () => {
                         </div>
                     </div>
                 </div>
+                {/* Video Modal */}
+                {showVideoModal && (
+                    <div className="video-modal-overlay" onClick={() => setShowVideoModal(false)}>
+                        <div className="video-modal-content" onClick={e => e.stopPropagation()}>
+                            <button className="close-modal" onClick={() => setShowVideoModal(false)}>&times;</button>
+                            <video controls autoPlay className="guidance-video">
+                                <source src="/video/earning-guidance.mp4" type="video/mp4" />
+                                Your browser does not support the video tag.
+                            </video>
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );

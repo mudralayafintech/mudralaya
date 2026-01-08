@@ -19,7 +19,8 @@
   border: none;
   font-size: 24px;
   cursor: pointer;
-  display: none; /* Hidden on desktop */
+  display: none;
+  /* Hidden on desktop */
 }
 
 .page-title {
@@ -30,9 +31,8 @@
 }
 
 .header-center {
-  flex: 1;
-  display: flex;
-  justify-content: center;
+  display: none;
+  /* Removed search/center content from header as requested */
 }
 
 .search-bar {
@@ -78,7 +78,8 @@
   background: none;
   border: none;
   font-size: 20px;
-  color: #0284c7; /* Blue color from design */
+  color: #0284c7;
+  /* Blue color from design */
   cursor: pointer;
   position: relative;
   padding: 8px;
@@ -96,7 +97,8 @@
   right: 8px;
   width: 8px;
   height: 8px;
-  background-color: #ef4444; /* Red dot */
+  background-color: #ef4444;
+  /* Red dot */
   border-radius: 50%;
   border: 1px solid #fff;
 }
@@ -139,21 +141,27 @@
 
 @media (max-width: 768px) {
   .dashboard-header {
-    padding: 0 15px;
+    padding: 0 8px;
     height: 60px;
   }
 
   .menu-btn {
     display: block;
-    margin-right: 10px;
+    margin-right: 0;
+    padding: 5px;
+  }
+
+  .header-left {
+    gap: 0;
   }
 
   .page-title {
     font-size: 16px;
+    margin-left: 2px;
   }
 
   .search-bar {
-    display: none; /* Hide search on mobile */
+    display: none;
   }
 
   .header-right {
@@ -161,7 +169,8 @@
   }
 
   .user-info {
-    display: none; /* Hide user name/role on mobile, show only avatar */
+    display: none;
+    /* Hide user name/role on mobile, show only avatar */
   }
 
   .icon-btn {

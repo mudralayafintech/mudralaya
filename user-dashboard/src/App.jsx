@@ -12,7 +12,6 @@ import Task from './pages/Task';
 import Membership from './pages/Membership';
 import Plans from './pages/Plans';
 import Wallet from './pages/Wallet';
-import Settings from './pages/Settings';
 
 function App() {
   return (
@@ -28,7 +27,6 @@ function App() {
             <Route path="membership" element={<Membership />} />
             <Route path="plans" element={<Plans />} />
             <Route path="wallet" element={<Wallet />} />
-            <Route path="settings" element={<Settings />} />
             <Route path="profile" element={<Profile />} />
           </Route>
         </Route>
