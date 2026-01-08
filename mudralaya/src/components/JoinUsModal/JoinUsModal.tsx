@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import Script from "next/script";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   X,
