@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Image from "next/image";
 import { motion } from "framer-motion";
 import { Gift, TrendingUp, Zap, GraduationCap, ArrowRight } from "lucide-react";
 import { useUI } from "@/context/UIContext";
@@ -67,9 +68,11 @@ const MemberBenefits = () => {
                 transition={{ duration: 0.8 }}
                 className={styles.imageWrapper}
               >
-                <img
+                <Image
                   src="/images/benefits.png"
                   alt="Member Benefits"
+                  width={500}
+                  height={350}
                   className={styles.mainImage}
                 />
               </motion.div>

@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X } from "lucide-react";
@@ -18,7 +19,8 @@ const Header = () => {
 
   useEffect(() => {
     const handleScroll = () => {
-      setScrolled(window.scrollY > 50);
+      const isScrolled = window.scrollY > 50;
+      setScrolled((prev) => (prev !== isScrolled ? isScrolled : prev));
     };
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
@@ -43,10 +45,13 @@ const Header = () => {
       <div className="container">
         <nav className={styles.nav}>
           <Link href="/" className={styles.logo}>
-            <img
+            <Image
               src="/images/mudralya_logo.webp"
               alt="Mudralaya"
+              width={160}
+              height={40}
               className={styles.logoImg}
+              priority
             />
           </Link>
 
@@ -123,9 +128,11 @@ const Header = () => {
               className={styles.mobileNav}
             >
               <div className={styles.mobileNavHeader}>
-                <img
+                <Image
                   src="/images/mudralya_logo.webp"
                   alt="Mudralaya"
+                  width={140}
+                  height={35}
                   className={styles.mobileLogo}
                 />
                 <button

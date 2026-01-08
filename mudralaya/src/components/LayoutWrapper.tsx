@@ -1,8 +1,12 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { useUI } from "@/context/UIContext";
-import LoginModal from "./Auth/LoginModal";
-import JoinUsModal from "./JoinUsModal/JoinUsModal";
+
+const LoginModal = dynamic(() => import("./Auth/LoginModal"), { ssr: false });
+const JoinUsModal = dynamic(() => import("./JoinUsModal/JoinUsModal"), {
+  ssr: false,
+});
 
 export default function LayoutWrapper({
   children,
@@ -14,8 +18,8 @@ export default function LayoutWrapper({
   return (
     <>
       {children}
-      <LoginModal />
-      <JoinUsModal />
+      {isLoginModalOpen && <LoginModal />}
+      {isJoinUsModalOpen && <JoinUsModal />}
     </>
   );
 }

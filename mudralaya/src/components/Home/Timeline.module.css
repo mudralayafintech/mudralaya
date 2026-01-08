@@ -101,7 +101,7 @@
 
 @media (max-width: 1024px) {
   .timelineWrapper {
-    padding: 6rem 0;
+    padding: 3rem 0;
   }
 
   .header {
@@ -147,6 +147,7 @@
     opacity: 1 !important;
     scale: 1 !important;
     transform: none !important;
+    left: auto !important; /* Override inline framer-motion styles */
     z-index: 1;
   }
 

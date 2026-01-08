@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap");
+/* Global Styles */
 
 html,
 body {
@@ -9,8 +9,8 @@ body {
 }
 
 :root {
-  --font-primary: "Inter", system-ui, -apple-system, sans-serif;
-  --font-heading: "Outfit", sans-serif;
+  --font-primary: var(--font-inter), system-ui, -apple-system, sans-serif;
+  --font-heading: var(--font-outfit), sans-serif;
 
   /* Colors - Premium Blue/Slate Palette */
   --primary: #2563eb;
@@ -19,6 +19,21 @@ body {
   --accent: #f59e0b;
   --background: #ffffff;
   --foreground: #0f172a;
+
+  /* Animations */
+  --fade-in-up: fadeInUp 0.8s ease-out forwards;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 
   --glass: rgba(255, 255, 255, 0.8);
   --glass-border: rgba(255, 255, 255, 0.2);

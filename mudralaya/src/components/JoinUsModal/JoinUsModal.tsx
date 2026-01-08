@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import Script from "next/script";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   X,
@@ -39,16 +40,7 @@ const JoinUsModal = () => {
     }
   }, [isJoinUsModalOpen, selectedPlan]);
 
-  useEffect(() => {
-    // Load Razorpay Script
-    const script = document.createElement("script");
-    script.src = "https://checkout.razorpay.com/v1/checkout.js";
-    script.async = true;
-    document.body.appendChild(script);
-    return () => {
-      document.body.removeChild(script);
-    };
-  }, []);
+  // Price calculation helpers (removed useEffect script injection)
 
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
@@ -128,10 +120,31 @@ const JoinUsModal = () => {
     setSubmitted(true);
   };
 
+  // Helper to load Razorpay dynamically
+  const loadRazorpay = (): Promise<boolean> => {
+    return new Promise((resolve) => {
+      if ((window as any).Razorpay) {
+        resolve(true);
+        return;
+      }
+      const script = document.createElement("script");
+      script.src = "https://checkout.razorpay.com/v1/checkout.js";
+      script.onload = () => resolve(true);
+      script.onerror = () => resolve(false);
+      document.body.appendChild(script);
+    });
+  };
+
   const handlePayment = async (amount: number, description: string) => {
     setSubmitting(true);
     setSubmitError("");
     try {
+      // 0. Load Razorpay Script
+      const isLoaded = await loadRazorpay();
+      if (!isLoaded) {
+        throw new Error("Razorpay SDK failed to load. Check your connection.");
+      }
+
       // 1. Create Order
       const { data: orderData, error: orderError } =
         await supabase.functions.invoke("razorpay-api", {

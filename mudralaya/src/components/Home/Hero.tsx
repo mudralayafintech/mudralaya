@@ -20,12 +20,7 @@ const Hero = () => {
       <div className="container">
         <div className={styles.grid}>
           {/* Left Content */}
-          <motion.div
-            initial={{ opacity: 0, x: -30 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
-            className={styles.content}
-          >
+          <div className={styles.content}>
             <div className={styles.badge}>
               <CheckCircle2 size={16} className={styles.badgeIcon} />
               <span>100% TRUSTED PLATFORM</span>
@@ -55,7 +50,7 @@ const Hero = () => {
                 Talk to our Advisor
               </Link>
             </div>
-          </motion.div>
+          </div>
 
           {/* Right Image */}
           <motion.div
@@ -65,9 +60,13 @@ const Hero = () => {
             className={styles.imageWrapper}
           >
             <div className={styles.imageInner}>
-              <img
+              <Image
                 src="/images/banner-2.png"
                 alt="Business Professionals"
+                width={650}
+                height={760}
+                quality={85}
+                priority
                 className={styles.image}
               />
               {/* Floating Floating Elements */}

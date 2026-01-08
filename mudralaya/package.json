@@ -8,6 +8,11 @@
     "start": "next start",
     "lint": "eslint"
   },
+  "browserslist": [
+    "defaults",
+    "not ie 11",
+    "not op_mini all"
+  ],
   "dependencies": {
     "@supabase/supabase-js": "^2.90.1",
     "clsx": "^2.1.1",
