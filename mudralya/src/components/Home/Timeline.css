@@ -233,7 +233,7 @@
     scale: 1 !important;
     border-color: #00AD97 !important;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05) !important;
-    padding: 1.25rem !important;
+    padding: 1.5rem !important;
   }
 
   .card-desc {
@@ -247,5 +247,19 @@
 
   .timeline-section {
     padding: 2rem 0 !important;
+  }
+
+  .how-to-join-title {
+    font-size: 2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .how-to-join-title {
+    font-size: 1.75rem;
+  }
+
+  .timeline-card-node {
+    padding: 1.25rem !important;
   }
 }

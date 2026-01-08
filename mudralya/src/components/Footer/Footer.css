@@ -118,19 +118,21 @@
 @media (max-width: 480px) {
   .site-footer {
     text-align: center;
-    padding: 2rem 1rem;
+    padding: 2.5rem 1rem;
   }
 
   .footer-logo-img {
-    height: 80px;
-    margin: 0 auto 1rem;
+    height: 70px;
+    margin: 0 auto 1.5rem;
   }
 
   .social-icon {
-    margin: 0 5px;
+    margin: 0 8px;
   }
 
   .input-group {
     justify-content: center;
+    max-width: 300px;
+    margin: 0 auto;
   }
 }

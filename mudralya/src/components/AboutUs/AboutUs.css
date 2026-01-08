@@ -385,7 +385,7 @@
 @media (max-width: 992px) {
   .about-us-hero-left {
     min-height: auto;
-    padding: 60px 40px;
+    padding: 80px 40px;
   }
 
   .about-us-hero-right {
@@ -405,57 +405,39 @@
   }
 
   .about-us-hero-text {
-    font-size: 1rem;
+    font-size: 1.1rem;
   }
 }
 
 @media (max-width: 768px) {
   .about-us-hero-left {
-    padding: 40px 24px;
+    padding: 60px 24px;
+    background-position: 70% center;
   }
 
   .about-us-hero-title {
-    font-size: 2.5rem;
+    font-size: 2.2rem;
   }
 
   .about-us-hero-subtitle {
-    font-size: 1.2rem;
+    font-size: 1.15rem;
   }
 
   .about-us-hero-text {
     font-size: 0.95rem;
+    margin-bottom: 24px;
   }
 
   .about-us-hero-buttons {
     flex-direction: column;
+    margin-top: 30px;
   }
 
   .btn-about-explore,
   .btn-about-advisor {
     width: 100%;
     text-align: center;
-  }
-
-  .about-us-hero-right {
-    min-height: 400px;
-  }
-
-  .about-us-hero-image-wrapper {
-    height: 400px;
-  }
-}
-
-@media (max-width: 576px) {
-  .about-us-hero-title {
-    font-size: 2rem;
-  }
-
-  .about-us-hero-subtitle {
-    font-size: 1.1rem;
-  }
-
-  .about-us-hero-text {
-    font-size: 0.9rem;
+    padding: 12px 24px;
   }
 
   .about-us-hero-right {
@@ -464,6 +446,34 @@
 
   .about-us-hero-image-wrapper {
     height: 350px;
+  }
+}
+
+@media (max-width: 576px) {
+  .about-us-hero-title {
+    font-size: 1.85rem;
+    margin-bottom: 16px;
+  }
+
+  .about-us-hero-subtitle {
+    font-size: 1.05rem;
+    margin-bottom: 16px;
+  }
+
+  .about-us-hero-text {
+    font-size: 0.95rem;
+  }
+
+  .about-us-hero-right {
+    min-height: 280px;
+  }
+
+  .about-us-hero-image-wrapper {
+    height: 280px;
+  }
+
+  .about-us-hero-left {
+    padding: 50px 20px;
   }
 }
 

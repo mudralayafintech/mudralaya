@@ -61,7 +61,7 @@
 
 .logo-overlay span {
   color: white !important;
-  text-shadow: 1px 1px 3px rgba(0,0,0,0.8);
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.8);
 }
 
 .form-side {
@@ -99,13 +99,15 @@ h2 {
   padding-bottom: 5px;
 }
 
-.form-control, .form-select {
+.form-control,
+.form-select {
   border-radius: 0.5rem;
   padding: 0.65rem 1rem;
   font-size: 0.9rem;
 }
 
-.form-control:focus, .form-select:focus {
+.form-control:focus,
+.form-select:focus {
   box-shadow: 0 0 0 0.25rem rgba(30, 136, 229, 0.25);
   border-color: var(--primary-blue);
 }
@@ -134,7 +136,7 @@ h2 {
   color: white;
 }
 
-.btn-submit:active, 
+.btn-submit:active,
 .btn-submit:focus {
   background-color: #1a71c2 !important;
   border-color: #1a71c2 !important;
@@ -145,7 +147,7 @@ h2 {
   .illustration-side {
     border-radius: var(--card-radius) 0 0 var(--card-radius);
   }
-  
+
   .form-side {
     border-radius: 0 var(--card-radius) var(--card-radius) 0;
   }
@@ -155,16 +157,16 @@ h2 {
   .advisor-page {
     padding: 10px;
   }
-  
+
   .form-side {
     padding: 30px 20px;
   }
-  
+
   .illustration-side {
     min-height: 300px;
     padding: 30px 20px;
   }
-  
+
   .logo-overlay {
     top: 20px;
     left: 20px;
@@ -172,12 +174,39 @@ h2 {
 }
 
 @media (max-width: 576px) {
-  .form-side {
-    padding: 20px 15px;
+  .advisor-card {
+    border-radius: 0.75rem;
   }
-  
+
+  .form-side {
+    padding: 25px 15px;
+  }
+
   h2 {
     font-size: 1.5rem;
   }
+
+  .subtitle {
+    font-size: 0.85rem;
+    margin-bottom: 20px;
+  }
+
+  .section-title {
+    font-size: 0.9rem;
+  }
+
+  .illustration-side {
+    min-height: 200px;
+  }
 }
 
+@media (max-width: 400px) {
+  h2 {
+    font-size: 1.3rem;
+  }
+
+  .btn-submit {
+    padding: 0.6rem 1rem;
+    font-size: 0.85rem;
+  }
+}
