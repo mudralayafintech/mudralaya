@@ -26,8 +26,13 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
   const supabase = createClient();
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
+    // 1. Instant navigation to avoid delay
     router.push("/login");
+
+    // 2. Perform sign out in background
+    await supabase.auth.signOut();
+
+    // 3. Refresh to ensure state is cleared everywhere
     router.refresh();
   };
 
