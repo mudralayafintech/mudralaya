@@ -48,10 +48,6 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
                         <MdAccountBalanceWallet className="nav-icon" />
                         <span>Wallet</span>
                     </NavLink>
-                    <NavLink to="/settings" className="nav-item">
-                        <MdSettings className="nav-icon" />
-                        <span>Settings</span>
-                    </NavLink>
                 </div>
 
                 <div className="nav-section logout-section">

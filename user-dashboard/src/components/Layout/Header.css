@@ -144,12 +144,26 @@
   }
 
   .menu-btn {
-    display: block;
-    margin-right: 10px;
+    display: flex; /* Centering the icon */
+    align-items: center;
+    justify-content: center;
+    margin-right: 8px; /* Slightly increased gap */
+    padding: 4px; /* Touch target */
+    height: 100%; /* Ensure full height alignment if needed, or stick to auto */
+  }
+
+  .header-left {
+    justify-content: flex-start;
+    align-items: center; /* Reinforce vertical centering */
+    gap: 0; /* Handled by margin */
+    flex: 0 1 auto;
+    height: 100%;
   }
 
   .page-title {
     font-size: 16px;
+    line-height: 1; /* Remove excess line-height for better visual centering */
+    padding-top: 2px; /* Optical adjustment if needed */
   }
 
   .search-bar {

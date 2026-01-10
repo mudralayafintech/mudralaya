@@ -428,6 +428,52 @@
   box-shadow: 0 8px 20px rgba(33, 150, 243, 0.4);
 }
 
+/* Header Controls */
+.task-header-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.task-tabs {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 4px; /* Hide scrollbar visual */
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.task-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.task-tab {
+  background: #fff;
+  border: 1px solid #dee2e6;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #6c757d;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s;
+}
+
+.task-tab.active {
+  background: #0d6efd;
+  color: white;
+  border-color: #0d6efd;
+  box-shadow: 0 2px 6px rgba(13, 110, 253, 0.2);
+}
+
+.task-actions {
+  flex-shrink: 0;
+}
+
 /* Responsive */
 @media (max-width: 992px) {
   .filters-sidebar {
@@ -439,15 +485,40 @@
 }
 
 @media (max-width: 768px) {
+  .task-header-controls {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .task-actions {
+    width: 100%;
+  }
+
+  .sort-select {
+    width: 100%; /* Full width sort on mobile */
+  }
+
   .task-card-header {
     flex-direction: column;
     align-items: flex-start;
     gap: 16px;
   }
 
+  /* Refined mobile card layout */
+  .task-left {
+    width: 100%;
+  }
+
+  .task-info {
+    width: 100%;
+  }
+
   .task-right {
     width: 100%;
-    justify-content: space-between;
+    justify-content: flex-end; /* Align price/toggle to right */
+    padding-top: 10px;
+    border-top: 1px solid #f1f3f5; /* Subtle separator */
   }
 
   .reward-pricing {
@@ -484,5 +555,49 @@
 
   .task-list {
     gap: 12px;
+  }
+}
+
+/* Mobile Filter Toggle */
+.btn-mobile-filter {
+  display: none;
+  width: 100%;
+  padding: 12px;
+  background: white;
+  border: 1px solid #e9ecef;
+  border-radius: 12px;
+  margin-bottom: 16px;
+  font-weight: 600;
+  color: #333;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+  cursor: pointer;
+}
+
+@media (max-width: 992px) {
+  .btn-mobile-filter {
+    display: flex; /* Show on mobile/tablet */
+  }
+
+  .filters-sidebar.mobile-hidden {
+    display: none;
+  }
+
+  .filters-sidebar.mobile-visible {
+    display: block;
+    animation: fadeIn 0.3s ease;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }

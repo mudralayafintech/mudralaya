@@ -31,8 +31,9 @@ const Header = ({ toggleSidebar }) => {
                     <MdNotifications />
                     <span className="badge"></span>
                 </button>
-                <button className="icon-btn settings-btn" title="Settings">
-                    <MdSettings />
+                <button className="icon-btn notification-btn">
+                    <MdNotifications />
+                    <span className="badge"></span>
                 </button>
                 <button className="icon-btn help-btn" title="Help">
                     <MdHelp />

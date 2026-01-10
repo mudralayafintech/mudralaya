@@ -29,6 +29,9 @@ const Task = () => {
     const [activeTab, setActiveTab] = useState('All Task');
     const [expandedTaskId, setExpandedTaskId] = useState(null);
 
+    // Mobile Filter State
+    const [isFiltersOpen, setIsFiltersOpen] = useState(false);
+
     useEffect(() => {
         const fetchTasks = async () => {
             try {
@@ -160,6 +163,8 @@ const Task = () => {
         return new Date(b.created_at) - new Date(a.created_at);
     });
 
+
+
     return (
         <div className="task-page">
             <div className="task-search-container">
@@ -170,7 +175,15 @@ const Task = () => {
             <div className="row">
                 {/* Sidebar */}
                 <div className="col-lg-3 mb-4">
-                    <div className="filters-sidebar" style={{ position: 'sticky', top: '100px' }}>
+                    {/* Mobile Filter Toggle */}
+                    <button
+                        className="btn-mobile-filter"
+                        onClick={() => setIsFiltersOpen(!isFiltersOpen)}
+                    >
+                        <FaFilter /> {isFiltersOpen ? 'Hide Filters' : 'Show Filters'}
+                    </button>
+
+                    <div className={`filters-sidebar ${isFiltersOpen ? 'mobile-visible' : 'mobile-hidden'}`} style={{ position: 'sticky', top: '100px' }}>
                         <div className="d-flex justify-content-between align-items-center mb-4">
                             <h5 className="mb-0 fw-bold text-dark">Filters</h5>
                             <button
@@ -253,14 +266,14 @@ const Task = () => {
                                             <h3>{task.title}</h3>
                                             <div className="task-meta">
                                                 <span>{task.category || task.type}</span>
+                                                <div className="info-tooltip-container ms-2" onClick={(e) => e.stopPropagation()}>
+                                                    <FaInfoCircle className="info-icon" style={{ fontSize: '14px', color: '#adb5bd' }} />
+                                                    <span className="info-tooltip-text">{task.performance_info || "You can earn more by your performance"}</span>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                     <div className="task-right">
-                                        <div className="info-tooltip-container">
-                                            <FaInfoCircle className="info-icon" />
-                                            <span className="info-tooltip-text">{task.performance_info || "You can earn more by your performance"}</span>
-                                        </div>
                                         <button className={`reward-btn`}>
                                             ₹ {task.reward_free || task.reward}
                                         </button>

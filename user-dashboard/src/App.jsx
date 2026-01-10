@@ -28,7 +28,6 @@ function App() {
             <Route path="membership" element={<Membership />} />
             <Route path="plans" element={<Plans />} />
             <Route path="wallet" element={<Wallet />} />
-            <Route path="settings" element={<Settings />} />
             <Route path="profile" element={<Profile />} />
           </Route>
         </Route>
