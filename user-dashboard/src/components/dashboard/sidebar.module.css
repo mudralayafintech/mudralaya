@@ -1,0 +1,151 @@
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 260px;
+  background: rgba(
+    255,
+    255,
+    255,
+    0.85
+  ); /* More opaque to hide underlying content */
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+  border-right: 1px solid rgba(255, 255, 255, 0.6);
+  display: flex;
+  flex-direction: column;
+  padding: 30px 0;
+  z-index: 999; /* Maintain high z-index */
+  box-shadow: 1px 0 20px rgba(0, 0, 0, 0.05);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transform: translateX(
+    -100%
+  ); /* Hidden by default to sync with layout closed state */
+}
+
+.sidebar.open {
+  transform: translateX(0);
+}
+
+.sidebarHeader {
+  padding: 0 24px;
+  margin-bottom: 50px;
+  display: flex;
+  justify-content: center;
+}
+
+.sidebarLogo {
+  height: 48px;
+  width: auto;
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1));
+}
+
+.sidebarNav {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 0 16px;
+  gap: 10px;
+}
+
+.navSection {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.navItem {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 20px;
+  color: var(--text-light);
+  border-radius: 16px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  font-weight: 600;
+  font-size: 15px;
+  border: 1px solid transparent;
+  position: relative;
+  /* overflow: hidden; Removed to prevent shadow clipping */
+}
+
+.navItem:hover {
+  background: rgba(255, 255, 255, 0.5);
+  color: var(--primary);
+  transform: translateX(4px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03);
+}
+
+/* Luminous Active State */
+.navItem.active,
+.active {
+  background: linear-gradient(135deg, #fff 0%, #f0f9ff 100%);
+  color: var(--primary);
+  border: 1px solid rgba(37, 99, 235, 0.1);
+  box-shadow: 0 10px 20px -5px rgba(37, 99, 235, 0.15),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.8);
+}
+
+.navItem.active::before,
+.active::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: var(--primary);
+  border-radius: 0 4px 4px 0;
+}
+
+.navIcon {
+  opacity: 0.7;
+  transition: all 0.3s;
+}
+
+.navItem.active .navIcon,
+.active .navIcon {
+  opacity: 1;
+  color: var(--primary);
+  transform: scale(1.1);
+  filter: drop-shadow(0 2px 5px rgba(37, 99, 235, 0.3));
+}
+
+.logoutSection {
+  margin-top: auto;
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+  padding-top: 20px;
+}
+
+.logoutBtn {
+  color: var(--error);
+  cursor: pointer;
+}
+
+.logoutBtn:hover {
+  background: #fef2f2;
+  color: #ef4444;
+  border-color: #fecaca;
+}
+
+/* Mobile Overlay */
+.mobileOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 998; /* Below sidebar (999) but above content */
+  display: none; /* Default hidden on desktop */
+}
+
+/* Mobile Styles */
+@media (max-width: 768px) {
+  /* Sidebar uses same transform logic as desktop now */
+
+  .mobileOverlay {
+    display: block; /* Show only on mobile when rendered */
+  }
+}

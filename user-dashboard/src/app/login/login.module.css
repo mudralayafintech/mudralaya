@@ -1,0 +1,400 @@
+/* Wrapper with Gradient Background */
+.loginWrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #020024 0%, #090979 35%, #00d4ff 100%);
+  padding: 1rem;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Decorative Blobs for Glass Effect */
+.blob1,
+.blob2,
+.blob3 {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  z-index: 0;
+  opacity: 0.6;
+  animation: float 10s infinite alternate;
+}
+
+.blob1 {
+  top: -10%;
+  left: -10%;
+  width: 500px;
+  height: 500px;
+  background: #ff00cc;
+  animation-delay: 0s;
+}
+
+.blob2 {
+  bottom: -10%;
+  right: -10%;
+  width: 400px;
+  height: 400px;
+  background: #3333ff;
+  animation-delay: -2s;
+}
+
+.blob3 {
+  top: 50%;
+  left: 50%;
+  width: 300px;
+  height: 300px;
+  background: #00ffcc;
+  transform: translate(-50%, -50%);
+  animation-delay: -5s;
+}
+
+/* Glass Container */
+.loginContainer {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  padding: 3.5rem;
+  border-radius: 24px;
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  width: 100%;
+  max-width: 450px;
+  text-align: center;
+  position: relative;
+  z-index: 10;
+  color: #fff;
+}
+
+/* Header */
+.loginHeader {
+  margin-bottom: 2.5rem;
+}
+
+.logo {
+  height: 60px;
+  width: auto;
+  margin-bottom: 1.5rem;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1));
+}
+
+.loginHeader h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  color: #fff;
+  letter-spacing: -0.5px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  background: linear-gradient(to right, #fff, #b3e5fc);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.loginHeader p {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 1rem;
+  font-weight: 300;
+  letter-spacing: 0.5px;
+}
+
+/* Inputs */
+.inputGroup {
+  position: relative;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: stretch;
+  transition: transform 0.2s;
+}
+
+.inputGroup:focus-within {
+  transform: scale(1.02);
+}
+
+.phonePrefix {
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-right: none;
+  border-radius: 12px 0 0 12px;
+  padding: 0 1rem;
+  display: flex;
+  align-items: center;
+  color: #fff;
+  font-weight: 600;
+  font-size: 1rem;
+  backdrop-filter: blur(5px);
+}
+
+.inputIcon {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 1.1rem;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.inputGroup input {
+  width: 100%;
+  padding: 1.1rem;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  font-size: 1rem;
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(5px);
+}
+
+.inputGroup input::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.inputGroup:has(.phonePrefix) input {
+  border-radius: 0 12px 12px 0;
+  padding-left: 0.8rem;
+}
+
+.inputGroup:has(.inputIcon) input {
+  padding-left: 3rem;
+}
+
+.inputGroup input:focus {
+  outline: none;
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.5);
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
+}
+
+/* Primary Button */
+.btnPrimary {
+  width: 100%;
+  background: linear-gradient(90deg, #00d2ff 0%, #3a7bd5 100%);
+  color: white;
+  padding: 1rem;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.8rem;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 15px rgba(0, 210, 255, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+.btnPrimary::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+  transition: 0.5s;
+}
+
+.btnPrimary:hover:not(:disabled)::before {
+  left: 100%;
+}
+
+.btnPrimary:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 210, 255, 0.5);
+}
+
+.btnPrimary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background: #333;
+}
+
+/* Secondary Actions */
+.btnText {
+  background: none;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.9rem;
+  margin-top: 1.5rem;
+  padding: 0.5rem 1rem;
+  border: 1px solid transparent;
+  border-radius: 20px;
+  transition: all 0.2s;
+}
+
+.btnText:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Error Message */
+.errorMessage {
+  background: rgba(220, 38, 38, 0.2);
+  border: 1px solid rgba(220, 38, 38, 0.5);
+  color: #ffcccc;
+  padding: 0.8rem;
+  border-radius: 12px;
+  margin-bottom: 1.5rem;
+  font-size: 0.9rem;
+  backdrop-filter: blur(5px);
+  animation: shake 0.4s ease-in-out;
+}
+
+/* Animations */
+@keyframes float {
+  0% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+  100% {
+    transform: translate(30px, 20px) rotate(10deg);
+  }
+}
+
+@keyframes shake {
+  10%,
+  90% {
+    transform: translate3d(-1px, 0, 0);
+  }
+  20%,
+  80% {
+    transform: translate3d(2px, 0, 0);
+  }
+  30%,
+  50%,
+  70% {
+    transform: translate3d(-4px, 0, 0);
+  }
+  40%,
+  60% {
+    transform: translate3d(4px, 0, 0);
+  }
+}
+
+.spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* OTP Info */
+.otpSentInfo {
+  margin-bottom: 2rem;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 1rem;
+  border-radius: 12px;
+}
+
+.otpSentText {
+  color: #fff;
+  font-size: 1rem;
+  margin-bottom: 0.25rem;
+}
+
+.otpDeliveryHint {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.85rem;
+}
+
+.otpSentText strong {
+  color: #00d2ff;
+  font-weight: 600;
+}
+
+.otpActions {
+  display: flex;
+  justify-content: center;
+  margin-top: 1rem;
+  min-height: 24px;
+}
+
+.timerText {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.95rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.resendBtn {
+  margin-top: 0;
+  color: #00d2ff;
+  font-weight: 600;
+}
+
+/* Verified Success */
+.verifiedSuccess {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 0;
+  animation: scaleUp 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.successIcon {
+  color: #00ffcc;
+  margin-bottom: 1.5rem;
+  filter: drop-shadow(0 0 10px rgba(0, 255, 204, 0.5));
+  transform: scale(1.5);
+}
+
+.verifiedSuccess h2 {
+  color: #fff;
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.verifiedSuccess p {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+@keyframes scaleUp {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Footer */
+.loginFooter {
+  margin-top: 2.5rem;
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .loginContainer {
+    padding: 2rem 1.5rem;
+    margin: 1rem;
+  }
+
+  .loginHeader h1 {
+    font-size: 1.8rem;
+  }
+
+  .blob1,
+  .blob2,
+  .blob3 {
+    opacity: 0.4;
+  }
+}

@@ -1,0 +1,503 @@
+/* Layout & Container */
+.dashboardHome {
+  padding: 0;
+  max-width: 1400px;
+  margin: 0 auto;
+  color: var(--text-main);
+}
+
+/* Spinner */
+.spinner {
+  animation: spin 1s linear infinite;
+  color: var(--primary);
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Welcome Section - "Holographic Card" Style */
+.welcomeSection {
+  /* Iridescent Gradient */
+  background: linear-gradient(120deg, #84fab0 0%, #8fd3f4 100%);
+  border-radius: 30px;
+  padding: 35px 40px;
+  margin-bottom: 35px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #0f172a;
+  box-shadow: 0 20px 40px -10px rgba(132, 250, 176, 0.3),
+    inset 0 2px 0 rgba(255, 255, 255, 0.4);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Abstract overlay shapes for texture */
+.welcomeSection::before {
+  content: "";
+  position: absolute;
+  top: -50%;
+  right: -20%;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.4) 0%,
+    transparent 70%
+  );
+  border-radius: 50%;
+  z-index: 1;
+}
+
+.welcomeTitle {
+  font-size: 28px;
+  font-weight: 800;
+  margin-bottom: 8px;
+  color: #0f172a;
+  position: relative;
+  z-index: 2;
+  text-shadow: 0 2px 0 rgba(255, 255, 255, 0.2);
+}
+
+.welcomeSubtitle {
+  color: rgba(15, 23, 42, 0.7);
+  font-size: 16px;
+  position: relative;
+  font-weight: 600;
+  z-index: 2;
+}
+
+.guidanceBtn {
+  background: rgba(255, 255, 255, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  color: #0f172a;
+  padding: 12px 28px;
+  border-radius: 50px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 15px;
+  font-weight: 700;
+  transition: all 0.3s;
+  backdrop-filter: blur(10px);
+  position: relative;
+  z-index: 2;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+.guidanceBtn:hover {
+  background: #fff;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.playIconWrapper {
+  width: 28px;
+  height: 28px;
+  background: #0f172a;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.guidanceBtn:hover .playIconWrapper {
+  background: var(--primary);
+}
+
+/* Stats Grid */
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 25px;
+  margin-bottom: 35px;
+}
+
+.statCard {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(20px);
+  border: 1px solid #fff;
+  border-radius: 26px;
+  padding: 26px;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.05),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.5);
+}
+
+.statCard:hover {
+  transform: translateY(-8px);
+  background: #fff;
+  box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.1),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.8);
+}
+
+.statHeader {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  color: var(--text-light);
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+}
+
+.statContent {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.statValue {
+  font-size: 32px;
+  font-weight: 800;
+  /* Gradient Text for Numbers */
+  background: linear-gradient(135deg, #0f172a 0%, #334155 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.statIconBg {
+  width: 56px;
+  height: 56px;
+  border-radius: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.statCard:hover .statIconBg {
+  transform: scale(1.1) rotate(5deg);
+}
+
+/* New Vibrant Icon Colors */
+.iconMoneyHand {
+  background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+  color: #059669;
+  box-shadow: 0 4px 10px rgba(16, 185, 129, 0.2);
+}
+.iconGraph {
+  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+  color: #2563eb;
+  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.2);
+}
+.iconWallet {
+  background: linear-gradient(135deg, #f3e8ff 0%, #e9d5ff 100%);
+  color: #9333ea;
+  box-shadow: 0 4px 10px rgba(147, 51, 234, 0.2);
+}
+
+/* Dashboard Main Grid columns */
+.dashboardGrid {
+  display: grid;
+  grid-template-columns: 400px 1fr;
+  gap: 30px;
+}
+
+.dashboardColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+/* Dashboard Card Generic */
+.dashboardCard {
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid #fff;
+  border-radius: 26px;
+  padding: 30px;
+  box-shadow: var(--card-shadow);
+  backdrop-filter: blur(20px);
+}
+
+.fullHeight {
+  flex: 1;
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 25px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid var(--input-border);
+}
+
+.cardHeader h3 {
+  font-size: 18px;
+  color: var(--text-main);
+  margin: 0;
+  font-weight: 700;
+}
+
+/* Ongoing Task Card */
+.ongoingTaskCard {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+}
+
+.taskInfoRow {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.taskIconCircle {
+  width: 60px;
+  height: 60px;
+  border-radius: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 26px;
+  flex-shrink: 0;
+  box-shadow: 0 8px 20px -5px rgba(0, 0, 0, 0.15);
+}
+
+.blueGradient {
+  background: linear-gradient(135deg, #60a5fa, #3b82f6);
+}
+
+.purpleGradient {
+  background: linear-gradient(135deg, #c084fc, #9333ea);
+}
+
+.taskDetails h4 {
+  font-size: 17px;
+  margin: 0 0 6px 0;
+  color: var(--text-main);
+  line-height: 1.4;
+  font-weight: 700;
+}
+
+.taskDetails p {
+  font-size: 13px;
+  margin: 0;
+  color: var(--text-light);
+  font-weight: 600;
+  background: rgba(0, 0, 0, 0.05); /* subtle Pill background */
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 6px;
+}
+
+.expandIcon {
+  margin-left: auto;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.2s;
+  background: #f1f5f9;
+  padding: 4px;
+  border-radius: 50%;
+}
+
+.expandIcon:hover {
+  color: var(--primary);
+  background: #e2e8f0;
+}
+
+.taskRewardsRow {
+  background: linear-gradient(to right, #f8fafc, #f1f5f9);
+  padding: 20px;
+  border-radius: 18px;
+  border: 1px solid #e2e8f0;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.02);
+}
+
+.taskRewardsRow > span {
+  display: block;
+  font-size: 12px;
+  color: var(--text-light);
+  font-weight: 700;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+  letter-spacing: 0.5px;
+}
+
+.rewards {
+  display: flex;
+  justify-content: space-between;
+}
+
+.rewardItem {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.badgeLabel {
+  font-size: 11px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  text-transform: uppercase;
+  font-weight: 800;
+  display: inline-block;
+}
+
+.member {
+  background: #fefce8;
+  color: #ca8a04;
+  border: 1px solid #fef08a;
+}
+.free {
+  background: #eff6ff;
+  color: #2563eb;
+  border: 1px solid #bfdbfe;
+}
+
+.amount {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--text-main);
+}
+
+.taskActionsRow {
+  display: flex;
+  gap: 15px;
+}
+
+.btnViewDetails {
+  flex: 1;
+  background: #fff;
+  border: 1px solid var(--input-border);
+  color: var(--text-main);
+  padding: 14px;
+  border-radius: 14px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.03);
+}
+
+.btnViewDetails:hover {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+  transform: translateY(-2px);
+}
+
+.btnCopyCode {
+  flex: 1;
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  border: none;
+  color: #fff;
+  padding: 14px;
+  border-radius: 14px;
+  font-size: 14px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  box-shadow: 0 10px 20px -5px rgba(37, 99, 235, 0.4);
+  transition: all 0.2s;
+}
+
+.btnCopyCode:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 15px 30px -5px rgba(37, 99, 235, 0.5);
+}
+
+/* Tasks Grid List */
+.tasksList {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.taskListItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #fff;
+  padding: 18px;
+  border-radius: 20px;
+  border: 1px solid transparent;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 15px -3px rgba(0, 0, 0, 0.05);
+}
+
+.taskListItem:hover {
+  border-color: #bfdbfe;
+  transform: scale(1.02);
+  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+}
+
+.taskItemLeft {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.btnPrimary {
+  background: #eff6ff;
+  color: var(--primary);
+  padding: 10px 24px;
+  border-radius: 12px;
+  border: 1px solid rgba(37, 99, 235, 0.1);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btnPrimary:hover {
+  background: var(--primary);
+  color: #fff;
+  box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
+}
+
+.btnSuccess {
+  background: #ecfdf5;
+  color: #10b981;
+  border: none;
+  padding: 10px 24px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: default;
+}
+
+/* Empty State */
+.emptyState {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100px;
+  color: var(--text-muted);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+  .dashboardGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboardHome {
+    padding: 0;
+  }
+
+  .statsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .welcomeSection {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+  }
+}

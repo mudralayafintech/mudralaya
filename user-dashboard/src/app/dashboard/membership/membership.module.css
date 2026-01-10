@@ -1,0 +1,190 @@
+.membershipPage {
+  padding: 40px;
+  min-height: 100vh;
+  color: var(--text-main);
+}
+
+.membershipHeader {
+  text-align: center;
+  margin-bottom: 50px;
+}
+
+.membershipHeader h1 {
+  font-size: 42px;
+  background: linear-gradient(to right, #2563eb, #7c3aed);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 10px;
+}
+
+.subtitle {
+  color: var(--text-light);
+  font-size: 18px;
+}
+
+/* Toggle */
+.planToggle {
+  background: #f1f5f9;
+  border: 1px solid var(--input-border);
+  padding: 6px;
+  border-radius: 40px;
+  display: inline-flex;
+  margin-top: 30px;
+}
+
+.toggleOption {
+  padding: 12px 30px;
+  border-radius: 30px;
+  background: transparent;
+  color: var(--text-light);
+  border: none;
+  font-weight: 500;
+  transition: all 0.3s;
+}
+
+.toggleOption.active {
+  background: #fff;
+  color: #000;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  font-weight: 700;
+}
+
+/* Content */
+.membershipContent {
+  display: flex;
+  justify-content: center;
+  gap: 60px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+/* Golden Card */
+.goldenCard {
+  width: 400px;
+  height: 250px;
+  background: linear-gradient(135deg, #ffd700 0%, #b8860b 100%);
+  border-radius: 24px;
+  padding: 30px;
+  position: relative;
+  box-shadow: 0 20px 50px rgba(184, 134, 11, 0.3),
+    0 10px 20px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  color: #4a3b00;
+  overflow: hidden;
+  transform-style: preserve-3d;
+  transition: transform 0.5s;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+.goldenCard:hover {
+  transform: rotateY(10deg) rotateX(10deg);
+}
+
+/* Benefits */
+.benefitsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+  max-width: 600px;
+}
+
+.benefitCard {
+  background: #fff;
+  border: 1px solid var(--input-border);
+  padding: 24px;
+  border-radius: 20px;
+  transition: all 0.3s;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.02);
+}
+
+.benefitCard:hover {
+  border-color: var(--primary-light);
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.05);
+}
+
+.benefitNumberBox {
+  color: var(--primary);
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+.benefitTitle {
+  font-size: 18px;
+  color: var(--text-main);
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.benefitDesc {
+  font-size: 14px;
+  color: var(--text-light);
+  line-height: 1.5;
+}
+
+/* Footer */
+.membershipFooter {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #fff;
+  border: 1px solid var(--input-border);
+  padding: 16px 32px;
+  border-radius: 50px;
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  z-index: 100;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+}
+
+.priceAmount {
+  color: var(--primary);
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.buyBtn {
+  background: linear-gradient(90deg, #2563eb 0%, #7c3aed 100%);
+  color: white;
+  border: none;
+  padding: 12px 30px;
+  border-radius: 30px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
+}
+
+.buyBtn:hover {
+  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
+  transform: scale(1.05);
+}
+
+/* Mobile */
+@media (max-width: 992px) {
+  .membershipContent {
+    flex-direction: column;
+  }
+
+  .membershipFooter {
+    width: 90%;
+    justify-content: space-between;
+  }
+}
+
+@media (max-width: 576px) {
+  .benefitsGrid {
+    grid-template-columns: 1fr;
+  }
+  .goldenCard {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1.6;
+  }
+}
