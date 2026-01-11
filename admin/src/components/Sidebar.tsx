@@ -10,6 +10,7 @@ import {
   Briefcase,
   CheckSquare,
   LogOut,
+  Users,
 } from "lucide-react";
 import styles from "./Sidebar.module.css";
 import clsx from "clsx";
@@ -45,6 +46,12 @@ const navItems = [
     path: "/dashboard/tasks",
     icon: CheckSquare,
     label: "Task Manager",
+  },
+  {
+    id: "clients",
+    path: "/dashboard/clients",
+    icon: Users,
+    label: "Clients",
   },
 ];
 

@@ -168,8 +168,9 @@ const JoinUsModal = () => {
         key: orderData.keyId,
         amount: orderData.amount,
         currency: orderData.currency,
-        name: "Mudralaya Fintech",
+        name: "Mudralaya Fintech Private Limited",
         description: description,
+        image: "/images/mudralya_logo.webp", // Ensure logo is passed
         order_id: orderData.id,
         handler: async function (response: any) {
           // 3. Verify Payment
