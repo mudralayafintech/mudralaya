@@ -48,14 +48,23 @@ const Footer = () => {
               All rights reserved.
             </p>
             <div className={styles.socials}>
-              <a href="#" className={styles.socialIcon} aria-label="Instagram">
+              <a
+                href="https://www.instagram.com/mudralaya?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw=="
+                className={styles.socialIcon}
+                aria-label="Instagram"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
                 <Instagram size={20} />
               </a>
-              <a href="#" className={styles.socialIcon} aria-label="LinkedIn">
+              <a
+                href="https://www.linkedin.com/company/mudralaya/posts/?feedView=all"
+                className={styles.socialIcon}
+                aria-label="LinkedIn"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
                 <Linkedin size={20} />
-              </a>
-              <a href="#" className={styles.socialIcon} aria-label="Twitter">
-                <Twitter size={20} />
               </a>
               <a href="#" className={styles.socialIcon} aria-label="YouTube">
                 <Youtube size={20} />
@@ -86,7 +95,7 @@ const Footer = () => {
               <h6 className={styles.title}>Support</h6>
               <ul className={styles.list}>
                 <li>
-                  <Link href="#help">Help Center</Link>
+                  <Link href="/contact">Help Center</Link>
                 </li>
                 <Link href="/terms-of-service">Terms of Service</Link>
                 <li>
