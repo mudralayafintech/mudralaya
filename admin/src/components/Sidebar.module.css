@@ -20,32 +20,33 @@
 /* Header */
 .header {
   display: flex;
+  justify-content: center; /* Center the logo */
   align-items: center;
-  gap: 1rem;
-  padding-bottom: 2rem;
   margin-bottom: 1rem;
   border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 .logo {
-  width: 40px;
-  height: 40px;
+  width: 120px; /* Bigger logo */
+  height: auto;
   object-fit: contain;
 }
 
+/* Brand text removed, style no longer needed but kept for safety or reuse */
 .brand {
-  font-size: 1.25rem;
-  font-weight: 800;
-  background: var(--primary-gradient);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  letter-spacing: -0.02em;
+  display: none;
 }
 
 /* Nav */
 .nav {
   flex: 1;
   overflow-y: auto;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+.nav::-webkit-scrollbar {
+  display: none;
 }
 
 .navList {
@@ -173,15 +174,36 @@
   display: none;
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.1);
-  backdrop-filter: blur(4px);
+  background: rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(8px);
   z-index: 40;
   transition: opacity 0.3s;
+}
+
+.closeBtn {
+  display: none;
+  background: transparent;
+  border: none;
+  color: var(--text-light);
+  cursor: pointer;
+  padding: 0.5rem;
+  transition: color 0.2s;
 }
 
 @media (max-width: 992px) {
   .sidebar {
     transform: translateX(-100%);
+    /* Enhanced Glassmorphism for mobile */
+    background: rgba(
+      255,
+      255,
+      255,
+      0.874
+    ); /* More visible but still translucent */
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-right: 1px solid rgba(255, 255, 255, 0.4);
+    box-shadow: 10px 0 30px rgba(0, 0, 0, 0.1);
   }
 
   .sidebar.mobileOpen {
@@ -190,5 +212,29 @@
 
   .mobileOverlay.active {
     display: block;
+  }
+
+  .header {
+    justify-content: center;
+    position: relative;
+    width: 100%; /* Ensure full width for absolute positioning */
+  }
+
+  .closeBtn {
+    display: flex !important; /* Force display */
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(0, 0, 0, 0.05); /* Darker bg for visibility */
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    color: #333333; /* Explicit dark color */
+    z-index: 60; /* High z-index */
+    cursor: pointer;
+    border: 1px solid rgba(0, 0, 0, 0.1);
   }
 }

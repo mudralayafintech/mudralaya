@@ -5,6 +5,8 @@ import Sidebar from "./Sidebar";
 import styles from "./DashboardShell.module.css";
 import { Menu } from "lucide-react";
 import TopHeader from "./TopHeader";
+import { usePathname } from "next/navigation";
+import { createClient } from "@/utils/supabase/client";
 
 export default function DashboardShell({
   children,
@@ -12,16 +14,32 @@ export default function DashboardShell({
   children: React.ReactNode;
 }) {
   const [isMobileOpen, setIsMobileOpen] = useState(false);
+  const pathname = usePathname();
+
+  const getPageTitle = (path: string) => {
+    if (path.includes("/dashboard/join")) return "Join Requests";
+    if (path.includes("/dashboard/contacts")) return "Messages";
+    if (path.includes("/dashboard/advisor")) return "Advisors";
+    if (path.includes("/dashboard/tasks")) return "Task Manager";
+    return "Overview";
+  };
 
   const toggleMobileSidebar = () => setIsMobileOpen(!isMobileOpen);
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    try {
+      const supabase = createClient();
+      await supabase.auth.signOut();
+    } catch (e) {
+      console.error("Logout error:", e);
+    }
+
     // 1. Clear sensitive data
     localStorage.removeItem("adminToken");
     localStorage.removeItem("adminUser");
     localStorage.removeItem("admin-storage");
 
-    // 2. Clear cookies if any (just in case Supabase helpers set them)
+    // 2. Clear cookies
     document.cookie.split(";").forEach((c) => {
       document.cookie = c
         .replace(/^ +/, "")
@@ -45,7 +63,7 @@ export default function DashboardShell({
           <button className={styles.menuBtn} onClick={toggleMobileSidebar}>
             <Menu size={24} />
           </button>
-          <span className={styles.mobileBrand}>Mudralaya Admin</span>
+          <span className={styles.mobileBrand}>{getPageTitle(pathname)}</span>
         </div>
 
         <TopHeader />

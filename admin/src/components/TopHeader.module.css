@@ -105,11 +105,8 @@
   color: var(--text-light);
 }
 
-@media (max-width: 768px) {
+@media (max-width: 992px) {
   .header {
-    padding: 1rem;
-  }
-  .adminInfo {
     display: none;
   }
 }

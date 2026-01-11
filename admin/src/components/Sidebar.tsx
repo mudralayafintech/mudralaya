@@ -10,6 +10,8 @@ import {
   Briefcase,
   CheckSquare,
   LogOut,
+  X,
+  ShieldCheck,
 } from "lucide-react";
 import styles from "./Sidebar.module.css";
 import clsx from "clsx";
@@ -46,6 +48,12 @@ const navItems = [
     icon: CheckSquare,
     label: "Task Manager",
   },
+  {
+    id: "kyc",
+    path: "/dashboard/kyc",
+    icon: ShieldCheck,
+    label: "KYC Requests",
+  },
 ];
 
 export default function Sidebar({
@@ -72,7 +80,9 @@ export default function Sidebar({
             alt="Mudralaya"
             className={styles.logo}
           />
-          <span className={styles.brand}>Admin Panel</span>
+          <button className={styles.closeBtn} onClick={toggleMobileSidebar}>
+            <X size={24} />
+          </button>
         </div>
 
         <nav className={styles.nav}>
