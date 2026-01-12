@@ -18,7 +18,7 @@ export async function updateSession(request: NextRequest) {
           return request.cookies.getAll()
         },
         setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) => {
+          cookiesToSet.forEach(({ name, value }) => {
             request.cookies.set(name, value)
           })
           response = NextResponse.next({
@@ -29,10 +29,10 @@ export async function updateSession(request: NextRequest) {
           cookiesToSet.forEach(({ name, value, options }) => {
             response.cookies.set(name, value, {
                 ...options,
-                domain: '.mudralaya.com',
+                domain: process.env.NODE_ENV === 'production' ? '.mudralaya.com' : undefined,
                 path: '/',
                 sameSite: 'lax',
-                secure: true,
+                secure: process.env.NODE_ENV === 'production',
             })
           })
         },

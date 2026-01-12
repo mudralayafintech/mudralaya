@@ -3,60 +3,62 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--bg-gradient);
-  background-size: 200% 200%;
-  animation: aurora 20s ease infinite;
-}
-
-@keyframes aurora {
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
+  background: linear-gradient(135deg, #f0fdf4 0%, #ffffff 100%);
+  padding: 1rem;
 }
 
 .card {
   width: 100%;
-  max-width: 400px;
-  padding: 2.5rem;
-  background: rgba(255, 255, 255, 0.75);
-  backdrop-filter: blur(20px);
-  border: 1px solid white;
+  max-width: 440px;
+  background: white;
   border-radius: 24px;
-  box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  padding: 3rem 2.5rem;
+  animation: slideUp 0.5s ease-out;
 }
 
 .header {
   text-align: center;
-  margin-bottom: 2rem;
+  margin-bottom: 2.5rem;
 }
 
 .logo {
   height: 48px;
-  margin-bottom: 1rem;
+  width: auto;
+  margin-bottom: 1.5rem;
 }
 
 .title {
-  font-size: 1.5rem;
+  font-size: 1.75rem;
   font-weight: 700;
-  color: var(--text-main);
+  color: #0f172a;
   margin-bottom: 0.5rem;
+  letter-spacing: -0.02em;
 }
 
 .subtitle {
-  color: var(--text-light);
+  color: #64748b;
+  font-size: 0.95rem;
+}
+
+.error {
+  background: #fef2f2;
+  color: #dc2626;
+  padding: 0.75rem 1rem;
+  border-radius: 12px;
   font-size: 0.875rem;
+  margin-bottom: 1.5rem;
+  border: 1px solid #fee2e2;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .form {
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
+  gap: 1.5rem;
 }
 
 .inputGroup {
@@ -66,46 +68,90 @@
 }
 
 .label {
-  font-size: 0.75rem;
-  font-weight: 700;
-  color: var(--text-light);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #334155;
+  margin-left: 0.25rem;
+}
+
+.inputWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.inputIcon {
+  position: absolute;
+  left: 1rem;
+  color: #94a3b8;
+  pointer-events: none;
 }
 
 .input {
-  padding: 0.75rem 1rem;
-  border-radius: 12px;
-  border: 1px solid var(--input-border);
-  background: rgba(255, 255, 255, 0.8);
-  font-size: 0.95rem;
+  width: 100%;
+  padding: 0.875rem 1rem;
+  border-radius: 14px;
+  border: 1px solid #e2e8f0;
+  font-size: 1rem;
+  color: #0f172a;
   transition: all 0.2s;
+  background: #f8fafc;
 }
 
-.input:focus {
+.inputWithIcon {
+  width: 100%;
+  padding: 0.875rem 1rem 0.875rem 3rem; /* Extra padding left for icon */
+  border-radius: 14px;
+  border: 1px solid #e2e8f0;
+  font-size: 1rem;
+  color: #0f172a;
+  transition: all 0.2s;
+  background: #f8fafc;
+}
+
+.input:focus,
+.inputWithIcon:focus {
   outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px var(--input-focus-ring);
-  transform: translateY(-1px);
+  border-color: #10b981;
+  background: white;
+  box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1);
+}
+
+.togglePassword {
+  position: absolute;
+  right: 1rem;
+  background: none;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  transition: color 0.2s;
+}
+
+.togglePassword:hover {
+  color: #64748b;
 }
 
 .button {
-  margin-top: 0.5rem;
-  padding: 0.875rem;
-  border-radius: 12px;
-  background: var(--primary-gradient);
-  color: white;
+  margin-top: 1rem;
+  width: 100%;
+  padding: 1rem;
+  border-radius: 14px;
   border: none;
-  font-weight: 600;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
   font-size: 1rem;
-  transition: all 0.3s;
-  position: relative;
-  overflow: hidden;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
 }
 
-.button:hover {
+.button:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 10px 20px -5px rgba(37, 99, 235, 0.4);
+  box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3);
 }
 
 .button:disabled {
@@ -114,12 +160,13 @@
   transform: none;
 }
 
-.error {
-  background: rgba(239, 68, 68, 0.1);
-  color: var(--error);
-  padding: 0.75rem;
-  border-radius: 8px;
-  font-size: 0.875rem;
-  text-align: center;
-  border: 1px solid rgba(239, 68, 68, 0.2);
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }

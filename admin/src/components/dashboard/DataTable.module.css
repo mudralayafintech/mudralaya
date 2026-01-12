@@ -89,12 +89,17 @@
 .tableContainer {
   overflow-x: auto;
   padding-bottom: 1rem; /* Space for shadows */
+  -webkit-overflow-scrolling: touch; /* Smooth scroll on iOS */
+  margin: 0 -1rem; /* Negative margin to let it bleed to edges on small screens */
+  padding: 0 1rem 1rem 1rem; /* Add padding back to keep content aligned */
+  width: calc(100% + 2rem);
 }
 
 .table {
   width: 100%;
   border-collapse: separate;
   border-spacing: 0 12px; /* Vertical gap between rows */
+  min-width: 800px; /* Force min width to ensure proper spacing on scroll */
 }
 
 /* Headers */

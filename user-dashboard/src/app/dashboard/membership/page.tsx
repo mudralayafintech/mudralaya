@@ -108,10 +108,9 @@ export default function Membership() {
         key: orderData.keyId,
         amount: orderData.amount,
         currency: orderData.currency,
-        name: "Mudralaya Fintech",
-        description: `${
-          billingCycle === "yearly" ? "Yearly" : "Monthly"
-        } Membership`,
+        name: "Mudralaya Fintech Private Limited",
+        description: `${billingCycle === "yearly" ? "Yearly" : "Monthly"
+          } Membership`,
         image: "/logo.png",
         order_id: orderData.id,
         handler: async function (response: any) {
@@ -206,17 +205,15 @@ export default function Membership() {
 
         <div className={styles.planToggle}>
           <button
-            className={`${styles.toggleOption} ${
-              billingCycle === "yearly" ? styles.active : ""
-            }`}
+            className={`${styles.toggleOption} ${billingCycle === "yearly" ? styles.active : ""
+              }`}
             onClick={() => setBillingCycle("yearly")}
           >
             Yearly -20%
           </button>
           <button
-            className={`${styles.toggleOption} ${
-              billingCycle === "monthly" ? styles.active : ""
-            }`}
+            className={`${styles.toggleOption} ${billingCycle === "monthly" ? styles.active : ""
+              }`}
             onClick={() => setBillingCycle("monthly")}
           >
             Monthly
@@ -259,9 +256,9 @@ export default function Membership() {
                 <span className={styles.value}>
                   {profile?.membership_expiry
                     ? new Date(profile.membership_expiry).toLocaleDateString(
-                        "en-US",
-                        { month: "2-digit", year: "2-digit" }
-                      )
+                      "en-US",
+                      { month: "2-digit", year: "2-digit" }
+                    )
                     : "MM/YY"}
                 </span>
               </div>

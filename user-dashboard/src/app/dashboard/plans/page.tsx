@@ -98,8 +98,8 @@ export default function Plans() {
           plan.id === 2 && hasLaptop
             ? 5000
             : typeof plan.price === "number"
-            ? plan.price
-            : 0;
+              ? plan.price
+              : 0;
 
         const { data: orderData, error: orderError } =
           await supabase.functions.invoke("razorpay-api", {
@@ -121,7 +121,7 @@ export default function Plans() {
           key: orderData.keyId,
           amount: orderData.amount,
           currency: orderData.currency,
-          name: "Mudralaya Fintech",
+          name: "Mudralaya Fintech Private Limited",
           description: `Purchase ${plan.name} Plan`,
           image: "/logo.png",
           order_id: orderData.id,

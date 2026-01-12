@@ -197,6 +197,7 @@ serve(async (req: Request): Promise<Response> => {
         if (delType === 'join') table = 'join_requests'
         if (delType === 'contact') table = 'contact_requests'
         if (delType === 'advisor') table = 'advisor_applications'
+        if (delType === 'client') table = 'users'
 
         if (!table) throw new Error('Invalid type')
 
@@ -207,6 +208,69 @@ serve(async (req: Request): Promise<Response> => {
 
         if (delError) throw delError
         result = { message: 'Deleted successfully' }
+        break;
+
+
+      case 'get-clients':
+        const { data: clients, error: clientsError } = await supabaseClient
+          .from('users')
+          .select(`
+            *,
+            user_kyc (
+              status,
+              updated_at
+            )
+          `)
+          .order('created_at', { ascending: false })
+
+        if (clientsError) throw clientsError
+
+        // Flatten KYC status for easier table display
+        result = clients.map((c: any) => ({
+          ...c,
+          kyc_status: c.user_kyc?.[0]?.status || 'not_submitted',
+          kyc_updated_at: c.user_kyc?.[0]?.updated_at
+        }))
+        break;
+
+      case 'get-client-details':
+        const { clientId } = data
+        const { data: client, error: clientError } = await supabaseClient
+          .from('users')
+          .select(`
+            *,
+            user_kyc (*)
+          `)
+          .eq('id', clientId)
+          .single()
+
+        if (clientError) throw clientError
+        result = client
+        break;
+
+      case 'update-kyc-status':
+        const { userId: kycUserId, status, reason } = data
+
+        // Update user_kyc table
+        const { data: updatedKyc, error: updateKycError } = await supabaseClient
+          .from('user_kyc')
+          .update({
+            status: status,
+            rejection_reason: reason || null,
+            updated_at: new Date()
+          })
+          .eq('user_id', kycUserId)
+          .select()
+          .single()
+
+        if (updateKycError) throw updateKycError
+
+        // If approved, verify the user profile as well
+        if (status === 'verified') {
+          await supabaseClient.from('users').update({ is_verified: true }).eq('id', kycUserId)
+        }
+
+        result = updatedKyc
         break;
 
       default:
