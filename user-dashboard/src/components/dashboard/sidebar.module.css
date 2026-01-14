@@ -4,24 +4,23 @@
   left: 0;
   bottom: 0;
   width: 260px;
-  background: rgba(
-    255,
-    255,
-    255,
-    0.85
-  ); /* More opaque to hide underlying content */
+  background: rgba(255,
+      255,
+      255,
+      0.85);
+  /* More opaque to hide underlying content */
   backdrop-filter: blur(30px);
   -webkit-backdrop-filter: blur(30px);
   border-right: 1px solid rgba(255, 255, 255, 0.6);
   display: flex;
   flex-direction: column;
   padding: 30px 0;
-  z-index: 999; /* Maintain high z-index */
+  z-index: 999;
+  /* Maintain high z-index */
   box-shadow: 1px 0 20px rgba(0, 0, 0, 0.05);
   transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  transform: translateX(
-    -100%
-  ); /* Hidden by default to sync with layout closed state */
+  transform: translateX(-100%);
+  /* Hidden by default to sync with layout closed state */
 }
 
 .sidebar.open {
@@ -137,8 +136,10 @@
   right: 0;
   bottom: 0;
   background-color: rgba(0, 0, 0, 0.5);
-  z-index: 998; /* Below sidebar (999) but above content */
-  display: none; /* Default hidden on desktop */
+  z-index: 998;
+  /* Below sidebar (999) but above content */
+  display: none;
+  /* Default hidden on desktop */
 }
 
 /* Mobile Styles */
@@ -146,6 +147,18 @@
   /* Sidebar uses same transform logic as desktop now */
 
   .mobileOverlay {
-    display: block; /* Show only on mobile when rendered */
+    display: block;
+    /* Show only on mobile when rendered */
+  }
+
+  .sidebarLogo {
+    height: 64px;
+    /* Increased from 48px for better visibility */
+  }
+
+  .sidebarHeader {
+    margin-bottom: 30px;
+    /* Reduced margin to bring content up */
+    padding: 0 15px;
   }
 }
