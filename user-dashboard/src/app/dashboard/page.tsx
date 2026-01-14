@@ -16,6 +16,7 @@ import {
   Loader2,
 } from "lucide-react";
 import styles from "./dashboard.module.css";
+import VideoModal from "@/components/dashboard/VideoModal";
 
 interface Task {
   id: string;
@@ -49,6 +50,7 @@ export default function DashboardHome() {
   const [loading, setLoading] = useState(true);
   const [profile, setProfile] = useState<any>(null);
   const [joiningTaskId, setJoiningTaskId] = useState<string | null>(null);
+  const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
 
   const supabase = createClient();
 
@@ -239,13 +241,22 @@ export default function DashboardHome() {
           </h1>
           <p className={styles.welcomeSubtitle}>Start your task to earn!</p>
         </div>
-        <button className={styles.guidanceBtn}>
+        <button
+          className={styles.guidanceBtn}
+          onClick={() => setIsVideoModalOpen(true)}
+        >
           <span>Earning Guidance</span>
           <div className={styles.playIconWrapper}>
             <Play size={16} fill="white" />
           </div>
         </button>
       </div>
+
+      <VideoModal
+        isOpen={isVideoModalOpen}
+        onClose={() => setIsVideoModalOpen(false)}
+        videoSrc="/video/mission_video_new.mp4"
+      />
 
       {/* Earnings Stats */}
       <div className={styles.statsGrid}>
@@ -313,7 +324,7 @@ export default function DashboardHome() {
                   <span>Task Reward</span>
                   <div className={styles.rewards}>
                     {data.ongoingTask.reward_member &&
-                    data.ongoingTask.reward_member > 0 ? (
+                      data.ongoingTask.reward_member > 0 ? (
                       <>
                         <div className={styles.rewardItem}>
                           <span
@@ -387,11 +398,10 @@ export default function DashboardHome() {
                 <div key={task.id} className={styles.taskListItem}>
                   <div className={styles.taskItemLeft}>
                     <div
-                      className={`${styles.taskIconCircle} ${
-                        index % 2 === 0
+                      className={`${styles.taskIconCircle} ${index % 2 === 0
                           ? styles.blueGradient
                           : styles.purpleGradient
-                      }`}
+                        }`}
                     >
                       {getIcon(task.icon_type)}
                     </div>
