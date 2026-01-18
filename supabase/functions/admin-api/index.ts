@@ -212,46 +212,89 @@ serve(async (req: Request): Promise<Response> => {
 
 
       case 'get-clients':
+        // 1. Fetch KYC entries
         const { data: clients, error: clientsError } = await supabaseClient
-          .from('users')
-          .select(`
-            *,
-            user_kyc (
-              status,
-              updated_at
-            )
-          `)
+          .from('user_kyc')
+          .select('*')
           .order('created_at', { ascending: false })
 
         if (clientsError) throw clientsError
 
-        // Flatten KYC status for easier table display
-        result = clients.map((c: any) => ({
-          ...c,
-          kyc_status: c.user_kyc?.[0]?.status || 'not_submitted',
-          kyc_updated_at: c.user_kyc?.[0]?.updated_at
-        }))
+        if (!clients || clients.length === 0) {
+            result = []
+            break
+        }
+
+        // 2. Fetch User Details manually using user_id (reliable) instead of join on account_id
+        const clientUserIds = clients.map((c: any) => c.user_id)
+        const { data: clientUsersData, error: clientUsersError } = await supabaseClient
+          .from('users')
+          .select('id, full_name, email_id, mobile_number, phone')
+          .in('id', clientUserIds)
+
+        if (clientUsersError) throw clientUsersError
+
+        // 3. Merge Data
+        const clientUsersMap = new Map()
+        clientUsersData?.forEach((u: any) => clientUsersMap.set(u.id, u))
+
+        result = clients.map((c: any) => {
+          const user = clientUsersMap.get(c.user_id) || null
+          // Polyfill mobile if needed
+          if (user && !user.mobile_number && user.phone) {
+              user.mobile_number = user.phone
+          }
+          return {
+            ...c,
+            id: c.id, // KYC ID
+            user_id: c.user_id,
+            full_name: user?.full_name || "N/A",
+            email_id: user?.email_id || "N/A",
+            mobile_number: user?.mobile_number || "N/A",
+            kyc_status: c.status,
+            created_at: c.created_at
+          }
+        })
         break;
 
       case 'get-client-details':
-        const { clientId } = data
-        const { data: client, error: clientError } = await supabaseClient
-          .from('users')
-          .select(`
-            *,
-            user_kyc (*)
-          `)
+        const { clientId } = data // This is actually the kyc_id from the URL
+        
+        // 1. Fetch KYC record
+        const { data: kycRecord, error: kycError } = await supabaseClient
+          .from('user_kyc')
+          .select('*')
           .eq('id', clientId)
           .single()
 
-        if (clientError) throw clientError
-        result = client
+        if (kycError) throw kycError
+
+        // 2. Fetch User record using reliable user_id
+        const { data: userRecord, error: userDetailsError } = await supabaseClient
+          .from('users')
+          .select('*')
+          .eq('id', kycRecord.user_id)
+          .single()
+          
+        if (userDetailsError) throw userDetailsError
+
+
+        // Polyfill mobile_number if missing
+        if (userRecord && !userRecord.mobile_number && userRecord.phone) {
+          userRecord.mobile_number = userRecord.phone
+        }
+
+        // 3. Return structure matching frontend expectation: User object with user_kyc array
+        result = {
+          ...userRecord,
+          user_kyc: [kycRecord]
+        }
         break;
 
       case 'update-kyc-status':
-        const { userId: kycUserId, status, reason } = data
+        const { userId: kycId, status, reason } = data // "userId" payload is actually KYC ID
 
-        // Update user_kyc table
+        // 1. Update user_kyc table using KYC ID
         const { data: updatedKyc, error: updateKycError } = await supabaseClient
           .from('user_kyc')
           .update({
@@ -259,15 +302,18 @@ serve(async (req: Request): Promise<Response> => {
             rejection_reason: reason || null,
             updated_at: new Date()
           })
-          .eq('user_id', kycUserId)
+          .eq('id', kycId) // Correct column is id, not user_id
           .select()
           .single()
 
         if (updateKycError) throw updateKycError
 
-        // If approved, verify the user profile as well
-        if (status === 'verified') {
-          await supabaseClient.from('users').update({ is_verified: true }).eq('id', kycUserId)
+        // 2. If approved, verify the user profile using the CORRECT user_id from the kyc record
+        if (status === 'verified' && updatedKyc?.user_id) {
+          await supabaseClient
+            .from('users')
+            .update({ is_verified: true })
+            .eq('id', updatedKyc.user_id)
         }
 
         result = updatedKyc
