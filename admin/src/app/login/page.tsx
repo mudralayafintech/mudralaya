@@ -2,19 +2,17 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import { createClient } from "@/utils/supabase/client";
+import { adminApiRequest } from "@/lib/adminApi";
 import styles from "./Login.module.css";
-import { Eye, EyeOff, Lock, Mail } from "lucide-react";
+import { Eye, EyeOff, Lock, User } from "lucide-react";
 
 export default function LoginPage() {
   const router = useRouter();
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-
-  const supabase = createClient();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -22,18 +20,26 @@ export default function LoginPage() {
     setError("");
 
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
+      // Call standard admin login API
+      const res = await adminApiRequest("login", {
+        username,
         password,
       });
 
-      if (error) {
-        throw error;
-      }
+      // Assuming res contains the token directly or in a property like 'token' or 'session'
+      // Based on common patterns and lack of explicit return type, we'll assume the token is returned
+      // or part of the response object.
+      // If the API returns { token: "..." }, use res.token.
+      // If the API returns the token string directly, use res.
+      const token = res?.token || res;
 
-      // Login successful! Supabase client handles session persistence automatically.
-      console.log("Logged in:", data);
-      router.push("/dashboard");
+      if (token && typeof token === "string") {
+        localStorage.setItem("adminToken", token);
+        console.log("Logged in successfully");
+        router.push("/dashboard");
+      } else {
+        throw new Error("Invalid response from server");
+      }
     } catch (err: any) {
       console.error("Login failed:", err);
       setError(err.message || "Login failed. Please check your credentials.");
@@ -60,15 +66,15 @@ export default function LoginPage() {
 
         <form onSubmit={handleLogin} className={styles.form}>
           <div className={styles.inputGroup}>
-            <label className={styles.label}>Email</label>
+            <label className={styles.label}>Username</label>
             <div className={styles.inputWrapper}>
-              <Mail className={styles.inputIcon} size={20} />
+              <User className={styles.inputIcon} size={20} />
               <input
-                type="email"
+                type="text"
                 className={styles.inputWithIcon}
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="admin@example.com"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                placeholder="Username"
                 required
                 disabled={loading}
               />
