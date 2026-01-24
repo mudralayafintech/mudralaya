@@ -18,6 +18,8 @@ interface Task {
 }
 
 interface Participant {
+  id: string;
+  user_id: string;
   users?: {
     full_name?: string;
     email_id?: string;
@@ -25,6 +27,7 @@ interface Participant {
   };
   status: string;
   reward_earned: number;
+  task_id: string;
 }
 
 export default function TaskManager() {
@@ -97,6 +100,36 @@ export default function TaskManager() {
       console.error("Failed to fetch participants", err);
     } finally {
       setLoadingParticipants(false);
+    }
+  };
+
+  const handleApproveTask = async (userTaskId: string) => {
+    if (!confirm("Are you sure you want to approve this task? The reward will be added to the user's wallet.")) {
+      return;
+    }
+    try {
+      await adminApiRequest("approve-task", { userTaskId });
+      alert("Task approved! Reward has been added to user's wallet.");
+      // Refresh participants list
+      if (selectedTask) {
+        handleViewProgress(selectedTask);
+      }
+    } catch (err: any) {
+      alert("Failed to approve task: " + err.message);
+    }
+  };
+
+  const handleRejectTask = async (userTaskId: string) => {
+    const reason = prompt("Please provide a reason for rejection (optional):");
+    try {
+      await adminApiRequest("reject-task", { userTaskId, reason: reason || null });
+      alert("Task rejected.");
+      // Refresh participants list
+      if (selectedTask) {
+        handleViewProgress(selectedTask);
+      }
+    } catch (err: any) {
+      alert("Failed to reject task: " + err.message);
     }
   };
 
@@ -255,18 +288,59 @@ export default function TaskManager() {
                       <span className={styles.userEmail}>
                         {p.users?.email_id}
                       </span>
+                      {p.reward_earned > 0 && (
+                        <span className={styles.rewardText}>
+                          Reward: ₹{p.reward_earned}
+                        </span>
+                      )}
                     </div>
-                    <div>
+                    <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
                       <span
                         className={clsx(
                           styles.statusPill,
-                          p.status === "completed"
+                          p.status === "completed" || p.status === "approved"
                             ? styles.completed
+                            : p.status === "rejected"
+                            ? styles.rejected
                             : styles.pending
                         )}
                       >
                         {p.status}
                       </span>
+                      {p.status === "completed" && (
+                        <>
+                          <button
+                            className={styles.approveBtn}
+                            onClick={() => handleApproveTask(p.id)}
+                            style={{
+                              padding: "6px 12px",
+                              fontSize: "12px",
+                              background: "#10b981",
+                              color: "white",
+                              border: "none",
+                              borderRadius: "6px",
+                              cursor: "pointer",
+                            }}
+                          >
+                            Approve
+                          </button>
+                          <button
+                            className={styles.rejectBtn}
+                            onClick={() => handleRejectTask(p.id)}
+                            style={{
+                              padding: "6px 12px",
+                              fontSize: "12px",
+                              background: "#ef4444",
+                              color: "white",
+                              border: "none",
+                              borderRadius: "6px",
+                              cursor: "pointer",
+                            }}
+                          >
+                            Reject
+                          </button>
+                        </>
+                      )}
                     </div>
                   </li>
                 ))}

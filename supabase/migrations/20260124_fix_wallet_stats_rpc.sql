@@ -1,5 +1,7 @@
--- Function to get wallet stats for a user
-CREATE OR REPLACE FUNCTION get_user_wallet_stats(user_id_param UUID)
+-- Ensure get_user_wallet_stats function exists and uses the correct implementation
+-- This function uses the transactions table for wallet stats
+
+CREATE OR REPLACE FUNCTION public.get_user_wallet_stats(user_id_param UUID)
 RETURNS JSONB
 LANGUAGE plpgsql
 SECURITY DEFINER
@@ -62,3 +64,7 @@ BEGIN
     RETURN result;
 END;
 $$;
+
+-- Grant execute permission to authenticated users
+GRANT EXECUTE ON FUNCTION public.get_user_wallet_stats(UUID) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.get_user_wallet_stats(UUID) TO anon;

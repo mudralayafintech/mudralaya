@@ -123,21 +123,60 @@ export default function TasksPage() {
   };
 
   const getSmartButtonLabel = (task: Task) => {
+    if (task.status === "approved") return "Reward Claimed";
+    if (task.status === "completed") return "Pending Approval";
     if (task.status === "ongoing" || task.status === "in_progress")
-      return "Resume Task";
-    if (task.status === "completed") return "Claim Reward";
+      return "Complete Task";
+    if (task.status === "rejected") return "Task Rejected";
     return "Start Task";
+  };
+
+  const handleCompleteTask = async (task: Task) => {
+    try {
+      const { error } = await supabase.functions.invoke("dashboard-api", {
+        body: {
+          action: "complete-task",
+          taskId: task.id,
+          submissionData: {
+            completed_at: new Date().toISOString(),
+            action_link_visited: task.action_link ? true : false,
+          },
+        },
+      });
+
+      if (error) {
+        console.error("Error completing task:", error);
+        alert("Failed to complete task. Please try again.");
+        return;
+      }
+
+      // Update local state
+      setTasks((prevTasks) =>
+        prevTasks.map((t) =>
+          t.id === task.id ? { ...t, status: "completed" } : t
+        )
+      );
+      alert("Task completed! Waiting for admin approval.");
+    } catch (err) {
+      console.error("Failed to complete task:", err);
+      alert("Failed to complete task. Please try again.");
+    }
   };
 
   const handleSmartAction = (task: Task) => {
     const label = getSmartButtonLabel(task);
-    if (label === "Resume Task") {
+    if (label === "Complete Task") {
       if (task.action_link) window.open(task.action_link, "_blank");
-    } else if (label === "Claim Reward") {
-      console.log("Claiming", task.id);
-    } else {
+      // Small delay to let user see the action link open
+      setTimeout(() => {
+        if (confirm("Have you completed the task? Click OK to submit for approval.")) {
+          handleCompleteTask(task);
+        }
+      }, 500);
+    } else if (label === "Start Task") {
       handleTakeTask(task);
     }
+    // "Reward Claimed", "Pending Approval", and "Task Rejected" are disabled states
   };
 
   const handleProfessionChange = (prof: string) => {
@@ -642,8 +681,25 @@ export default function TasksPage() {
 
                     <div className="mt-3" style={{ marginTop: "16px" }}>
                       <button
-                        className={styles.btnTakeTask}
+                        className={`${styles.btnTakeTask} ${
+                          task.status === "approved" || task.status === "rejected"
+                            ? styles.btnDisabled
+                            : ""
+                        }`}
                         onClick={() => handleSmartAction(task)}
+                        disabled={
+                          task.status === "approved" || task.status === "rejected"
+                        }
+                        style={{
+                          opacity:
+                            task.status === "approved" || task.status === "rejected"
+                              ? 0.6
+                              : 1,
+                          cursor:
+                            task.status === "approved" || task.status === "rejected"
+                              ? "not-allowed"
+                              : "pointer",
+                        }}
                       >
                         {getSmartButtonLabel(task)}
                       </button>

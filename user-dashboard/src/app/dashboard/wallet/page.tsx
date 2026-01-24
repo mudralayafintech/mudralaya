@@ -97,12 +97,12 @@ export default function Wallet() {
         setWalletData({
           transactions: summary.transactions || [],
           stats: {
-            today: summary.stats?.today || 450,
-            monthly: summary.stats?.monthly || 250,
-            approved: summary.stats?.approved || 450,
-            pending: summary.stats?.pending || 450,
-            total: summary.stats?.total || 450,
-            payout: summary.stats?.payout || 450,
+            today: summary.stats?.today || 0,
+            monthly: summary.stats?.monthly || 0,
+            approved: summary.stats?.approved || 0,
+            pending: summary.stats?.pending || 0,
+            total: summary.stats?.total || 0,
+            payout: summary.stats?.payout || 0,
           },
         });
       }

@@ -319,6 +319,108 @@ serve(async (req: Request): Promise<Response> => {
         result = updatedKyc
         break;
 
+      case 'approve-task':
+        const { userTaskId } = data
+        if (!userTaskId) throw new Error('User Task ID is required')
+
+        // Get user_task details
+        const { data: userTask, error: fetchError } = await supabaseClient
+          .from('user_tasks')
+          .select('*, tasks(*)')
+          .eq('id', userTaskId)
+          .maybeSingle()
+
+        if (fetchError) throw fetchError
+        if (!userTask) throw new Error('User task not found')
+        if (userTask.status !== 'completed') {
+          throw new Error(`Task must be completed before approval. Current status: ${userTask.status}`)
+        }
+
+        // Update status to approved
+        const { data: approvedTask, error: approveError } = await supabaseClient
+          .from('user_tasks')
+          .update({
+            status: 'approved',
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', userTaskId)
+          .select()
+          .single()
+
+        if (approveError) throw approveError
+        if (!approvedTask) throw new Error('Failed to approve task')
+
+        // Create transaction record
+        const taskTitle = (userTask.tasks as any)?.title || 'Task Completed'
+        const taskIcon = (userTask.tasks as any)?.icon_type || 'group'
+        const rewardAmount = userTask.reward_earned || 0
+
+        if (rewardAmount <= 0) {
+          throw new Error('Invalid reward amount. Cannot create transaction with zero or negative amount.')
+        }
+
+        const { data: transaction, error: transactionError } = await supabaseClient
+          .from('transactions')
+          .insert({
+            user_id: userTask.user_id,
+            title: taskTitle,
+            sub_title: 'Task reward',
+            amount: rewardAmount,
+            type: 'reward',
+            status: 'completed',
+            icon_type: taskIcon
+          })
+          .select()
+          .single()
+
+        if (transactionError) {
+          // Rollback the approval if transaction creation fails
+          await supabaseClient
+            .from('user_tasks')
+            .update({ status: 'completed' })
+            .eq('id', userTaskId)
+          throw new Error(`Failed to create transaction: ${transactionError.message}`)
+        }
+
+        if (!transaction) throw new Error('Transaction creation returned no data')
+
+        result = { approvedTask, transaction }
+        break;
+
+      case 'reject-task':
+        const { userTaskId: rejectUserTaskId, reason: rejectReason } = data
+        if (!rejectUserTaskId) throw new Error('User Task ID is required')
+
+        // Check if task exists
+        const { data: taskToReject, error: checkRejectError } = await supabaseClient
+          .from('user_tasks')
+          .select('*')
+          .eq('id', rejectUserTaskId)
+          .maybeSingle()
+
+        if (checkRejectError) throw checkRejectError
+        if (!taskToReject) throw new Error('User task not found')
+
+        // Update status to rejected
+        const { data: rejectedTask, error: rejectError } = await supabaseClient
+          .from('user_tasks')
+          .update({
+            status: 'rejected',
+            submission_data: rejectReason 
+              ? { ...(taskToReject.submission_data || {}), rejection_reason: rejectReason }
+              : taskToReject.submission_data,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', rejectUserTaskId)
+          .select()
+          .single()
+
+        if (rejectError) throw rejectError
+        if (!rejectedTask) throw new Error('Failed to reject task')
+
+        result = rejectedTask
+        break;
+
       default:
         throw new Error('Invalid action')
     }
@@ -330,9 +432,15 @@ serve(async (req: Request): Promise<Response> => {
 
   } catch (error: any) {
     console.error('Admin API Error:', error)
-    return new Response(JSON.stringify({ error: error.message }), {
+    const statusCode = error.message?.includes('Unauthorized') ? 401 
+      : error.message?.includes('not found') ? 404 
+      : 400
+    return new Response(JSON.stringify({ 
+      error: error.message || 'An error occurred',
+      stack: Deno.env.get('DENO_ENV') === 'development' ? error.stack : undefined
+    }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      status: 400,
+      status: statusCode,
     })
   }
 })
