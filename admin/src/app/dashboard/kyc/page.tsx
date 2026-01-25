@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { createClient } from "@/utils/supabase/client";
+import { adminApiRequest } from "@/lib/adminApi";
 import styles from "./kyc.module.css";
 import {
   CheckCircle,
@@ -23,7 +24,7 @@ interface KYCRecord {
   adhaar_card_url: string;
   bank_proof_url: string;
   selfie_url: string;
-  status: "pending" | "approved" | "rejected";
+  status: "pending" | "approved" | "verified" | "rejected" | "fail";
   created_at: string;
   rejection_reason?: string;
   // Optional if we can fetch user details
@@ -37,6 +38,45 @@ interface KYCRecord {
   };
 }
 
+// Document Card Component
+function DocumentCard({
+  label,
+  url,
+  onView,
+}: {
+  label: string;
+  url: string;
+  onView: (url: string) => void;
+}) {
+  return (
+    <div className={styles.docCard}>
+      <div className={styles.docHeader}>
+        <FileText size={16} /> {label}
+      </div>
+      <div
+        className={styles.docPreview}
+        onClick={() => url && onView(url)}
+        style={{ cursor: url ? "pointer" : "not-allowed" }}
+      >
+        {url ? (
+          <>
+            <div className={styles.viewOverlay}>Click to View</div>
+            <div className={styles.docPlaceholder}>
+              <FileText size={32} />
+              <span>View Document</span>
+            </div>
+          </>
+        ) : (
+          <div className={styles.docPlaceholder}>
+            <X size={32} />
+            <span>Not Available</span>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export default function KYCPage() {
   const [records, setRecords] = useState<KYCRecord[]>([]);
   const [loading, setLoading] = useState(true);
@@ -44,6 +84,8 @@ export default function KYCPage() {
   const [actionLoading, setActionLoading] = useState(false);
   const [rejectReason, setRejectReason] = useState("");
   const [showRejectInput, setShowRejectInput] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState<string>("all");
 
   const supabase = createClient();
 
@@ -55,73 +97,87 @@ export default function KYCPage() {
     try {
       setLoading(true);
 
-      // 1. Fetch KYC Records
+      // Check if admin is logged in
+      const adminToken = typeof window !== "undefined" ? localStorage.getItem("adminToken") : null;
+      if (!adminToken) {
+        console.warn("Admin token not found, using direct database query");
+        // Fall through to direct query
+      } else {
+        // Use admin-api to fetch KYC records with user details
+        try {
+          const kycData = await adminApiRequest("get-kyc-records", {});
+
+          if (!kycData || kycData.length === 0) {
+            setRecords([]);
+            return;
+          }
+
+          setRecords(kycData);
+          return; // Success, exit early
+        } catch (apiErr: any) {
+          console.error("Error fetching KYC via admin-api:", apiErr);
+          
+          // If unauthorized, redirect to login
+          if (apiErr.message?.includes("Unauthorized") || apiErr.message?.includes("401")) {
+            console.warn("Unauthorized, redirecting to login");
+            window.location.href = "/login";
+            return;
+          }
+          
+          // For other errors, fall through to direct query
+          console.warn("Falling back to direct database query");
+        }
+      }
+      
+      // Fallback to direct database query if admin-api fails or no token
       const { data: kycData, error: kycError } = await supabase
         .from("user_kyc")
         .select("*")
         .order("created_at", { ascending: false });
 
-      if (kycError) throw kycError;
+      if (kycError) {
+        console.error("Direct DB query error:", kycError);
+        setRecords([]);
+        return;
+      }
+
       if (!kycData || kycData.length === 0) {
         setRecords([]);
         return;
       }
 
-      // 2. Extract IDs to batch fetch details
       const userIds = Array.from(
         new Set(kycData.map((r) => r.user_id).filter(Boolean))
       );
-      const accountIds = Array.from(
-        new Set(kycData.map((r) => r.account_id).filter(Boolean))
-      );
 
-      // Combine IDs for user fetch (assuming account_id also points to users table users)
-      const allUserIds = Array.from(new Set([...userIds, ...accountIds]));
+      if (userIds.length > 0) {
+        const { data: usersData, error: usersError } = await supabase
+          .from("users")
+          .select("id, full_name, email_id, mobile_number, phone")
+          .in("id", userIds);
 
-      // 3. Fetch User Profiles (public.users)
-      const { data: usersData, error: usersError } = await supabase
-        .from("users")
-        .select("id, full_name, email_id, mobile_number")
-        .in("id", allUserIds);
+        if (usersError) console.error("Error fetching users:", usersError);
 
-      if (usersError) console.error("Error fetching users:", usersError);
+        const mergedRecords = kycData.map((record) => {
+          const profile = usersData?.find((u) => u.id === record.user_id);
+          return {
+            ...record,
+            users: profile ? {
+              full_name: profile.full_name,
+              email_id: profile.email_id,
+              mobile_number: profile.mobile_number || profile.phone,
+            } : null,
+          };
+        });
 
-      // 4. Fetch Account Details (public.account_details)
-      // Assuming account_details.user_id corresponds to the user/account id
-      const { data: accountData, error: accountError } = await supabase
-        .from("account_details")
-        .select("user_id, holder_name, bank_name, account_number, ifsc_code")
-        .in("user_id", allUserIds);
-
-      if (accountError) console.error("Error fetching accounts:", accountError);
-
-      // 5. Merge Data
-      const mergedRecords = kycData.map((record) => {
-        // Find mapped user profile (try account_id first, then user_id)
-        const profile = usersData?.find(
-          (u) => u.id === record.account_id || u.id === record.user_id
-        );
-        // Find mapped account details
-        const bank = accountData?.find(
-          (a) => a.user_id === record.account_id || a.user_id === record.user_id
-        );
-
-        return {
-          ...record,
-          users: {
-            full_name: profile?.full_name,
-            email_id: profile?.email_id,
-            mobile_number: profile?.mobile_number,
-            bank_name: bank?.bank_name,
-            account_number: bank?.account_number,
-            ifsc_code: bank?.ifsc_code,
-          },
-        };
-      });
-
-      setRecords(mergedRecords);
-    } catch (err) {
-      console.error("Error fetching KYC:", err);
+        setRecords(mergedRecords);
+      } else {
+        // No user IDs, return records without user data
+        setRecords(kycData.map((r: any) => ({ ...r, users: null })));
+      }
+    } catch (err: any) {
+      console.error("Unexpected error fetching KYC:", err);
+      setRecords([]);
     } finally {
       setLoading(false);
     }
@@ -129,68 +185,116 @@ export default function KYCPage() {
 
   const updateStatus = async (
     id: string,
-    status: "approved" | "rejected",
+    status: "approved" | "rejected" | "verified",
     reason?: string
   ) => {
     try {
       setActionLoading(true);
-      const { error } = await supabase
-        .from("user_kyc")
-        .update({
-          status,
-          rejection_reason: reason || null, // Ensure column name matches schema if added, schema didn't show it but plan did.
-          // Wait, migration 20260110_create_kyc_schema.sql DID NOT have rejection_reason.
-          // I should probably check if column exists or add it.
-          // For now, let's assume valid fields only: `status`.
-          // If status is rejected, maybe we just set status.
-          // I will stick to status only if I can't modify schema right now.
-        })
-        .eq("id", id);
-
-      if (error) throw error;
+      
+      // Use admin-api for status updates
+      await adminApiRequest("update-kyc-status", {
+        userId: id, // This is actually the KYC ID
+        status: status === "approved" ? "verified" : status,
+        reason: reason || null,
+      });
 
       // Update local state
       setRecords((prev) =>
-        prev.map((r) => (r.id === id ? { ...r, status } : r))
+        prev.map((r) => (r.id === id ? { ...r, status: status === "approved" ? "verified" : status, rejection_reason: reason } : r))
       );
-      setSelectedRecord(null);
+      
+      if (selectedRecord?.id === id) {
+        setSelectedRecord({
+          ...selectedRecord,
+          status: status === "approved" ? "verified" : status,
+          rejection_reason: reason,
+        });
+      }
+      
       setShowRejectInput(false);
       setRejectReason("");
-    } catch (err) {
+      alert(`KYC ${status === "approved" ? "Approved" : "Rejected"} successfully!`);
+    } catch (err: any) {
       console.error("Error updating status:", err);
-      alert("Failed to update status");
+      alert(`Failed to update status: ${err.message || "Unknown error"}`);
     } finally {
       setActionLoading(false);
     }
   };
 
   // Helper to get signed URL for viewing private docs
-  const openDocument = async (path: string) => {
-    if (!path) return;
-    // The path stored might be full URL or relative path.
-    // Migration says text, KYCModal uploads as `userId/filename`.
-    // We need to sign it.
-    const { data } = await supabase.storage
-      .from("kyc-documents")
-      .createSignedUrl(path, 3600); // 1 hour access
+  const getDocumentUrl = async (path: string): Promise<string | null> => {
+    if (!path) return null;
+    
+    // Check if it's already a full URL
+    if (path.startsWith("http://") || path.startsWith("https://")) {
+      return path;
+    }
 
-    if (data?.signedUrl) {
-      window.open(data.signedUrl, "_blank");
-    } else {
-      // If it's already a public URL (unlikely for KYC) or full URL
-      window.open(path, "_blank");
+    // Try to create signed URL from storage
+    try {
+      const { data, error } = await supabase.storage
+        .from("kyc-documents")
+        .createSignedUrl(path, 3600); // 1 hour access
+
+      if (error) {
+        console.error("Error creating signed URL:", error);
+        // Try public URL as fallback
+        const publicUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/kyc-documents/${path}`;
+        return publicUrl;
+      }
+
+      return data?.signedUrl || null;
+    } catch (err) {
+      console.error("Error getting document URL:", err);
+      // Fallback to public URL
+      const publicUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/kyc-documents/${path}`;
+      return publicUrl;
     }
   };
+
+  const openDocument = async (path: string) => {
+    const url = await getDocumentUrl(path);
+    if (url) {
+      window.open(url, "_blank");
+    } else {
+      alert("Unable to load document. Please try again.");
+    }
+  };
+
+  // Filter records based on search and status
+  const filteredRecords = records.filter((record) => {
+    const matchesSearch =
+      !searchQuery ||
+      record.user_id.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      record.users?.full_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      record.users?.email_id?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      record.users?.mobile_number?.includes(searchQuery);
+
+    let matchesStatus = false;
+    if (statusFilter === "all") {
+      matchesStatus = true;
+    } else if (statusFilter === "approved") {
+      // Show both approved and verified for "approved" filter
+      matchesStatus = record.status === "approved" || record.status === "verified";
+    } else {
+      matchesStatus = record.status === statusFilter;
+    }
+
+    return matchesSearch && matchesStatus;
+  });
 
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "approved":
+      case "verified":
         return (
           <span className={`${styles.badge} ${styles.status_approved}`}>
-            <CheckCircle size={14} /> Approved
+            <CheckCircle size={14} /> {status === "verified" ? "Verified" : "Approved"}
           </span>
         );
       case "rejected":
+      case "fail":
         return (
           <span className={`${styles.badge} ${styles.status_rejected}`}>
             <XCircle size={14} /> Rejected
@@ -214,6 +318,32 @@ export default function KYCPage() {
             Manage and verify user documents
           </p>
         </div>
+      </div>
+
+      {/* Search and Filter */}
+      <div className={styles.filtersContainer}>
+        <div className={styles.searchBox}>
+          <Search size={18} className={styles.searchIcon} />
+          <input
+            type="text"
+            placeholder="Search by name, email, phone, or user ID..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className={styles.searchInput}
+          />
+        </div>
+        <select
+          value={statusFilter}
+          onChange={(e) => setStatusFilter(e.target.value)}
+          className={styles.statusFilter}
+        >
+          <option value="all">All Status</option>
+          <option value="pending">Pending</option>
+          <option value="approved">Approved</option>
+          <option value="verified">Verified</option>
+          <option value="rejected">Rejected</option>
+          <option value="fail">Failed</option>
+        </select>
       </div>
 
       <div className={styles.statsGrid}>
@@ -250,28 +380,49 @@ export default function KYCPage() {
           <thead>
             <tr>
               <th>Status</th>
+              <th>User</th>
+              <th>Contact</th>
               <th>Date</th>
-              <th>User ID</th>
               <th>Actions</th>
             </tr>
           </thead>
           <tbody>
             {loading ? (
               <tr>
-                <td colSpan={4} className="text-center p-8 text-gray-400">
+                <td colSpan={5} className="text-center p-8 text-gray-400">
                   Loading records...
                 </td>
               </tr>
-            ) : records.length === 0 ? (
+            ) : filteredRecords.length === 0 ? (
               <tr>
-                <td colSpan={4} className="text-center p-8 text-gray-400">
-                  No KYC requests found.
+                <td colSpan={5} className="text-center p-8 text-gray-400">
+                  {records.length === 0
+                    ? "No KYC requests found."
+                    : "No records match your search."}
                 </td>
               </tr>
             ) : (
-              records.map((record) => (
+              filteredRecords.map((record) => (
                 <tr key={record.id} className={styles.row}>
                   <td>{getStatusBadge(record.status)}</td>
+                  <td>
+                    <div>
+                      <div className="font-semibold text-sm">
+                        {record.users?.full_name || "N/A"}
+                      </div>
+                      <div className="text-xs text-gray-500 font-mono">
+                        ID: {record.user_id.slice(0, 8)}...
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <div className="text-sm">
+                      <div>{record.users?.email_id || "N/A"}</div>
+                      <div className="text-xs text-gray-500">
+                        {record.users?.mobile_number || "N/A"}
+                      </div>
+                    </div>
+                  </td>
                   <td>
                     {new Date(record.created_at).toLocaleDateString("en-IN", {
                       day: "numeric",
@@ -279,14 +430,11 @@ export default function KYCPage() {
                       year: "numeric",
                     })}
                   </td>
-                  <td className="font-mono text-xs text-gray-500">
-                    {record.user_id}
-                  </td>
                   <td>
                     <button
                       className={styles.actionBtn}
                       onClick={() => setSelectedRecord(record)}
-                      title="View Details"
+                      title="View Details & Documents"
                     >
                       <Eye size={18} />
                     </button>
@@ -312,106 +460,146 @@ export default function KYCPage() {
             </div>
 
             <div className={styles.modalContent}>
-              <div className="flex items-center gap-2 mb-6 p-4 bg-blue-50 rounded-xl text-blue-700">
-                <User size={20} />
-                <span className="font-mono text-sm">
-                  User ID: {selectedRecord.user_id}
-                </span>
+              {/* User Information */}
+              <div className={styles.userInfoCard}>
+                <div className={styles.userInfoHeader}>
+                  <User size={20} />
+                  <h4>User Information</h4>
+                </div>
+                <div className={styles.userInfoGrid}>
+                  <div>
+                    <label>Name</label>
+                    <div>{selectedRecord.users?.full_name || "N/A"}</div>
+                  </div>
+                  <div>
+                    <label>Email</label>
+                    <div>{selectedRecord.users?.email_id || "N/A"}</div>
+                  </div>
+                  <div>
+                    <label>Phone</label>
+                    <div>{selectedRecord.users?.mobile_number || "N/A"}</div>
+                  </div>
+                  <div>
+                    <label>User ID</label>
+                    <div className="font-mono text-xs">{selectedRecord.user_id}</div>
+                  </div>
+                </div>
               </div>
 
-              <div className={styles.docGrid}>
-                <div className={styles.docCard}>
-                  <div className={styles.docHeader}>
-                    <FileText size={16} /> PAN Card
-                  </div>
-                  <div
-                    className={styles.docPreview}
-                    onClick={() => openDocument(selectedRecord.pan_card_url)}
-                  >
-                    <div className={styles.viewOverlay}>Click to View</div>
-                    {/* Placeholder or thumbnail if available */}
-                    <img
-                      src="/images/placeholder_doc.png"
-                      alt="PAN"
-                      onError={(e) => (e.currentTarget.style.display = "none")}
-                    />
-                    <span className="absolute text-gray-400 text-xs">
-                      Preview
-                    </span>
-                  </div>
-                </div>
-                <div className={styles.docCard}>
-                  <div className={styles.docHeader}>
-                    <FileText size={16} /> Aadhaar Card
-                  </div>
-                  <div
-                    className={styles.docPreview}
-                    onClick={() => openDocument(selectedRecord.adhaar_card_url)}
-                  >
-                    <div className={styles.viewOverlay}>Click to View</div>
-                    <span className="absolute text-gray-400 text-xs">
-                      Preview
-                    </span>
-                  </div>
-                </div>
-                <div className={styles.docCard}>
-                  <div className={styles.docHeader}>
-                    <FileText size={16} /> Bank Proof
-                  </div>
-                  <div
-                    className={styles.docPreview}
-                    onClick={() => openDocument(selectedRecord.bank_proof_url)}
-                  >
-                    <div className={styles.viewOverlay}>Click to View</div>
-                    <span className="absolute text-gray-400 text-xs">
-                      Preview
-                    </span>
-                  </div>
-                </div>
-                <div className={styles.docCard}>
-                  <div className={styles.docHeader}>
-                    <User size={16} /> Selfie
-                  </div>
-                  <div
-                    className={styles.docPreview}
-                    onClick={() => openDocument(selectedRecord.selfie_url)}
-                  >
-                    <div className={styles.viewOverlay}>Click to View</div>
-                    <span className="absolute text-gray-400 text-xs">
-                      Preview
-                    </span>
-                  </div>
+              {/* Documents Section */}
+              <div className={styles.documentsSection}>
+                <h4 className={styles.sectionTitle}>Submitted Documents</h4>
+                <div className={styles.docGrid}>
+                  <DocumentCard
+                    label="PAN Card"
+                    url={selectedRecord.pan_card_url}
+                    onView={openDocument}
+                  />
+                  <DocumentCard
+                    label="Aadhaar Card"
+                    url={selectedRecord.adhaar_card_url}
+                    onView={openDocument}
+                  />
+                  <DocumentCard
+                    label="Bank Proof"
+                    url={selectedRecord.bank_proof_url}
+                    onView={openDocument}
+                  />
+                  <DocumentCard
+                    label="Selfie / Photo"
+                    url={selectedRecord.selfie_url}
+                    onView={openDocument}
+                  />
                 </div>
               </div>
+
+              {/* Rejection Reason Display */}
+              {selectedRecord.status === "rejected" &&
+                selectedRecord.rejection_reason && (
+                  <div className={styles.rejectionReason}>
+                    <strong>Rejection Reason:</strong>
+                    <p>{selectedRecord.rejection_reason}</p>
+                  </div>
+                )}
             </div>
 
             <div className={styles.modalActions}>
-              {selectedRecord.status === "pending" && (
+              {(selectedRecord.status === "pending" ||
+                selectedRecord.status === "rejected") && (
                 <>
-                  <button
-                    className={`${styles.btn} ${styles.btnReject}`}
-                    onClick={() => {
-                      // Simple reject for now
-                      if (confirm("Reject this KYC?")) {
-                        updateStatus(selectedRecord.id, "rejected");
-                      }
-                    }}
-                    disabled={actionLoading}
-                  >
-                    Reject
-                  </button>
-                  <button
-                    className={`${styles.btn} ${styles.btnApprove}`}
-                    onClick={() => updateStatus(selectedRecord.id, "approved")}
-                    disabled={actionLoading}
-                  >
-                    Approve
-                  </button>
+                  {showRejectInput ? (
+                    <div className={styles.rejectInputContainer}>
+                      <textarea
+                        placeholder="Enter rejection reason..."
+                        value={rejectReason}
+                        onChange={(e) => setRejectReason(e.target.value)}
+                        className={styles.rejectTextarea}
+                        rows={3}
+                      />
+                      <div className={styles.rejectActions}>
+                        <button
+                          className={styles.btnCancel}
+                          onClick={() => {
+                            setShowRejectInput(false);
+                            setRejectReason("");
+                          }}
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          className={`${styles.btn} ${styles.btnReject}`}
+                          onClick={() => {
+                            if (!rejectReason.trim()) {
+                              alert("Please provide a rejection reason.");
+                              return;
+                            }
+                            updateStatus(
+                              selectedRecord.id,
+                              "rejected",
+                              rejectReason
+                            );
+                          }}
+                          disabled={actionLoading}
+                        >
+                          Confirm Reject
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <>
+                      <button
+                        className={`${styles.btn} ${styles.btnReject}`}
+                        onClick={() => setShowRejectInput(true)}
+                        disabled={actionLoading}
+                      >
+                        <XCircle size={18} /> Reject
+                      </button>
+                      <button
+                        className={`${styles.btn} ${styles.btnApprove}`}
+                        onClick={() => {
+                          if (
+                            confirm(
+                              "Are you sure you want to approve this KYC? This will verify the user."
+                            )
+                          ) {
+                            updateStatus(selectedRecord.id, "approved");
+                          }
+                        }}
+                        disabled={actionLoading}
+                      >
+                        <CheckCircle size={18} /> Approve
+                      </button>
+                    </>
+                  )}
                 </>
               )}
               <button
                 className={`${styles.btn} ${styles.btnClose}`}
-                onClick={() => setSelectedRecord(null)}
+                onClick={() => {
+                  setSelectedRecord(null);
+                  setShowRejectInput(false);
+                  setRejectReason("");
+                }}
               >
                 Close
               </button>
