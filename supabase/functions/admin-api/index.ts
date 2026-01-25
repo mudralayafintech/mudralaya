@@ -19,11 +19,30 @@ serve(async (req: Request): Promise<Response> => {
     const adminUser = Deno.env.get('DASHBOARD_ADMIN_USER')
     const adminPass = Deno.env.get('DASHBOARD_ADMIN_PASS')
 
+    // Check if environment variables are configured
+    if (!adminUser || !adminPass) {
+      console.error('Admin credentials not configured. Please set DASHBOARD_ADMIN_USER and DASHBOARD_ADMIN_PASS environment variables.')
+      return new Response(JSON.stringify({ 
+        error: 'Server configuration error: Admin credentials not set. Please contact the administrator.' 
+      }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 500,
+      })
+    }
+
     // Simple Admin Auth check
     const authHeader = req.headers.get('x-admin-password')
 
     if (action === 'login') {
+      // Log login attempt (without exposing passwords)
+      console.log('Login attempt:', { 
+        username: data.username, 
+        usernameMatch: data.username === adminUser,
+        passwordProvided: !!data.password 
+      })
+      
       if (data.username === adminUser && data.password === adminPass) {
+        console.log('Login successful')
         return new Response(JSON.stringify({
           message: 'Logged in',
           success: true,
@@ -33,6 +52,7 @@ serve(async (req: Request): Promise<Response> => {
           status: 200,
         })
       } else {
+        console.log('Login failed: Invalid credentials')
         return new Response(JSON.stringify({ error: 'Invalid credentials' }), {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
           status: 401,
