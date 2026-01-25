@@ -4,7 +4,7 @@ const supabase = createClient();
 
 export async function adminApiRequest(action: string, data: any = {}) {
   const adminToken = typeof window !== "undefined" ? localStorage.getItem("adminToken") : null;
-  
+
   if (!adminToken && action !== "login") {
     throw new Error("Unauthorized");
   }
@@ -18,20 +18,20 @@ export async function adminApiRequest(action: string, data: any = {}) {
 
   if (error) {
     console.error("[AdminAPI] Error:", error);
-    
+
     // Try to extract error message from various error formats
     let errorMessage = error.message || "An error occurred";
     let statusCode = 500;
-    
+
     // Check if error has context with response body
     if (error instanceof Error) {
       const errorAny = error as any;
-      
+
       // Check context property (Supabase FunctionsHttpError format)
       if ('context' in errorAny) {
         const context = errorAny.context;
         console.error("Error Context:", context);
-        
+
         // Check if context is a Response object (it might show as {} when logged but is actually a Response)
         let response: Response | null = null;
         if (context instanceof Response) {
@@ -54,7 +54,7 @@ export async function adminApiRequest(action: string, data: any = {}) {
             }
           }
         }
-        
+
         // Read response body if we have a Response object
         if (response) {
           if (statusCode === 500 && response.status) {
@@ -111,7 +111,7 @@ export async function adminApiRequest(action: string, data: any = {}) {
             console.warn("Failed to read response body:", e);
           }
         }
-        
+
         // Try to extract message from context.body (if already parsed)
         if (context && typeof context === 'object' && 'body' in context && !response) {
           try {
@@ -126,7 +126,7 @@ export async function adminApiRequest(action: string, data: any = {}) {
             }
           }
         }
-        
+
         // Check for error property directly in context
         if (context && typeof context === 'object' && 'error' in context) {
           const contextError = context.error;
@@ -136,7 +136,7 @@ export async function adminApiRequest(action: string, data: any = {}) {
             errorMessage = contextError.message || errorMessage;
           }
         }
-        
+
         // Extract status code from context (if not already set from response)
         if (context && typeof context === 'object' && 'status' in context && statusCode === 500) {
           const contextStatus = context.status;
@@ -145,7 +145,7 @@ export async function adminApiRequest(action: string, data: any = {}) {
           }
         }
       }
-      
+
       // Check for response property (some Supabase error formats)
       if ('response' in errorAny && errorAny.response && !(errorAny.context instanceof Response)) {
         const response = errorAny.response;
@@ -153,18 +153,18 @@ export async function adminApiRequest(action: string, data: any = {}) {
           statusCode = response.status;
         }
       }
-      
+
       // Check for status property directly
       if ('status' in errorAny && typeof errorAny.status === 'number' && statusCode === 500) {
         statusCode = errorAny.status;
       }
-      
+
       // Check for statusCode property (alternative naming)
       if ('statusCode' in errorAny && typeof errorAny.statusCode === 'number' && statusCode === 500) {
         statusCode = errorAny.statusCode;
       }
     }
-    
+
     // Determine status code from error message if not set
     if (statusCode === 500) {
       if (errorMessage.includes('Unauthorized') || errorMessage.includes('Invalid credentials')) {
@@ -173,8 +173,12 @@ export async function adminApiRequest(action: string, data: any = {}) {
         statusCode = 404;
       }
     }
-    
+
     // Create a new error with the extracted message
+    // Create a new error with the extracted message
+    if (statusCode === 401) {
+      errorMessage = `${errorMessage}. (Hint: Check DASHBOARD_ADMIN_USER and DASHBOARD_ADMIN_PASS in your Supabase Edge Function Secrets)`;
+    }
     const enhancedError = new Error(errorMessage);
     (enhancedError as any).status = statusCode;
     throw enhancedError;

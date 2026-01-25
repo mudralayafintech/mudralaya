@@ -41,6 +41,47 @@ export default function Wallet() {
     account_number: "",
     ifsc_code: "",
   });
+  const [errors, setErrors] = useState({
+    holder_name: "",
+    bank_name: "",
+    account_number: "",
+    ifsc_code: "",
+  });
+
+  const validateForm = () => {
+    let isValid = true;
+    const newErrors = {
+      holder_name: "",
+      bank_name: "",
+      account_number: "",
+      ifsc_code: "",
+    };
+
+    if (!formData.holder_name.trim() || formData.holder_name.length < 3) {
+      newErrors.holder_name = "Name must be at least 3 characters";
+      isValid = false;
+    }
+
+    if (!formData.bank_name.trim() || formData.bank_name.length < 3) {
+      newErrors.bank_name = "Bank Name must be at least 3 characters";
+      isValid = false;
+    }
+
+    // Account number: 9-18 digits, numeric
+    if (!/^\d{9,18}$/.test(formData.account_number)) {
+      newErrors.account_number = "Account Number must be 9-18 digits";
+      isValid = false;
+    }
+
+    // IFSC: 4 letters, 0, 6 alphanumeric. strict check
+    if (!/^[A-Z]{4}0[A-Z0-9]{6}$/.test(formData.ifsc_code)) {
+      newErrors.ifsc_code = "Invalid IFSC Code (e.g., SBIN0001234)";
+      isValid = false;
+    }
+
+    setErrors(newErrors);
+    return isValid;
+  };
 
   // KYC State
   const [isKYCModalOpen, setIsKYCModalOpen] = useState(false);
@@ -127,6 +168,8 @@ export default function Wallet() {
   }, []);
 
   const handleSave = async () => {
+    if (!validateForm()) return;
+
     try {
       const { error } = await supabase.functions.invoke("bank-account", {
         method: "POST",
@@ -426,47 +469,56 @@ export default function Wallet() {
                   <input
                     type="text"
                     value={formData.holder_name}
-                    onChange={(e) =>
-                      setFormData({ ...formData, holder_name: e.target.value })
-                    }
+                    onChange={(e) => {
+                      setFormData({ ...formData, holder_name: e.target.value });
+                      if (errors.holder_name) setErrors({ ...errors, holder_name: "" });
+                    }}
                     placeholder="Enter name"
                   />
+                  {errors.holder_name && <span className={styles.errorText} style={{ color: 'red', fontSize: '12px' }}>{errors.holder_name}</span>}
                 </div>
                 <div className={styles.formGroup}>
                   <label>Bank Name</label>
                   <input
                     type="text"
                     value={formData.bank_name}
-                    onChange={(e) =>
-                      setFormData({ ...formData, bank_name: e.target.value })
-                    }
+                    onChange={(e) => {
+                      setFormData({ ...formData, bank_name: e.target.value });
+                      if (errors.bank_name) setErrors({ ...errors, bank_name: "" });
+                    }}
                     placeholder="Enter bank name"
                   />
+                  {errors.bank_name && <span className={styles.errorText} style={{ color: 'red', fontSize: '12px' }}>{errors.bank_name}</span>}
                 </div>
                 <div className={styles.formGroup}>
                   <label>Account Number</label>
                   <input
                     type="text"
                     value={formData.account_number}
-                    onChange={(e) =>
+                    onChange={(e) => {
+                      const val = e.target.value.replace(/\D/g, "");
                       setFormData({
                         ...formData,
-                        account_number: e.target.value,
-                      })
-                    }
+                        account_number: val,
+                      });
+                      if (errors.account_number) setErrors({ ...errors, account_number: "" });
+                    }}
                     placeholder="Enter account number"
                   />
+                  {errors.account_number && <span className={styles.errorText} style={{ color: 'red', fontSize: '12px' }}>{errors.account_number}</span>}
                 </div>
                 <div className={styles.formGroup}>
                   <label>IFSC Code</label>
                   <input
                     type="text"
                     value={formData.ifsc_code}
-                    onChange={(e) =>
-                      setFormData({ ...formData, ifsc_code: e.target.value })
-                    }
+                    onChange={(e) => {
+                      setFormData({ ...formData, ifsc_code: e.target.value.toUpperCase() });
+                      if (errors.ifsc_code) setErrors({ ...errors, ifsc_code: "" });
+                    }}
                     placeholder="Enter IFSC code"
                   />
+                  {errors.ifsc_code && <span className={styles.errorText} style={{ color: 'red', fontSize: '12px' }}>{errors.ifsc_code}</span>}
                 </div>
                 <div className={styles.formActions}>
                   <button

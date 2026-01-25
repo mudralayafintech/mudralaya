@@ -61,9 +61,8 @@ const Header = () => {
               <li key={link.href}>
                 <Link
                   href={link.href}
-                  className={`${styles.navLink} ${
-                    pathname === link.href ? styles.active : ""
-                  }`}
+                  className={`${styles.navLink} ${pathname === link.href ? styles.active : ""
+                    }`}
                 >
                   {link.name}
                   {pathname === link.href && (
@@ -87,12 +86,12 @@ const Header = () => {
                   Dashboard
                 </Link>
               ) : (
-                <button
+                <Link
+                  href="https://user.mudralaya.com"
                   className={styles.loginBtn}
-                  onClick={() => openLoginModal()}
                 >
                   Login
-                </button>
+                </Link>
               )}
             </li>
           </ul>
@@ -148,9 +147,8 @@ const Header = () => {
                   <li key={link.href}>
                     <Link
                       href={link.href}
-                      className={`${styles.mobileNavLink} ${
-                        pathname === link.href ? styles.activeMobile : ""
-                      }`}
+                      className={`${styles.mobileNavLink} ${pathname === link.href ? styles.activeMobile : ""
+                        }`}
                     >
                       {link.name}
                     </Link>
@@ -168,12 +166,12 @@ const Header = () => {
                       Dashboard
                     </Link>
                   ) : (
-                    <button
+                    <Link
+                      href="https://user.mudralaya.com"
                       className={styles.mobileLoginBtn}
-                      onClick={() => openLoginModal()}
                     >
                       Login
-                    </button>
+                    </Link>
                   )}
                 </li>
               </ul>
@@ -181,7 +179,7 @@ const Header = () => {
           </>
         )}
       </AnimatePresence>
-    </header>
+    </header >
   );
 };
 

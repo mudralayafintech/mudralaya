@@ -51,8 +51,8 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
           <Image
             src="/mudralaya_logo.webp"
             alt="Mudralaya"
-            width={200}
-            height={60}
+            width={500}
+            height={150}
             className={styles.sidebarLogo}
             priority
           />

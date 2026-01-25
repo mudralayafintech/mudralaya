@@ -22,6 +22,17 @@ export default function Login() {
   const router = useRouter();
   const supabase = createClient();
 
+  // Check for existing session on mount
+  useEffect(() => {
+    const checkSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        router.replace("/dashboard");
+      }
+    };
+    checkSession();
+  }, [router, supabase.auth]);
+
   const handleSendOtp = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);

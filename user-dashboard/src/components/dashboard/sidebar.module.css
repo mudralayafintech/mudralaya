@@ -28,16 +28,21 @@
 }
 
 .sidebarHeader {
-  padding: 0 24px;
-  margin-bottom: 50px;
+  padding: 0;
+  margin-bottom: 40px;
   display: flex;
   justify-content: center;
+  align-items: center;
 }
 
 .sidebarLogo {
-  height: 48px;
-  width: auto;
-  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1));
+  width: 100%;
+  max-width: 250px;
+  height: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 6px #0000001a);
+  border: 5px solid red;
+  /* DEBUG: Visual confirmation */
 }
 
 .sidebarNav {
@@ -152,8 +157,9 @@
   }
 
   .sidebarLogo {
-    height: 64px;
-    /* Increased from 48px for better visibility */
+    height: 5rem;
+    width: auto;
+    /* Adjusted for mobile */
   }
 
   .sidebarHeader {
