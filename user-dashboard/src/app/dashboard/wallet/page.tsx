@@ -12,6 +12,8 @@ import {
   Rocket,
   MessageSquare,
   Megaphone,
+  CheckCircle,
+  AlertCircle,
 } from "lucide-react";
 import Skeleton from "@/components/ui/Skeleton";
 import { createClient } from "@/utils/supabase/client";
@@ -57,11 +59,18 @@ export default function Wallet() {
       setUserId(session.user.id);
 
       // Fetch KYC Status
-      const { data: kycData } = await supabase
+      // Fetch KYC Status
+      const { data: kycData, error: kycError } = await supabase
         .from("user_kyc")
         .select("status")
         .eq("user_id", session.user.id)
-        .single();
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (kycError) {
+        console.error("Error fetching KYC status:", kycError);
+      }
 
       if (kycData) {
         setKycStatus(kycData.status);
@@ -239,19 +248,26 @@ export default function Wallet() {
             Track your earnings and manage your bank account for payouts
           </p>
         </div>
-        {kycStatus === "verified" ? (
-          <div className={styles.kycBadgeSuccess}>✓ KYC Verified</div>
-        ) : kycStatus === "pending" ? (
-          <div className={styles.kycBadgePending}>
-            ⧗ KYC Submitted (Pending)
+        {kycStatus === "approved" || kycStatus === "verified" ? (
+          <div className={styles.kycBadgeSuccess}>
+            <CheckCircle size={16} /> KYC Verified
           </div>
-        ) : kycStatus === "fail" || kycStatus === "rejected" ? (
+        ) : kycStatus === "rejected" ? (
           <button
             className={styles.kycBtnError}
-            onClick={() => setIsKYCModalOpen(true)}
+            onClick={() => {
+              if (confirm("Your KYC was rejected. Do you want to try again?")) {
+                setIsKYCModalOpen(true);
+              }
+            }}
+            title="Click to retry"
           >
-            ⚠ KYC Failed - Retry
+            <AlertCircle size={16} /> Rejected - Retry
           </button>
+        ) : kycStatus === "pending" || kycStatus === "submitted" ? (
+          <div className={styles.kycBadgePending}>
+            ⧗ KYC Pending
+          </div>
         ) : (
           <button
             className={styles.kycBtn}
