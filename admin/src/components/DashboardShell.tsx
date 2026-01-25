@@ -21,8 +21,6 @@ export default function DashboardShell({
     if (path.includes("/dashboard/contacts")) return "Messages";
     if (path.includes("/dashboard/advisor")) return "Advisors";
     if (path.includes("/dashboard/tasks")) return "Task Manager";
-    if (path.includes("/dashboard/kyc")) return "KYC Requests";
-    if (path.includes("/dashboard/clients")) return "Clients";
     return "Overview";
   };
 

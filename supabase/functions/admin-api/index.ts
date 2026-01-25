@@ -16,13 +16,6 @@ serve(async (req: Request): Promise<Response> => {
     const payload = await req.json().catch(() => ({}))
     const { action, data } = payload
 
-    if (!action) {
-      return new Response(JSON.stringify({ error: 'Action is required' }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 400,
-      })
-    }
-
     const adminUser = Deno.env.get('DASHBOARD_ADMIN_USER')
     const adminPass = Deno.env.get('DASHBOARD_ADMIN_PASS')
 
@@ -264,79 +257,6 @@ serve(async (req: Request): Promise<Response> => {
         })
         break;
 
-      case 'get-kyc-records':
-        try {
-          // Fetch all KYC records with user details
-          const { data: kycRecords, error: kycError } = await supabaseClient
-            .from('user_kyc')
-            .select('*')
-            .order('created_at', { ascending: false })
-
-          if (kycError) {
-            console.error('Error fetching KYC records:', kycError)
-            throw new Error(`Failed to fetch KYC records: ${kycError.message || 'Unknown error'}`)
-          }
-
-          if (!kycRecords || kycRecords.length === 0) {
-            result = []
-            break
-          }
-
-          // Fetch user details
-          const kycUserIds = kycRecords
-            .map((k: any) => k.user_id)
-            .filter((id: any) => id != null)
-
-          if (kycUserIds.length === 0) {
-            // No valid user IDs, return records without user data
-            result = kycRecords.map((k: any) => ({
-              ...k,
-              users: null
-            }))
-            break
-          }
-
-          const { data: kycUsersData, error: kycUsersError } = await supabaseClient
-            .from('users')
-            .select('id, full_name, email_id, mobile_number, phone')
-            .in('id', kycUserIds)
-
-          if (kycUsersError) {
-            console.error('Error fetching users for KYC:', kycUsersError)
-            // Return records without user data if user fetch fails
-            result = kycRecords.map((k: any) => ({
-              ...k,
-              users: null
-            }))
-            break
-          }
-
-          // Merge data
-          const kycUsersMap = new Map()
-          kycUsersData?.forEach((u: any) => {
-            if (!u.mobile_number && u.phone) {
-              u.mobile_number = u.phone
-            }
-            kycUsersMap.set(u.id, u)
-          })
-
-          result = kycRecords.map((k: any) => {
-            const user = kycUsersMap.get(k.user_id) || null
-            return {
-              ...k,
-              users: user ? {
-                full_name: user.full_name,
-                email_id: user.email_id,
-                mobile_number: user.mobile_number,
-              } : null
-            }
-          })
-        } catch (kycCaseError: any) {
-          console.error('Error in get-kyc-records case:', kycCaseError)
-          throw new Error(`KYC records fetch failed: ${kycCaseError.message || 'Unknown error'}`)
-        }
-        break;
-
       case 'get-client-details':
         const { clientId } = data // This is actually the kyc_id from the URL
         
@@ -512,31 +432,13 @@ serve(async (req: Request): Promise<Response> => {
 
   } catch (error: any) {
     console.error('Admin API Error:', error)
-    console.error('Error details:', {
-      message: error.message,
-      name: error.name,
-      code: error.code,
-      details: error.details,
-      hint: error.hint
-    })
-    
     const statusCode = error.message?.includes('Unauthorized') ? 401 
-      : error.message?.includes('not found') || error.code === 'PGRST116' ? 404 
-      : 500
-    
-    const errorResponse: any = {
+      : error.message?.includes('not found') ? 404 
+      : 400
+    return new Response(JSON.stringify({ 
       error: error.message || 'An error occurred',
-    }
-    
-    // Include additional error details in development
-    if (Deno.env.get('DENO_ENV') === 'development' || Deno.env.get('ENVIRONMENT') === 'development') {
-      errorResponse.stack = error.stack
-      errorResponse.details = error.details
-      errorResponse.hint = error.hint
-      errorResponse.code = error.code
-    }
-    
-    return new Response(JSON.stringify(errorResponse), {
+      stack: Deno.env.get('DENO_ENV') === 'development' ? error.stack : undefined
+    }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: statusCode,
     })

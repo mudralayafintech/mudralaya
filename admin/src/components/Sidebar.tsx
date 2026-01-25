@@ -11,7 +11,6 @@ import {
   CheckSquare,
   LogOut,
   Users,
-  Shield,
 } from "lucide-react";
 import styles from "./Sidebar.module.css";
 import clsx from "clsx";
@@ -47,12 +46,6 @@ const navItems = [
     path: "/dashboard/tasks",
     icon: CheckSquare,
     label: "Task Manager",
-  },
-  {
-    id: "kyc",
-    path: "/dashboard/kyc",
-    icon: Shield,
-    label: "KYC",
   },
   {
     id: "clients",
@@ -92,7 +85,7 @@ export default function Sidebar({
         <nav className={styles.nav}>
           <ul className={styles.navList}>
             {navItems.map((item) => {
-              const isActive = pathname === item.path || pathname?.startsWith(item.path + '/');
+              const isActive = pathname === item.path;
               return (
                 <li key={item.id}>
                   <Link
