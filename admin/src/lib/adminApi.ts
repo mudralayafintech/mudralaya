@@ -49,7 +49,7 @@ export async function adminApiRequest(action: string, data: any = {}) {
           // Check if it has a response property
           if ('response' in context && context.response instanceof Response) {
             response = context.response;
-            if (statusCode === 500 && response.status) {
+            if (statusCode === 500 && response && response.status) {
               statusCode = response.status;
             }
           }
