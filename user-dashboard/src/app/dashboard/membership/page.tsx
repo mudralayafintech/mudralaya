@@ -37,7 +37,7 @@ const BENEFITS = [
 
 export default function Membership() {
   const [billingCycle, setBillingCycle] = useState<"yearly" | "monthly">(
-    "yearly"
+    "yearly",
   );
   const [profile, setProfile] = useState<any>(null);
   const [user, setUser] = useState<any>(null);
@@ -109,8 +109,9 @@ export default function Membership() {
         amount: orderData.amount,
         currency: orderData.currency,
         name: "Mudralaya Fintech Private Limited",
-        description: `${billingCycle === "yearly" ? "Yearly" : "Monthly"
-          } Membership`,
+        description: `${
+          billingCycle === "yearly" ? "Yearly" : "Monthly"
+        } Membership`,
         image: "/logo.png",
         order_id: orderData.id,
         handler: async function (response: any) {
@@ -130,13 +131,13 @@ export default function Membership() {
                     plan: billingCycle,
                   },
                 },
-              }
+              },
             );
 
             if (verifyError) throw verifyError;
 
             alert(
-              "Membership processed successfully! Welcome to Mudralaya Gold."
+              "Membership processed successfully! Welcome to Mudralaya Gold.",
             );
             window.location.reload(); // Reload to fetch new profile data
           } catch (err) {
@@ -162,13 +163,24 @@ export default function Membership() {
     } catch (err: any) {
       console.error("Payment Error:", err);
       alert(
-        `Payment initialization failed: ${err.message || JSON.stringify(err)}`
+        `Payment initialization failed: ${err.message || JSON.stringify(err)}`,
       );
     }
   };
 
   const price = billingCycle === "yearly" ? 999 : 99;
   const period = billingCycle === "yearly" ? "Year" : "30 Days";
+
+  // Helper to parse expiry (handling potential formats)
+  const getExpiryDate = (dateStr: string) => {
+    if (!dateStr) return null;
+    // Try IST format first if applicable or just standard Date parsing
+    const d = new Date(dateStr);
+    return isNaN(d.getTime()) ? null : d;
+  };
+
+  const expiryDate = getExpiryDate(profile?.membership_expiry);
+  const isActive = expiryDate ? expiryDate > new Date() : false;
 
   if (loading && !profile)
     return (
@@ -205,15 +217,17 @@ export default function Membership() {
 
         <div className={styles.planToggle}>
           <button
-            className={`${styles.toggleOption} ${billingCycle === "yearly" ? styles.active : ""
-              }`}
+            className={`${styles.toggleOption} ${
+              billingCycle === "yearly" ? styles.active : ""
+            }`}
             onClick={() => setBillingCycle("yearly")}
           >
             Yearly -20%
           </button>
           <button
-            className={`${styles.toggleOption} ${billingCycle === "monthly" ? styles.active : ""
-              }`}
+            className={`${styles.toggleOption} ${
+              billingCycle === "monthly" ? styles.active : ""
+            }`}
             onClick={() => setBillingCycle("monthly")}
           >
             Monthly
@@ -256,9 +270,9 @@ export default function Membership() {
                 <span className={styles.value}>
                   {profile?.membership_expiry
                     ? new Date(profile.membership_expiry).toLocaleDateString(
-                      "en-US",
-                      { month: "2-digit", year: "2-digit" }
-                    )
+                        "en-US",
+                        { month: "2-digit", year: "2-digit" },
+                      )
                     : "MM/YY"}
                 </span>
               </div>
@@ -281,8 +295,17 @@ export default function Membership() {
         <div className={styles.priceText}>
           <span className={styles.priceAmount}>₹ {price}</span> / {period}
         </div>
-        <button className={styles.buyBtn} onClick={handleBuyNow}>
-          Buy Now <ArrowRight />
+        <button
+          className={styles.buyBtn}
+          onClick={handleBuyNow}
+          disabled={isActive}
+          style={{
+            opacity: isActive ? 0.7 : 1,
+            cursor: isActive ? "not-allowed" : "pointer",
+            backgroundColor: isActive ? "#22c55e" : undefined, // Green if active
+          }}
+        >
+          {isActive ? "Membership Active" : "Buy Now"} <ArrowRight />
         </button>
       </footer>
     </div>

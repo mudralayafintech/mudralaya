@@ -142,7 +142,7 @@ export default function Plans() {
                       plan: "individual",
                     },
                   },
-                }
+                },
               );
 
               if (verifyError) throw verifyError;
@@ -173,13 +173,13 @@ export default function Plans() {
       } catch (err: any) {
         console.error("Payment Error:", err);
         alert(
-          `Payment initialization failed: ${err.message || JSON.stringify(err)}`
+          `Payment initialization failed: ${err.message || JSON.stringify(err)}`,
         );
       }
     } else {
       // Business / Startup -> Contact Support
       alert(
-        `For ${plan.name}, please contact our sales team at support@mudralaya.com for a customized quote.`
+        `For ${plan.name}, please contact our sales team at support@mudralaya.com for a customized quote.`,
       );
     }
   };
@@ -222,8 +222,9 @@ export default function Plans() {
       type: "black",
       badgeType: "wide",
       hasCheckbox: true,
-      buttonText: "CHOOSE PLAN",
-      buttonStyle: "cyan",
+      buttonText:
+        profile?.plan_type === "INDIVIDUAL" ? "CURRENT PLAN" : "CHOOSE PLAN",
+      buttonStyle: profile?.plan_type === "INDIVIDUAL" ? "outline" : "cyan",
     },
     {
       id: 3,
@@ -362,13 +363,17 @@ export default function Plans() {
 
             <button
               className={`${styles.planBtn} ${getButtonStyle(
-                plan.buttonStyle
+                plan.buttonStyle,
               )}`}
               onClick={() => handlePlanSelect(plan)}
               disabled={plan.id === 1}
               style={{
-                cursor: plan.id === 1 ? "not-allowed" : "pointer",
-                opacity: plan.id === 1 ? 0.7 : 1,
+                cursor:
+                  plan.id === 1 || plan.buttonText === "CURRENT PLAN"
+                    ? "not-allowed"
+                    : "pointer",
+                opacity:
+                  plan.id === 1 || plan.buttonText === "CURRENT PLAN" ? 0.7 : 1,
               }}
             >
               {plan.buttonText}
