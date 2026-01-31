@@ -216,6 +216,10 @@ export default function Membership() {
       </div>
     );
 
+  const isCurrentPlanActive =
+    isActive &&
+    profile?.membership_type?.toLowerCase() === billingCycle.toLowerCase();
+
   return (
     <div className={styles.membershipPage}>
       <header className={styles.membershipHeader}>
@@ -307,14 +311,19 @@ export default function Membership() {
         <button
           className={styles.buyBtn}
           onClick={handleBuyNow}
-          disabled={isActive}
+          disabled={isCurrentPlanActive}
           style={{
-            opacity: isActive ? 0.7 : 1,
-            cursor: isActive ? "not-allowed" : "pointer",
-            backgroundColor: isActive ? "#22c55e" : undefined, // Green if active
+            opacity: isCurrentPlanActive ? 0.7 : 1,
+            cursor: isCurrentPlanActive ? "not-allowed" : "pointer",
+            backgroundColor: isCurrentPlanActive ? "#22c55e" : undefined,
           }}
         >
-          {isActive ? "Membership Active" : "Buy Now"} <ArrowRight />
+          {isCurrentPlanActive
+            ? "Membership Active"
+            : isActive
+              ? "Upgrade / Extend"
+              : "Buy Now"}{" "}
+          <ArrowRight />
         </button>
       </footer>
     </div>
