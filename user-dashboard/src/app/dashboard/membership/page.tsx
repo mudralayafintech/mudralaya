@@ -174,7 +174,16 @@ export default function Membership() {
   // Helper to parse expiry (handling potential formats)
   const getExpiryDate = (dateStr: string) => {
     if (!dateStr) return null;
-    // Try IST format first if applicable or just standard Date parsing
+
+    // Check for DD/MM/YYYY format (e.g. 31/01/2026...)
+    const ddmmyyyy = dateStr.match(/^(\d{2})\/(\d{2})\/(\d{4})/);
+    if (ddmmyyyy) {
+      const day = parseInt(ddmmyyyy[1], 10);
+      const month = parseInt(ddmmyyyy[2], 10) - 1; // Months are 0-indexed
+      const year = parseInt(ddmmyyyy[3], 10);
+      return new Date(year, month, day);
+    }
+
     const d = new Date(dateStr);
     return isNaN(d.getTime()) ? null : d;
   };
@@ -268,11 +277,11 @@ export default function Membership() {
               <div className={styles.cardExpiry}>
                 <span className={styles.label}>Expires</span>
                 <span className={styles.value}>
-                  {profile?.membership_expiry
-                    ? new Date(profile.membership_expiry).toLocaleDateString(
-                        "en-US",
-                        { month: "2-digit", year: "2-digit" },
-                      )
+                  {expiryDate
+                    ? expiryDate.toLocaleDateString("en-US", {
+                        month: "2-digit",
+                        year: "2-digit",
+                      })
                     : "MM/YY"}
                 </span>
               </div>
