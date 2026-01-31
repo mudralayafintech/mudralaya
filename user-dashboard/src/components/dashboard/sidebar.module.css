@@ -4,10 +4,7 @@
   left: 0;
   bottom: 0;
   width: 260px;
-  background: rgba(255,
-      255,
-      255,
-      0.85);
+  background: rgba(255, 255, 255, 0.85);
   /* More opaque to hide underlying content */
   backdrop-filter: blur(30px);
   -webkit-backdrop-filter: blur(30px);
@@ -41,7 +38,7 @@
   height: auto;
   object-fit: contain;
   filter: drop-shadow(0 4px 6px #0000001a);
-  border: 5px solid red;
+  /* border: 5px solid red; */
   /* DEBUG: Visual confirmation */
 }
 
@@ -87,7 +84,8 @@
   background: linear-gradient(135deg, #fff 0%, #f0f9ff 100%);
   color: var(--primary);
   border: 1px solid rgba(37, 99, 235, 0.1);
-  box-shadow: 0 10px 20px -5px rgba(37, 99, 235, 0.15),
+  box-shadow:
+    0 10px 20px -5px rgba(37, 99, 235, 0.15),
     inset 0 0 0 1px rgba(255, 255, 255, 0.8);
 }
 
