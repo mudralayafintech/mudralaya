@@ -129,6 +129,7 @@ export default function Login() {
     setOtp("");
     setTimer(60);
     setResendAttempts(0);
+
     if (phone.startsWith("+91")) {
       setPhone(phone.replace("+91", ""));
     }

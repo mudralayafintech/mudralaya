@@ -11,7 +11,7 @@ BEGIN
   -- Note: Using the ANON key or Service Role key header might be needed if --no-verify-jwt is NOT used.
   -- Since we deployed with --no-verify-jwt, no auth header is strictly required, 
   -- but adding Content-Type is good practice.
-  SELECT extensions.net_http_post(
+  SELECT net.http_post(
     url := 'https://mhsizqmhqngcaztresmh.supabase.co/functions/v1/push-notification',
     body := jsonb_build_object(
         'record', row_to_json(NEW),

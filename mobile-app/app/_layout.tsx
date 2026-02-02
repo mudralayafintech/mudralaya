@@ -10,6 +10,7 @@ import {
   PermissionsAndroid,
   Alert,
 } from "react-native";
+import { NotificationDropdown } from "@/components/NotificationDropdown";
 import { useRouter, useSegments, useRootNavigationState } from "expo-router";
 import { ThemeProvider } from "@/lib/ThemeContext";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
@@ -30,6 +31,13 @@ export default function RootLayout() {
   const [initialized, setInitialized] = useState(false);
   const segments = useSegments();
   const router = useRouter();
+
+  // Notification dropdown state
+  const [notificationVisible, setNotificationVisible] = useState(false);
+  const [notificationData, setNotificationData] = useState({
+    title: "",
+    message: "",
+  });
 
   const rootNavigationState = useRootNavigationState();
 
@@ -52,18 +60,34 @@ export default function RootLayout() {
         // 2. Subscribe to general topic
         messaging()
           .subscribeToTopic("all_users")
-          .then(() => console.log("Subscribed to all_users topic!"));
+          .then(() => {
+            console.log("Subscribed to all_users topic!");
+            // Alert.alert('Subscribed', 'Connected to notifications channel');
+          })
+          .catch((e) => console.error("Subscription failed", e));
       }
     };
 
     requestUserPermission();
 
+    // Debug: Log FCM status (removed alert)
+    const checkDebug = async () => {
+      const authStatus = await messaging().hasPermission();
+      console.log("FCM Debug: Auth Status", authStatus);
+
+      const token = await messaging().getToken();
+      console.log("FCM Debug: Token", token);
+    };
+    checkDebug();
+
     // 3. Listen for foreground messages
     const unsubscribe = messaging().onMessage(async (remoteMessage) => {
-      Alert.alert(
-        remoteMessage.notification?.title || "New Notification",
-        remoteMessage.notification?.body || "",
-      );
+      // Show custom animated dropdown
+      setNotificationData({
+        title: remoteMessage.notification?.title || "New Notification",
+        message: remoteMessage.notification?.body || "",
+      });
+      setNotificationVisible(true);
     });
 
     return unsubscribe;
@@ -108,7 +132,8 @@ export default function RootLayout() {
     if (!initialized || !rootNavigationState?.key) return;
 
     // Check if in auth group
-    const inAuthGroup = segments[0] === "(drawer)";
+    const inAuthGroup =
+      segments[0] === "(drawer)" || segments[0] === "notifications";
     const isPublicRoute =
       segments[0] === "login" ||
       segments[0] === "create-task" ||
@@ -174,10 +199,22 @@ export default function RootLayout() {
           <Stack.Screen name="signup" options={{ headerShown: false }} />
           <Stack.Screen name="onboarding" options={{ headerShown: false }} />
           <Stack.Screen
+            name="notifications"
+            options={{ headerShown: false, presentation: "modal" }}
+          />
+          <Stack.Screen
             name="+not-found"
             options={{ title: "Oops!", headerShown: true }}
           />
         </Stack>
+
+        {/* Animated Notification Dropdown */}
+        <NotificationDropdown
+          visible={notificationVisible}
+          title={notificationData.title}
+          message={notificationData.message}
+          onDismiss={() => setNotificationVisible(false)}
+        />
       </ThemeProvider>
     </GestureHandlerRootView>
   );
