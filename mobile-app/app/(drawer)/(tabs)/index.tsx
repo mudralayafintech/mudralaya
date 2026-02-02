@@ -11,6 +11,7 @@ import {
   Platform,
 } from "react-native";
 import { DrawerActions, useNavigation } from "@react-navigation/native";
+import { router } from "expo-router";
 import { supabase } from "@/lib/supabase";
 import {
   Play,
@@ -286,8 +287,10 @@ export default function DashboardHome() {
                     styles.bellBtn,
                     isDark && { backgroundColor: "rgba(30,41,59,0.5)" },
                   ]}
+                  onPress={() => router.push("/notifications")}
                 >
                   <Bell size={22} color={textColor} />
+                  {/* We can wire up the red dot to real state later */}
                   <View style={styles.notificationDot} />
                 </TouchableOpacity>
               </View>

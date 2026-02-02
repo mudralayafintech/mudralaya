@@ -77,11 +77,43 @@ export default function TaskManager() {
   const handleCreateTask = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await adminApiRequest("create-task", newTask);
+      // Convert empty strings to null for numeric fields
+      const taskData = {
+        ...newTask,
+        reward_free:
+          newTask.reward_free === "" ? 0 : Number(newTask.reward_free),
+        reward_member:
+          newTask.reward_member === "" ? null : Number(newTask.reward_member),
+        reward_premium:
+          newTask.reward_premium === "" ? null : Number(newTask.reward_premium),
+        reward_min:
+          newTask.reward_min === "" ? null : Number(newTask.reward_min),
+        reward_max:
+          newTask.reward_max === "" ? null : Number(newTask.reward_max),
+      };
+
+      await adminApiRequest("create-task", taskData);
       alert("Task Created Successfully");
       setShowCreateForm(false);
-      // Reset form (simplified for brevity, should reset all fields)
-      setNewTask({ ...newTask, title: "", description: "" });
+      // Reset form
+      setNewTask({
+        title: "",
+        description: "",
+        reward_free: "",
+        reward_premium: "",
+        reward_min: "",
+        reward_max: "",
+        reward_info: "",
+        type: "Daily",
+        task_type: "Daily",
+        video_link: "",
+        pdf_url: "",
+        action_link: "",
+        icon_type: "group",
+        target_audience: [],
+        steps: "",
+        reward_member: "",
+      });
       fetchTasks();
     } catch (err: any) {
       alert("Failed to create task: " + err.message);
@@ -188,25 +220,13 @@ export default function TaskManager() {
                 <div className={styles.col6}>
                   <label className={styles.label}>Task Title</label>
                   <input
+                    type="text"
                     className={styles.input}
                     value={newTask.title}
                     onChange={(e) =>
                       setNewTask({ ...newTask, title: e.target.value })
                     }
-                    placeholder="e.g., Daily Login Bonus"
-                    required
-                  />
-                </div>
-                <div className={styles.col3}>
-                  <label className={styles.label}>Free Reward (₹)</label>
-                  <input
-                    type="number"
-                    className={styles.input}
-                    value={newTask.reward_free}
-                    onChange={(e) =>
-                      setNewTask({ ...newTask, reward_free: e.target.value })
-                    }
-                    placeholder="0"
+                    placeholder="Enter task title"
                     required
                   />
                 </div>
@@ -227,6 +247,25 @@ export default function TaskManager() {
                     <option value="Dedicated">Dedicated Task</option>
                   </select>
                 </div>
+                <div className={styles.col3}>
+                  <label className={styles.label}>Icon Type</label>
+                  <select
+                    className={styles.select}
+                    value={newTask.icon_type}
+                    onChange={(e) =>
+                      setNewTask({ ...newTask, icon_type: e.target.value })
+                    }
+                  >
+                    <option value="group">Group</option>
+                    <option value="youtube">YouTube</option>
+                    <option value="facebook">Facebook</option>
+                    <option value="instagram">Instagram</option>
+                    <option value="twitter">Twitter</option>
+                    <option value="linkedin">LinkedIn</option>
+                    <option value="telegram">Telegram</option>
+                    <option value="whatsapp">WhatsApp</option>
+                  </select>
+                </div>
 
                 <div className={styles.col12}>
                   <label className={styles.label}>Description</label>
@@ -237,9 +276,152 @@ export default function TaskManager() {
                     onChange={(e) =>
                       setNewTask({ ...newTask, description: e.target.value })
                     }
-                    placeholder="Describe the task steps..."
+                    placeholder="Describe the task..."
                   />
                 </div>
+
+                <div className={styles.col12}>
+                  <label className={styles.label}>Steps (Optional)</label>
+                  <textarea
+                    className={styles.textarea}
+                    rows={2}
+                    value={newTask.steps}
+                    onChange={(e) =>
+                      setNewTask({ ...newTask, steps: e.target.value })
+                    }
+                    placeholder="Step-by-step instructions..."
+                  />
+                </div>
+
+                <div className={styles.col3}>
+                  <label className={styles.label}>Free Reward (₹)</label>
+                  <input
+                    type="number"
+                    className={styles.input}
+                    value={newTask.reward_free}
+                    onChange={(e) =>
+                      setNewTask({ ...newTask, reward_free: e.target.value })
+                    }
+                    placeholder="0"
+                  />
+                </div>
+                <div className={styles.col3}>
+                  <label className={styles.label}>Member Reward (₹)</label>
+                  <input
+                    type="number"
+                    className={styles.input}
+                    value={newTask.reward_member}
+                    onChange={(e) =>
+                      setNewTask({ ...newTask, reward_member: e.target.value })
+                    }
+                    placeholder="0"
+                  />
+                </div>
+                <div className={styles.col3}>
+                  <label className={styles.label}>Premium Reward (₹)</label>
+                  <input
+                    type="number"
+                    className={styles.input}
+                    value={newTask.reward_premium}
+                    onChange={(e) =>
+                      setNewTask({ ...newTask, reward_premium: e.target.value })
+                    }
+                    placeholder="0"
+                  />
+                </div>
+                <div className={styles.col3}>
+                  <label className={styles.label}>Reward Info</label>
+                  <input
+                    type="text"
+                    className={styles.input}
+                    value={newTask.reward_info}
+                    onChange={(e) =>
+                      setNewTask({ ...newTask, reward_info: e.target.value })
+                    }
+                    placeholder="e.g., Up to ₹500"
+                  />
+                </div>
+
+                <div className={styles.col6}>
+                  <label className={styles.label}>Video Link (Optional)</label>
+                  <input
+                    type="url"
+                    className={styles.input}
+                    value={newTask.video_link}
+                    onChange={(e) =>
+                      setNewTask({ ...newTask, video_link: e.target.value })
+                    }
+                    placeholder="https://youtube.com/..."
+                  />
+                </div>
+                <div className={styles.col6}>
+                  <label className={styles.label}>PDF URL (Optional)</label>
+                  <input
+                    type="url"
+                    className={styles.input}
+                    value={newTask.pdf_url}
+                    onChange={(e) =>
+                      setNewTask({ ...newTask, pdf_url: e.target.value })
+                    }
+                    placeholder="https://..."
+                  />
+                </div>
+
+                <div className={styles.col12}>
+                  <label className={styles.label}>Action Link (Optional)</label>
+                  <input
+                    type="url"
+                    className={styles.input}
+                    value={newTask.action_link}
+                    onChange={(e) =>
+                      setNewTask({ ...newTask, action_link: e.target.value })
+                    }
+                    placeholder="https://..."
+                  />
+                </div>
+
+                <div className={styles.col12}>
+                  <label className={styles.label}>Target Audience</label>
+                  <div
+                    style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}
+                  >
+                    {["All", "Free", "Member", "Premium"].map((audience) => (
+                      <label
+                        key={audience}
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "6px",
+                        }}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={newTask.target_audience.includes(audience)}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setNewTask({
+                                ...newTask,
+                                target_audience: [
+                                  ...newTask.target_audience,
+                                  audience,
+                                ],
+                              });
+                            } else {
+                              setNewTask({
+                                ...newTask,
+                                target_audience: newTask.target_audience.filter(
+                                  (a) => a !== audience,
+                                ),
+                              });
+                            }
+                          }}
+                        />
+                        {audience}
+                      </label>
+                    ))}
+                  </div>
+                </div>
+
                 <div className={styles.col12} style={{ textAlign: "right" }}>
                   <button type="submit" className={styles.saveBtn}>
                     Save Task

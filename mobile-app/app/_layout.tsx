@@ -2,11 +2,19 @@ import { Stack } from "expo-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { Session } from "@supabase/supabase-js";
-import { View, ActivityIndicator, Text } from "react-native";
+import {
+  View,
+  ActivityIndicator,
+  Text,
+  Platform,
+  PermissionsAndroid,
+  Alert,
+} from "react-native";
 import { useRouter, useSegments, useRootNavigationState } from "expo-router";
 import { ThemeProvider } from "@/lib/ThemeContext";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import * as SplashScreen from "expo-splash-screen";
+import messaging from "@react-native-firebase/messaging";
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -24,6 +32,42 @@ export default function RootLayout() {
   const router = useRouter();
 
   const rootNavigationState = useRootNavigationState();
+
+  useEffect(() => {
+    // 1. Request Permission
+    const requestUserPermission = async () => {
+      if (Platform.OS === "android" && Platform.Version >= 33) {
+        await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS,
+        );
+      }
+
+      const authStatus = await messaging().requestPermission();
+      const enabled =
+        authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+        authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+
+      if (enabled) {
+        console.log("Authorization status:", authStatus);
+        // 2. Subscribe to general topic
+        messaging()
+          .subscribeToTopic("all_users")
+          .then(() => console.log("Subscribed to all_users topic!"));
+      }
+    };
+
+    requestUserPermission();
+
+    // 3. Listen for foreground messages
+    const unsubscribe = messaging().onMessage(async (remoteMessage) => {
+      Alert.alert(
+        remoteMessage.notification?.title || "New Notification",
+        remoteMessage.notification?.body || "",
+      );
+    });
+
+    return unsubscribe;
+  }, []);
 
   useEffect(() => {
     // Check initial session

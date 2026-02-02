@@ -632,7 +632,7 @@ export default function Settings() {
               </View>
             ) : (
               <View style={styles.emptyNotifContainer}>
-                <Text style={[styles.emptyNotifText, { color: subTextColor }]}>
+                <Text style={[styles.emptyNotifText, { color: textColor }]}>
                   No new notifications
                 </Text>
               </View>
@@ -823,13 +823,13 @@ export default function Settings() {
                     styles.tab,
                     activeTab === tab.id && [
                       styles.activeTab,
-                      { backgroundColor: isDark ? "#4F46E5" : "#111" },
+                      { backgroundColor: "#4F46E5" },
                     ],
                     {
                       backgroundColor: isDark
                         ? "rgba(30, 41, 59, 0.5)"
-                        : "rgba(255,255,255,0.5)",
-                      borderColor: isDark ? "rgba(255,255,255,0.1)" : "#fff",
+                        : "#f1f5f9",
+                      borderColor: isDark ? "rgba(255,255,255,0.1)" : "#e2e8f0",
                     },
                   ]}
                   onPress={() => setActiveTab(tab.id)}
@@ -841,14 +841,14 @@ export default function Settings() {
                         ? "#fff"
                         : isDark
                           ? "#94a3b8"
-                          : "#666"
+                          : textColor
                     }
                   />
                   <Text
                     style={[
                       styles.tabText,
                       activeTab === tab.id && styles.activeTabText,
-                      { color: activeTab === tab.id ? "#fff" : subTextColor },
+                      { color: activeTab === tab.id ? "#fff" : textColor },
                     ]}
                   >
                     {tab.label}
