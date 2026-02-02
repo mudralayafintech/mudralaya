@@ -101,17 +101,33 @@ export default function Plans() {
               ? plan.price
               : 0;
 
-        const { data: orderData, error: orderError } =
-          await supabase.functions.invoke("razorpay-api", {
-            body: {
+        // Get session for auth headers
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
+
+        const orderRes = await fetch(
+          `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/razorpay-api`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${session?.access_token || ""}`,
+              apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "",
+            },
+            body: JSON.stringify({
               action: "create-order",
               data: {
                 amount: finalAmount,
                 currency: "INR",
                 receipt: `plan_ind_${Date.now()}`,
               },
-            },
-          });
+            }),
+          },
+        );
+
+        const orderData = await orderRes.json();
+        const orderError = !orderRes.ok ? orderData : null;
 
         if (orderError) throw orderError;
         if (!orderData) throw new Error("No order data returned");
@@ -128,10 +144,20 @@ export default function Plans() {
           handler: async function (response: any) {
             try {
               // 3. Verify Payment
-              const { error: verifyError } = await supabase.functions.invoke(
-                "razorpay-api",
+              const {
+                data: { session: verifySession },
+              } = await supabase.auth.getSession();
+
+              const verifyRes = await fetch(
+                `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/razorpay-api`,
                 {
-                  body: {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${verifySession?.access_token || ""}`,
+                    apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "",
+                  },
+                  body: JSON.stringify({
                     action: "verify-payment",
                     data: {
                       razorpay_payment_id: response.razorpay_payment_id,
@@ -140,10 +166,14 @@ export default function Plans() {
                       type: "plan",
                       userId: user?.id,
                       plan: "individual",
+                      hasLaptop: hasLaptop,
                     },
-                  },
+                  }),
                 },
               );
+
+              const verifyData = await verifyRes.json();
+              const verifyError = !verifyRes.ok ? verifyData : null;
 
               if (verifyError) throw verifyError;
 

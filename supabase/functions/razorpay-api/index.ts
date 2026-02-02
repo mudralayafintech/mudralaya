@@ -242,8 +242,28 @@ serve(async (req: Request): Promise<Response> => {
       // Handle Individual Plan Payment
       if (type === 'plan' && userId && plan === 'individual') {
         const now = new Date();
-        const { amount: rawAmount, hasLaptop } = data || {};
-        const finalAmount = rawAmount || 25000;
+        const { hasLaptop } = data || {};
+        
+        // Fetch the actual amount from Razorpay order to ensure accuracy
+        let finalAmount = 25000; // Default
+        try {
+          const razorAuth = btoa(`${RAZORPAY_KEY_ID}:${RAZORPAY_KEY_SECRET}`);
+          const orderResponse = await fetch(`https://api.razorpay.com/v1/orders/${razorpay_order_id}`, {
+            method: 'GET',
+            headers: {
+              'Authorization': `Basic ${razorAuth}`
+            }
+          });
+          
+          if (orderResponse.ok) {
+            const orderData = await orderResponse.json();
+            // Razorpay stores amount in paise, convert to rupees
+            finalAmount = Math.round(orderData.amount / 100);
+            console.log('Fetched actual amount from Razorpay:', finalAmount);
+          }
+        } catch (e) {
+          console.error('Failed to fetch Razorpay order, using default:', e);
+        }
 
         // 1. Record Transaction (STRICTLY matching user schema + transaction_id)
         const txPayload: any = {
