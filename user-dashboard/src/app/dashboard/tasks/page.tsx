@@ -14,6 +14,8 @@ import {
   ChevronUp,
   FileText,
   Loader2,
+  Gem,
+  Youtube,
 } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
 import styles from "./tasks.module.css";
@@ -43,6 +45,9 @@ export default function TasksPage() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
   const supabase = createClient();
+
+  // Search and Filter States
+  const [searchQuery, setSearchQuery] = useState("");
 
   // Sidebar Filter States
   const [selectedProfessions, setSelectedProfessions] = useState<{
@@ -426,6 +431,8 @@ export default function TasksPage() {
           type="text"
           placeholder="Search tasks"
           className={styles.taskSearchInput}
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
         />
       </div>
 
