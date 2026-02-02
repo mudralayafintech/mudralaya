@@ -814,7 +814,6 @@ export default function Settings() {
             >
               {[
                 { id: "account", label: "Account", icon: User },
-                { id: "notifications", label: "Notifications", icon: Bell },
                 { id: "appearance", label: "Appearance", icon: Palette },
               ].map((tab: any) => (
                 <TouchableOpacity

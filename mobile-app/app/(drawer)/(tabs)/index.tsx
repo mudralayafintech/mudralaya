@@ -10,7 +10,11 @@ import {
   Dimensions,
   Platform,
 } from "react-native";
-import { DrawerActions, useNavigation } from "@react-navigation/native";
+import {
+  DrawerActions,
+  useNavigation,
+  useFocusEffect,
+} from "@react-navigation/native";
 import { router } from "expo-router";
 import { supabase } from "@/lib/supabase";
 import {
@@ -141,7 +145,34 @@ export default function DashboardHome() {
     setLoading(true);
     setRefreshing(true);
     fetchDashboardData();
+    fetchUnreadCount();
   }, []);
+
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  // Re-fetch badge when screen comes into focus (e.g. back from Notifications screen)
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchUnreadCount();
+    }, []),
+  );
+
+  const fetchUnreadCount = async () => {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) return;
+
+    // Count unread notifications (personal only for now to ensure read-status accuracy)
+    // To support global read status, we'd need a separate join table.
+    const { count } = await supabase
+      .from("notifications")
+      .select("*", { count: "exact", head: true })
+      .eq("user_id", user.id)
+      .is("read_at", null);
+
+    if (count !== null) setUnreadCount(count);
+  };
 
   const handleStartTask = async (task: Task) => {
     const {
@@ -290,8 +321,13 @@ export default function DashboardHome() {
                   onPress={() => router.push("/notifications")}
                 >
                   <Bell size={22} color={textColor} />
-                  {/* We can wire up the red dot to real state later */}
-                  <View style={styles.notificationDot} />
+                  {unreadCount > 0 && (
+                    <View style={styles.notificationBadge}>
+                      <Text style={styles.notificationCountText}>
+                        {unreadCount > 99 ? "99+" : unreadCount}
+                      </Text>
+                    </View>
+                  )}
                 </TouchableOpacity>
               </View>
 
@@ -651,16 +687,24 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     position: "relative",
   },
-  notificationDot: {
+  notificationBadge: {
     position: "absolute",
-    top: 8,
-    right: 8,
-    width: 8,
-    height: 8,
-    borderRadius: 4,
+    top: -4,
+    right: -4,
+    minWidth: 16,
+    height: 16,
+    borderRadius: 8,
     backgroundColor: "#ef4444",
+    justifyContent: "center",
+    alignItems: "center",
     borderWidth: 1.5,
     borderColor: "#fff",
+    paddingHorizontal: 2,
+  },
+  notificationCountText: {
+    color: "#fff",
+    fontSize: 9,
+    fontWeight: "800",
   },
   welcomeRow: {
     flexDirection: "row",

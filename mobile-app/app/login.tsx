@@ -323,7 +323,7 @@ const styles = StyleSheet.create({
   glassCard: {
     borderRadius: 24,
     padding: 24,
-    backgroundColor: "rgba(255,255,255,0.95)",
+    backgroundColor: "rgba(255, 255, 255, 1)",
     overflow: "hidden",
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 4 },
