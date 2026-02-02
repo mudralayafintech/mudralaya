@@ -30,6 +30,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
 import VideoModal from "@/components/VideoModal";
 import { GlassView } from "@/components/GlassView";
+import { Skeleton } from "@/components/Skeleton";
 import { StatusBar } from "expo-status-bar";
 
 interface Task {
@@ -122,8 +123,12 @@ export default function DashboardHome() {
     } catch (err) {
       console.error("Error fetching dashboard data:", err);
     } finally {
-      setLoading(false);
+      if (!refreshing) setLoading(false);
       setRefreshing(false);
+      // Ensure loading is false after a short delay for smooth transition if refreshing
+      if (refreshing) {
+        setTimeout(() => setLoading(false), 500);
+      }
     }
   };
 
@@ -132,6 +137,7 @@ export default function DashboardHome() {
   }, []);
 
   const onRefresh = React.useCallback(() => {
+    setLoading(true);
     setRefreshing(true);
     fetchDashboardData();
   }, []);
@@ -179,6 +185,50 @@ export default function DashboardHome() {
     ? "rgba(255,255,255,0.1)"
     : "rgba(255, 255, 255, 0.5)";
 
+  const DashboardSkeleton = () => (
+    <View style={styles.skeletonContainer}>
+      {/* Header Skeleton */}
+      <View style={styles.header}>
+        <View style={styles.headerTop}>
+          <Skeleton width={40} height={40} borderRadius={12} />
+          <Skeleton width={40} height={40} borderRadius={12} />
+        </View>
+        <View style={styles.welcomeRow}>
+          <View>
+            <Skeleton width={100} height={14} style={{ marginBottom: 8 }} />
+            <Skeleton width={150} height={24} />
+          </View>
+          <Skeleton width={100} height={36} borderRadius={20} />
+        </View>
+      </View>
+
+      {/* Stats Skeleton */}
+      <View style={styles.statsContainer}>
+        <View style={styles.statsRow}>
+          <Skeleton width="48%" height={80} borderRadius={24} />
+          <Skeleton width="48%" height={80} borderRadius={24} />
+        </View>
+        <Skeleton width="100%" height={60} borderRadius={24} />
+      </View>
+
+      {/* Ongoing Task Skeleton */}
+      <View style={styles.section}>
+        <Skeleton width={120} height={24} style={{ marginBottom: 12 }} />
+        <Skeleton width="100%" height={160} borderRadius={24} />
+      </View>
+
+      {/* Task List Skeleton */}
+      <View style={styles.section}>
+        <Skeleton width={180} height={24} style={{ marginBottom: 12 }} />
+        <View style={{ gap: 12 }}>
+          {[1, 2, 3].map((i) => (
+            <Skeleton key={i} width="100%" height={80} borderRadius={20} />
+          ))}
+        </View>
+      </View>
+    </View>
+  );
+
   return (
     <View style={[styles.container, { backgroundColor: bgColor }]}>
       <StatusBar style={isDark ? "light" : "dark"} />
@@ -197,302 +247,322 @@ export default function DashboardHome() {
       </View>
 
       <SafeAreaView style={styles.safeArea}>
-        <ScrollView
-          contentContainerStyle={styles.scrollContent}
-          refreshControl={
-            <RefreshControl
-              refreshing={refreshing}
-              onRefresh={onRefresh}
-              tintColor="#4f46e5"
-            />
-          }
-          showsVerticalScrollIndicator={false}
-        >
-          {/* Header Section */}
-          <View style={styles.header}>
-            <View style={styles.headerTop}>
-              <TouchableOpacity
-                style={[
-                  styles.menuBtn,
-                  isDark && { backgroundColor: "rgba(30,41,59,0.5)" },
-                ]}
-                onPress={() =>
-                  navigation.dispatch(DrawerActions.toggleDrawer())
-                }
-              >
-                <Menu size={24} color={textColor} />
-              </TouchableOpacity>
+        {loading ? (
+          <ScrollView
+            contentContainerStyle={styles.scrollContent}
+            showsVerticalScrollIndicator={false}
+          >
+            <DashboardSkeleton />
+          </ScrollView>
+        ) : (
+          <ScrollView
+            contentContainerStyle={styles.scrollContent}
+            refreshControl={
+              <RefreshControl
+                refreshing={refreshing}
+                onRefresh={onRefresh}
+                tintColor="#4f46e5"
+              />
+            }
+            showsVerticalScrollIndicator={false}
+          >
+            {/* Header Section */}
+            <View style={styles.header}>
+              <View style={styles.headerTop}>
+                <TouchableOpacity
+                  style={[
+                    styles.menuBtn,
+                    isDark && { backgroundColor: "rgba(30,41,59,0.5)" },
+                  ]}
+                  onPress={() =>
+                    navigation.dispatch(DrawerActions.toggleDrawer())
+                  }
+                >
+                  <Menu size={24} color={textColor} />
+                </TouchableOpacity>
 
-              <TouchableOpacity
-                style={[
-                  styles.bellBtn,
-                  isDark && { backgroundColor: "rgba(30,41,59,0.5)" },
-                ]}
-              >
-                <Bell size={22} color={textColor} />
-                <View style={styles.notificationDot} />
-              </TouchableOpacity>
+                <TouchableOpacity
+                  style={[
+                    styles.bellBtn,
+                    isDark && { backgroundColor: "rgba(30,41,59,0.5)" },
+                  ]}
+                >
+                  <Bell size={22} color={textColor} />
+                  <View style={styles.notificationDot} />
+                </TouchableOpacity>
+              </View>
+
+              <View style={styles.welcomeRow}>
+                <View style={styles.welcomeTextContainer}>
+                  <Text style={[styles.greeting, { color: subTextColor }]}>
+                    Welcome back,
+                  </Text>
+                  <Text
+                    style={[styles.username, { color: textColor }]}
+                    numberOfLines={1}
+                  >
+                    {profile?.full_name?.split(" ")[0] || "Partner"} 👋
+                  </Text>
+                </View>
+                <TouchableOpacity
+                  activeOpacity={0.8}
+                  onPress={() => setIsVideoModalOpen(true)}
+                >
+                  <GlassView intensity={80} style={styles.guidanceBtn}>
+                    <LinearGradient
+                      colors={[
+                        "rgba(79, 70, 229, 0.9)",
+                        "rgba(99, 102, 241, 0.9)",
+                      ]}
+                      start={{ x: 0, y: 0 }}
+                      end={{ x: 1, y: 1 }}
+                      style={styles.guidanceGradient}
+                    >
+                      <Play size={14} color="#fff" fill="#fff" />
+                      <Text style={styles.guidanceText}>Guidance</Text>
+                    </LinearGradient>
+                  </GlassView>
+                </TouchableOpacity>
+              </View>
             </View>
 
-            <View style={styles.welcomeRow}>
-              <View style={styles.welcomeTextContainer}>
-                <Text style={[styles.greeting, { color: subTextColor }]}>
-                  Welcome back,
-                </Text>
-                <Text
-                  style={[styles.username, { color: textColor }]}
-                  numberOfLines={1}
+            {/* Stats Grid - GLASS EFFECT */}
+            <View style={styles.statsContainer}>
+              <View style={styles.statsRow}>
+                {/* Today */}
+                <GlassView
+                  intensity={60}
+                  style={[
+                    styles.statCard,
+                    {
+                      borderColor: borderColor,
+                      backgroundColor: isDark
+                        ? "rgba(30,41,59,0.4)"
+                        : undefined,
+                    },
+                  ]}
                 >
-                  {profile?.full_name?.split(" ")[0] || "Partner"} 👋
-                </Text>
-              </View>
-              <TouchableOpacity
-                activeOpacity={0.8}
-                onPress={() => setIsVideoModalOpen(true)}
-              >
-                <GlassView intensity={80} style={styles.guidanceBtn}>
-                  <LinearGradient
-                    colors={[
-                      "rgba(79, 70, 229, 0.9)",
-                      "rgba(99, 102, 241, 0.9)",
+                  <View
+                    style={[
+                      styles.statIconBox,
+                      { backgroundColor: "rgba(59, 130, 246, 0.1)" },
                     ]}
+                  >
+                    <HandCoins size={20} color="#3b82f6" />
+                  </View>
+                  <View>
+                    <Text style={[styles.statLabel, { color: subTextColor }]}>
+                      Today
+                    </Text>
+                    <Text style={[styles.statValue, { color: textColor }]}>
+                      ₹{data.stats.today}
+                    </Text>
+                  </View>
+                </GlassView>
+
+                {/* Monthly */}
+                <GlassView
+                  intensity={60}
+                  style={[
+                    styles.statCard,
+                    {
+                      borderColor: borderColor,
+                      backgroundColor: isDark
+                        ? "rgba(30,41,59,0.4)"
+                        : undefined,
+                    },
+                  ]}
+                >
+                  <View
+                    style={[
+                      styles.statIconBox,
+                      { backgroundColor: "rgba(139, 92, 246, 0.1)" },
+                    ]}
+                  >
+                    <TrendingUp size={20} color="#8b5cf6" />
+                  </View>
+                  <View>
+                    <Text style={[styles.statLabel, { color: subTextColor }]}>
+                      Monthly
+                    </Text>
+                    <Text style={[styles.statValue, { color: textColor }]}>
+                      ₹{data.stats.monthly}
+                    </Text>
+                  </View>
+                </GlassView>
+              </View>
+
+              {/* Total Balance - Full Width */}
+              <GlassView
+                intensity={70}
+                style={[
+                  styles.statCard,
+                  styles.statCardFull,
+                  {
+                    borderColor: borderColor,
+                    backgroundColor: isDark ? "rgba(30,41,59,0.4)" : undefined,
+                  },
+                ]}
+              >
+                <View
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    gap: 12,
+                  }}
+                >
+                  <View
+                    style={[
+                      styles.statIconBox,
+                      { backgroundColor: "rgba(16, 185, 129, 0.1)" },
+                    ]}
+                  >
+                    <Wallet size={20} color="#10b981" />
+                  </View>
+                  <View>
+                    <Text style={[styles.statLabel, { color: subTextColor }]}>
+                      Total Earnings
+                    </Text>
+                    <Text style={[styles.statValue, { color: textColor }]}>
+                      ₹{data.stats.total}
+                    </Text>
+                  </View>
+                </View>
+                <ChevronRight size={20} color={subTextColor} />
+              </GlassView>
+            </View>
+
+            {/* Ongoing Task - Premium Dark Card */}
+            {data.ongoingTask && (
+              <View style={styles.section}>
+                <View style={styles.sectionHeader}>
+                  <Text style={[styles.sectionTitle, { color: textColor }]}>
+                    Active Mission
+                  </Text>
+                  <View style={styles.liveBadge}>
+                    <View style={styles.liveDot} />
+                    <Text style={styles.liveText}>Live</Text>
+                  </View>
+                </View>
+
+                <TouchableOpacity activeOpacity={0.9}>
+                  <LinearGradient
+                    colors={["#0f172a", "#1e293b", "#334155"]}
                     start={{ x: 0, y: 0 }}
                     end={{ x: 1, y: 1 }}
-                    style={styles.guidanceGradient}
+                    style={styles.ongoingCard}
                   >
-                    <Play size={14} color="#fff" fill="#fff" />
-                    <Text style={styles.guidanceText}>Guidance</Text>
-                  </LinearGradient>
-                </GlassView>
-              </TouchableOpacity>
-            </View>
-          </View>
+                    {/* Subtle glass overlay inside dark card */}
+                    <View style={styles.glassOverlay} />
 
-          {/* Stats Grid - GLASS EFFECT */}
-          <View style={styles.statsContainer}>
-            <View style={styles.statsRow}>
-              {/* Today */}
-              <GlassView
-                intensity={60}
-                style={[
-                  styles.statCard,
-                  {
-                    borderColor: borderColor,
-                    backgroundColor: isDark ? "rgba(30,41,59,0.4)" : undefined,
-                  },
-                ]}
-              >
-                <View
-                  style={[
-                    styles.statIconBox,
-                    { backgroundColor: "rgba(59, 130, 246, 0.1)" },
-                  ]}
-                >
-                  <HandCoins size={20} color="#3b82f6" />
-                </View>
-                <View>
-                  <Text style={[styles.statLabel, { color: subTextColor }]}>
-                    Today
-                  </Text>
-                  <Text style={[styles.statValue, { color: textColor }]}>
-                    ₹{data.stats.today}
-                  </Text>
-                </View>
-              </GlassView>
-
-              {/* Monthly */}
-              <GlassView
-                intensity={60}
-                style={[
-                  styles.statCard,
-                  {
-                    borderColor: borderColor,
-                    backgroundColor: isDark ? "rgba(30,41,59,0.4)" : undefined,
-                  },
-                ]}
-              >
-                <View
-                  style={[
-                    styles.statIconBox,
-                    { backgroundColor: "rgba(139, 92, 246, 0.1)" },
-                  ]}
-                >
-                  <TrendingUp size={20} color="#8b5cf6" />
-                </View>
-                <View>
-                  <Text style={[styles.statLabel, { color: subTextColor }]}>
-                    Monthly
-                  </Text>
-                  <Text style={[styles.statValue, { color: textColor }]}>
-                    ₹{data.stats.monthly}
-                  </Text>
-                </View>
-              </GlassView>
-            </View>
-
-            {/* Total Balance - Full Width */}
-            <GlassView
-              intensity={70}
-              style={[
-                styles.statCard,
-                styles.statCardFull,
-                {
-                  borderColor: borderColor,
-                  backgroundColor: isDark ? "rgba(30,41,59,0.4)" : undefined,
-                },
-              ]}
-            >
-              <View
-                style={{ flexDirection: "row", alignItems: "center", gap: 12 }}
-              >
-                <View
-                  style={[
-                    styles.statIconBox,
-                    { backgroundColor: "rgba(16, 185, 129, 0.1)" },
-                  ]}
-                >
-                  <Wallet size={20} color="#10b981" />
-                </View>
-                <View>
-                  <Text style={[styles.statLabel, { color: subTextColor }]}>
-                    Total Earnings
-                  </Text>
-                  <Text style={[styles.statValue, { color: textColor }]}>
-                    ₹{data.stats.total}
-                  </Text>
-                </View>
-              </View>
-              <ChevronRight size={20} color={subTextColor} />
-            </GlassView>
-          </View>
-
-          {/* Ongoing Task - Premium Dark Card */}
-          {data.ongoingTask && (
-            <View style={styles.section}>
-              <View style={styles.sectionHeader}>
-                <Text style={[styles.sectionTitle, { color: textColor }]}>
-                  Active Mission
-                </Text>
-                <View style={styles.liveBadge}>
-                  <View style={styles.liveDot} />
-                  <Text style={styles.liveText}>Live</Text>
-                </View>
-              </View>
-
-              <TouchableOpacity activeOpacity={0.9}>
-                <LinearGradient
-                  colors={["#0f172a", "#1e293b", "#334155"]}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 1 }}
-                  style={styles.ongoingCard}
-                >
-                  {/* Subtle glass overlay inside dark card */}
-                  <View style={styles.glassOverlay} />
-
-                  <View style={styles.ongoingHeader}>
-                    <View style={styles.ongoingIconBox}>
-                      {getIcon(data.ongoingTask.icon_type, "#22d3ee")}
-                    </View>
-                    <View style={{ flex: 1 }}>
-                      <Text style={styles.ongoingTitle} numberOfLines={1}>
-                        {data.ongoingTask.title}
-                      </Text>
-                      <Text style={styles.ongoingCategory}>
-                        {data.ongoingTask.category}
-                      </Text>
-                    </View>
-                  </View>
-
-                  <View style={styles.ongoingActions}>
-                    <TouchableOpacity style={styles.resumeBtn}>
-                      <Text style={styles.resumeBtnText}>Resume Task</Text>
-                      <ChevronRight size={16} color="#0f172a" />
-                    </TouchableOpacity>
-                    <TouchableOpacity style={styles.claimBtn}>
-                      <Text style={styles.claimBtnText}>Claim Reward</Text>
-                    </TouchableOpacity>
-                  </View>
-                </LinearGradient>
-              </TouchableOpacity>
-            </View>
-          )}
-
-          {/* Available Tasks */}
-          <View style={styles.section}>
-            <Text style={[styles.sectionTitle, { color: textColor }]}>
-              Available Opportunities
-            </Text>
-            <View style={styles.taskList}>
-              {data.tasks.map((task, index) => {
-                const isJoined = data.ongoingTask?.id === task.id;
-
-                return (
-                  <View
-                    key={task.id}
-                    style={[
-                      styles.taskCard,
-                      { backgroundColor: cardBg, borderColor: borderColor },
-                    ]}
-                  >
-                    <View style={styles.taskLeft}>
-                      <View
-                        style={[
-                          styles.taskIconBox,
-                          {
-                            backgroundColor: isDark
-                              ? "rgba(255,255,255,0.05)"
-                              : index % 2 === 0
-                                ? "#eff6ff"
-                                : "#f5f3ff",
-                          },
-                        ]}
-                      >
-                        {getIcon(
-                          task.icon_type,
-                          index % 2 === 0 ? "#3b82f6" : "#8b5cf6",
-                        )}
+                    <View style={styles.ongoingHeader}>
+                      <View style={styles.ongoingIconBox}>
+                        {getIcon(data.ongoingTask.icon_type, "#22d3ee")}
                       </View>
-                      <View style={styles.taskInfo}>
-                        <Text
-                          style={[styles.taskTitle, { color: textColor }]}
-                          numberOfLines={1}
-                        >
-                          {task.title}
+                      <View style={{ flex: 1 }}>
+                        <Text style={styles.ongoingTitle} numberOfLines={1}>
+                          {data.ongoingTask.title}
                         </Text>
-                        <Text
-                          style={[styles.taskCategory, { color: subTextColor }]}
-                        >
-                          {task.category}
+                        <Text style={styles.ongoingCategory}>
+                          {data.ongoingTask.category}
                         </Text>
                       </View>
                     </View>
 
-                    {isJoined ? (
-                      <View style={styles.joinedBadge}>
-                        <CheckCircle2 size={14} color="#16a34a" />
-                        <Text style={styles.joinedText}>Joined</Text>
-                      </View>
-                    ) : (
-                      <TouchableOpacity
-                        style={styles.startBtn}
-                        onPress={() => handleStartTask(task)}
-                        disabled={
-                          joiningTaskId === task.id || !!data.ongoingTask
-                        }
-                      >
-                        {joiningTaskId === task.id ? (
-                          <ActivityIndicator size="small" color="#fff" />
-                        ) : (
-                          <Text style={styles.startBtnText}>Start</Text>
-                        )}
+                    <View style={styles.ongoingActions}>
+                      <TouchableOpacity style={styles.resumeBtn}>
+                        <Text style={styles.resumeBtnText}>Resume Task</Text>
+                        <ChevronRight size={16} color="#0f172a" />
                       </TouchableOpacity>
-                    )}
-                  </View>
-                );
-              })}
+                      <TouchableOpacity style={styles.claimBtn}>
+                        <Text style={styles.claimBtnText}>Claim Reward</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </LinearGradient>
+                </TouchableOpacity>
+              </View>
+            )}
+
+            {/* Available Tasks */}
+            <View style={styles.section}>
+              <Text style={[styles.sectionTitle, { color: textColor }]}>
+                Available Opportunities
+              </Text>
+              <View style={styles.taskList}>
+                {data.tasks.map((task, index) => {
+                  const isJoined = data.ongoingTask?.id === task.id;
+
+                  return (
+                    <View
+                      key={task.id}
+                      style={[
+                        styles.taskCard,
+                        { backgroundColor: cardBg, borderColor: borderColor },
+                      ]}
+                    >
+                      <View style={styles.taskLeft}>
+                        <View
+                          style={[
+                            styles.taskIconBox,
+                            {
+                              backgroundColor: isDark
+                                ? "rgba(255,255,255,0.05)"
+                                : index % 2 === 0
+                                  ? "#eff6ff"
+                                  : "#f5f3ff",
+                            },
+                          ]}
+                        >
+                          {getIcon(
+                            task.icon_type,
+                            index % 2 === 0 ? "#3b82f6" : "#8b5cf6",
+                          )}
+                        </View>
+                        <View style={styles.taskInfo}>
+                          <Text
+                            style={[styles.taskTitle, { color: textColor }]}
+                            numberOfLines={1}
+                          >
+                            {task.title}
+                          </Text>
+                          <Text
+                            style={[
+                              styles.taskCategory,
+                              { color: subTextColor },
+                            ]}
+                          >
+                            {task.category}
+                          </Text>
+                        </View>
+                      </View>
+
+                      {isJoined ? (
+                        <View style={styles.joinedBadge}>
+                          <CheckCircle2 size={14} color="#16a34a" />
+                          <Text style={styles.joinedText}>Joined</Text>
+                        </View>
+                      ) : (
+                        <TouchableOpacity
+                          style={styles.startBtn}
+                          onPress={() => handleStartTask(task)}
+                          disabled={
+                            joiningTaskId === task.id || !!data.ongoingTask
+                          }
+                        >
+                          {joiningTaskId === task.id ? (
+                            <ActivityIndicator size="small" color="#fff" />
+                          ) : (
+                            <Text style={styles.startBtnText}>Start</Text>
+                          )}
+                        </TouchableOpacity>
+                      )}
+                    </View>
+                  );
+                })}
+              </View>
             </View>
-          </View>
-        </ScrollView>
+          </ScrollView>
+        )}
 
         <VideoModal
           visible={isVideoModalOpen}
@@ -848,5 +918,8 @@ const styles = StyleSheet.create({
     color: "#16a34a",
     fontWeight: "600",
     fontSize: 12,
+  },
+  skeletonContainer: {
+    gap: 20,
   },
 });

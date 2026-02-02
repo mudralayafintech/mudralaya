@@ -10,6 +10,7 @@ import {
   Dimensions,
   LayoutAnimation,
   UIManager,
+  RefreshControl,
 } from "react-native";
 import { CustomAlert } from "../../components/CustomAlert";
 import { Stack, useRouter, useNavigation } from "expo-router";
@@ -32,6 +33,7 @@ import RazorpayCheckout from "react-native-razorpay";
 import { DrawerActions } from "@react-navigation/native";
 import { supabase } from "../../lib/supabase";
 import { useTheme } from "@/lib/ThemeContext";
+import { Skeleton } from "../../components/Skeleton";
 
 // Plan interface and constants
 
@@ -325,9 +327,39 @@ export default function PlansScreen() {
   const dotColor = isDark ? "#475569" : "#cbd5e1";
   const activeDotColor = isDark ? "#818cf8" : "#4f46e5";
 
+  const PlansSkeleton = () => (
+    <View style={{ padding: 20 }}>
+      {/* Header Text */}
+      <View style={{ marginBottom: 30 }}>
+        <Skeleton width={200} height={30} style={{ marginBottom: 10 }} />
+        <Skeleton width="90%" height={20} />
+      </View>
+
+      {/* Plan Card Skeleton */}
+      <View style={{ alignItems: "center" }}>
+        <Skeleton width={CARD_WIDTH} height={500} borderRadius={24} />
+      </View>
+
+      {/* Pagination Dots */}
+      <View
+        style={{
+          flexDirection: "row",
+          justifyContent: "center",
+          gap: 8,
+          marginTop: 24,
+        }}
+      >
+        {[1, 2, 3, 4].map((i) => (
+          <Skeleton key={i} width={8} height={8} borderRadius={4} />
+        ))}
+      </View>
+    </View>
+  );
+
   const [hasLaptop, setHasLaptop] = useState(false);
   const [currentPlan, setCurrentPlan] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     fetchUserStatus();
@@ -357,8 +389,18 @@ export default function PlansScreen() {
       }
     } catch (err) {
       console.error("Fetch Status Exception:", err);
+    } finally {
+      if (!refreshing) setLoading(false);
+      setRefreshing(false);
+      if (refreshing) setTimeout(() => setLoading(false), 500);
     }
   };
+
+  const onRefresh = React.useCallback(() => {
+    setLoading(true);
+    setRefreshing(true);
+    fetchUserStatus();
+  }, []);
   const [activeIndex, setActiveIndex] = useState(0);
   const [alert, setAlert] = useState({
     visible: false,
@@ -696,63 +738,77 @@ export default function PlansScreen() {
         <ScrollView
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              tintColor="#4f46e5"
+            />
+          }
         >
-          <View style={styles.pageHeader}>
-            <Text style={[styles.title, { color: textColor }]}>
-              Mudralaya Plans
-            </Text>
-            <Text style={[styles.subtitle, { color: subTextColor }]}>
-              Choose the best plan for yourself and start your journey with
-              Mudralaya
-            </Text>
-          </View>
+          {loading ? (
+            <PlansSkeleton />
+          ) : (
+            <>
+              <View style={styles.pageHeader}>
+                <Text style={[styles.title, { color: textColor }]}>
+                  Mudralaya Plans
+                </Text>
+                <Text style={[styles.subtitle, { color: subTextColor }]}>
+                  Choose the best plan for yourself and start your journey with
+                  Mudralaya
+                </Text>
+              </View>
 
-          <ScrollView
-            horizontal
-            pagingEnabled={false}
-            snapToInterval={CARD_WIDTH + CARD_SPACING * 2}
-            snapToAlignment="center"
-            decelerationRate="fast"
-            showsHorizontalScrollIndicator={false}
-            onScroll={(e) => {
-              const x = e.nativeEvent.contentOffset.x;
-              const index = Math.round(x / (CARD_WIDTH + CARD_SPACING * 2));
-              setActiveIndex(index);
-            }}
-            scrollEventThrottle={16}
-            contentContainerStyle={{
-              paddingHorizontal: (width - CARD_WIDTH - CARD_SPACING * 2) / 2,
-              alignItems: "flex-start",
-            }}
-          >
-            {plans.map((plan) => (
-              <PlanCard
-                key={plan.id}
-                plan={plan}
-                onSelect={handlePlanSelect}
-                hasLaptop={hasLaptop}
-                setHasLaptop={setHasLaptop}
-                currentPlan={currentPlan}
-              />
-            ))}
-          </ScrollView>
+              <ScrollView
+                horizontal
+                pagingEnabled={false}
+                snapToInterval={CARD_WIDTH + CARD_SPACING * 2}
+                snapToAlignment="center"
+                decelerationRate="fast"
+                showsHorizontalScrollIndicator={false}
+                onScroll={(e) => {
+                  const x = e.nativeEvent.contentOffset.x;
+                  const index = Math.round(x / (CARD_WIDTH + CARD_SPACING * 2));
+                  setActiveIndex(index);
+                }}
+                scrollEventThrottle={16}
+                contentContainerStyle={{
+                  paddingHorizontal:
+                    (width - CARD_WIDTH - CARD_SPACING * 2) / 2,
+                  alignItems: "flex-start",
+                }}
+              >
+                {plans.map((plan) => (
+                  <PlanCard
+                    key={plan.id}
+                    plan={plan}
+                    onSelect={handlePlanSelect}
+                    hasLaptop={hasLaptop}
+                    setHasLaptop={setHasLaptop}
+                    currentPlan={currentPlan}
+                  />
+                ))}
+              </ScrollView>
 
-          {/* Pagination Dots */}
-          <View style={styles.pagination}>
-            {plans.map((_, i) => (
-              <View
-                key={i}
-                style={[
-                  styles.dot,
-                  {
-                    backgroundColor:
-                      activeIndex === i ? activeDotColor : dotColor,
-                  },
-                  activeIndex === i ? styles.activeDot : null,
-                ]}
-              />
-            ))}
-          </View>
+              {/* Pagination Dots */}
+              <View style={styles.pagination}>
+                {plans.map((_, i) => (
+                  <View
+                    key={i}
+                    style={[
+                      styles.dot,
+                      {
+                        backgroundColor:
+                          activeIndex === i ? activeDotColor : dotColor,
+                      },
+                      activeIndex === i ? styles.activeDot : null,
+                    ]}
+                  />
+                ))}
+              </View>
+            </>
+          )}
 
           <CustomAlert
             visible={alert.visible}

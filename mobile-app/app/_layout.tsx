@@ -115,19 +115,23 @@ export default function RootLayout() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <ThemeProvider>
-        <Stack screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="login" />
-          <Stack.Screen name="(drawer)" />
+        <Stack
+          screenOptions={{
+            headerShown: false,
+            animation: "slide_from_right", // Smooth native-like transition
+            animationDuration: 200,
+            gestureEnabled: true, // Enable swipe back
+            presentation: "card",
+          }}
+        >
+          <Stack.Screen name="(drawer)" options={{ headerShown: false }} />
+          <Stack.Screen name="index" options={{ headerShown: false }} />
+          <Stack.Screen name="login" options={{ headerShown: false }} />
+          <Stack.Screen name="signup" options={{ headerShown: false }} />
+          <Stack.Screen name="onboarding" options={{ headerShown: false }} />
           <Stack.Screen
-            name="profile"
-            options={{
-              headerShown: true,
-              title: "Profile",
-              headerBackTitleVisible: false,
-              headerStyle: { backgroundColor: "#fff" },
-              headerTitleStyle: { color: "#0f172a", fontWeight: "bold" },
-              headerTintColor: "#0f172a",
-            }}
+            name="+not-found"
+            options={{ title: "Oops!", headerShown: true }}
           />
         </Stack>
       </ThemeProvider>

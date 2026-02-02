@@ -153,13 +153,26 @@ serve(async (req: Request): Promise<Response> => {
         try {
           const { data: userData } = await supabaseClient
             .from('users')
-            .select('membership_expiry')
+            .select('membership_expiry, membership_type')
             .eq('id', userId)
             .single();
           
           if (userData?.membership_expiry) {
             const existingDate = parseAnyDate(userData.membership_expiry);
             if (existingDate && existingDate > new Date()) {
+              // Active Membership Found
+              const currentPlan = userData.membership_type || 'monthly'; // default to monthly if not set
+              
+              // 1. Downgrade Guard: IF Active Yearly AND Trying Monthly -> BLOCK
+              if (currentPlan.toLowerCase() === 'yearly' && !isYearly) {
+                 return new Response(JSON.stringify({ 
+                   error: "Cannot downgrade to Monthly while Yearly plan is active. Please wait for expiry." 
+                 }), {
+                  headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+                  status: 400,
+                });
+              }
+
               currentExpiryDate = existingDate;
               isStacked = true;
             }

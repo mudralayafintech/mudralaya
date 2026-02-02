@@ -30,6 +30,7 @@ import {
   Bell,
 } from "lucide-react-native";
 import { GlassView } from "@/components/GlassView";
+import { Skeleton } from "@/components/Skeleton";
 import { useTheme } from "@/lib/ThemeContext";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { DrawerActions, useNavigation } from "@react-navigation/native";
@@ -61,6 +62,7 @@ export default function TasksScreen() {
   const navigation = useNavigation();
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState("All Task");
   const [expandedTaskId, setExpandedTaskId] = useState<string | null>(null);
@@ -115,9 +117,17 @@ export default function TasksScreen() {
     } catch (err) {
       console.error("Error fetching tasks:", err);
     } finally {
-      setLoading(false);
+      if (!refreshing) setLoading(false);
+      setRefreshing(false);
+      if (refreshing) setTimeout(() => setLoading(false), 500);
     }
   };
+
+  const onRefresh = React.useCallback(() => {
+    setLoading(true);
+    setRefreshing(true);
+    fetchTasks();
+  }, []);
 
   const handleTakeTask = async (task: Task) => {
     if (task.action_link) {
@@ -337,11 +347,34 @@ export default function TasksScreen() {
 
       <SafeAreaView style={styles.safeArea} edges={["top"]}>
         {loading ? (
-          <ActivityIndicator
-            size="large"
-            color="#0f172a"
-            style={{ marginTop: 100 }}
-          />
+          <View style={{ padding: 20, gap: 16 }}>
+            {/* Header Skeleton */}
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "space-between",
+                marginBottom: 10,
+              }}
+            >
+              <Skeleton width={40} height={40} borderRadius={12} />
+              <Skeleton width={40} height={40} borderRadius={12} />
+            </View>
+            <Skeleton width="100%" height={50} borderRadius={16} />
+
+            {/* Tabs Skeleton */}
+            <View style={{ flexDirection: "row", gap: 10, marginTop: 10 }}>
+              <Skeleton width={80} height={36} borderRadius={20} />
+              <Skeleton width={80} height={36} borderRadius={20} />
+              <Skeleton width={80} height={36} borderRadius={20} />
+            </View>
+
+            {/* Task Cards Skeleton */}
+            {[1, 2, 3, 4].map((i) => (
+              <View key={i} style={{ marginTop: 20 }}>
+                <Skeleton width="100%" height={100} borderRadius={20} />
+              </View>
+            ))}
+          </View>
         ) : (
           <FlatList
             ListHeaderComponent={renderHeader}
@@ -349,6 +382,8 @@ export default function TasksScreen() {
             keyExtractor={(item) => item.id}
             contentContainerStyle={styles.listContent}
             showsVerticalScrollIndicator={false}
+            refreshing={refreshing}
+            onRefresh={onRefresh}
             renderItem={({ item }) => (
               <GlassView
                 intensity={70}

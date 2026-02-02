@@ -32,6 +32,7 @@ import {
   Bell,
 } from "lucide-react-native";
 import { GlassView } from "@/components/GlassView";
+import { Skeleton } from "@/components/Skeleton";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { DrawerActions, useNavigation } from "@react-navigation/native";
 import { LinearGradient } from "expo-linear-gradient";
@@ -132,12 +133,14 @@ export default function WalletScreen() {
     } catch (error) {
       console.error("Error fetching data:", error);
     } finally {
-      setLoading(false);
+      if (!refreshing) setLoading(false);
       setRefreshing(false);
+      if (refreshing) setTimeout(() => setLoading(false), 500);
     }
   };
 
   const onRefresh = React.useCallback(() => {
+    setLoading(true);
     setRefreshing(true);
     fetchInitialData();
   }, []);
@@ -197,6 +200,52 @@ export default function WalletScreen() {
   const cardBg = isDark ? "rgba(30, 41, 59, 0.6)" : "#fff";
   const borderColor = isDark ? "transparent" : "rgba(255,255,255,0.5)";
 
+  const WalletSkeleton = () => (
+    <View style={{ gap: 24, padding: 20 }}>
+      {/* Header */}
+      <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+        <Skeleton width={40} height={40} borderRadius={12} />
+        <View style={{ flexDirection: "row", gap: 12 }}>
+          <Skeleton width={80} height={32} borderRadius={20} />
+          <Skeleton width={40} height={40} borderRadius={12} />
+        </View>
+      </View>
+
+      {/* Stats Grid */}
+      <View style={{ flexDirection: "row", gap: 12 }}>
+        <Skeleton width="48%" height={80} borderRadius={24} />
+        <Skeleton width="48%" height={80} borderRadius={24} />
+      </View>
+
+      {/* Metrics Row */}
+      <View style={{ flexDirection: "row", gap: 12, flexWrap: "wrap" }}>
+        {[1, 2, 3, 4].map((i) => (
+          <Skeleton key={i} width="47%" height={100} borderRadius={24} />
+        ))}
+      </View>
+
+      {/* Payout Card */}
+      <Skeleton width="100%" height={180} borderRadius={24} />
+
+      {/* Bank Details */}
+      <Skeleton width="100%" height={200} borderRadius={24} />
+
+      {/* Recent Transactions */}
+      <View>
+        <Skeleton width={150} height={20} style={{ marginBottom: 12 }} />
+        {[1, 2, 3].map((i) => (
+          <Skeleton
+            key={i}
+            width="100%"
+            height={70}
+            borderRadius={20}
+            style={{ marginBottom: 10 }}
+          />
+        ))}
+      </View>
+    </View>
+  );
+
   return (
     <View style={styles.container}>
       <StatusBar style={isDark ? "light" : "dark"} />
@@ -225,420 +274,465 @@ export default function WalletScreen() {
             />
           }
         >
-          <View style={styles.headerContainer}>
-            {/* Top Bar: Menu, KYC & Bell */}
-            <View style={styles.headerTop}>
-              <TouchableOpacity
-                style={[
-                  styles.menuBtn,
-                  isDark && { backgroundColor: "rgba(30,41,59,0.5)" },
-                ]}
-                onPress={() =>
-                  navigation.dispatch(DrawerActions.toggleDrawer())
-                }
-              >
-                <Menu size={24} color={iconColor} />
-              </TouchableOpacity>
-
-              <View
-                style={{ flexDirection: "row", alignItems: "center", gap: 12 }}
-              >
-                <TouchableOpacity
-                  activeOpacity={0.8}
-                  style={[
-                    styles.kycBadge,
-                    kycStatus === "verified"
-                      ? { backgroundColor: "#dcfce7", borderColor: "#bbf7d0" } // Green
-                      : kycStatus === "rejected"
-                        ? { backgroundColor: "#fee2e2", borderColor: "#fecaca" } // Red
-                        : {
-                            backgroundColor: "#ffedd5",
-                            borderColor: "#fed7aa",
-                          }, // Orange
-                    { marginBottom: 0 }, // Reset margin for top bar placement
-                  ]}
-                  onPress={() => {
-                    if (kycStatus !== "verified") setKycModalVisible(true);
-                  }}
-                >
-                  {kycStatus === "verified" ? (
-                    <CheckCircle size={14} color="#16a34a" />
-                  ) : kycStatus === "rejected" ? (
-                    <AlertCircle size={14} color="#ef4444" />
-                  ) : (
-                    <AlertCircle size={14} color="#f97316" />
-                  )}
-                  <Text
-                    style={[
-                      styles.kycText,
-                      kycStatus === "verified"
-                        ? { color: "#16a34a" }
-                        : kycStatus === "rejected"
-                          ? { color: "#ef4444" }
-                          : { color: "#c2410c" },
-                    ]}
-                  >
-                    {kycStatus === "verified" ? "Verified" : "KYC"}
-                  </Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  style={[
-                    styles.bellBtn,
-                    isDark && { backgroundColor: "rgba(30,41,59,0.5)" },
-                  ]}
-                >
-                  <Bell size={22} color={iconColor} />
-                  <View style={styles.notificationDot} />
-                </TouchableOpacity>
-              </View>
-            </View>
-          </View>
-
-          {/* Stats Grid - Premium Glass */}
-          <View style={styles.statsGrid}>
-            <GlassView
-              intensity={70}
-              style={[styles.statCardLarge, { borderColor }]}
-              tint={isDark ? "dark" : "light"}
-            >
-              <View
-                style={[
-                  styles.iconCircle,
-                  { backgroundColor: "rgba(249, 115, 22, 0.1)" },
-                ]}
-              >
-                <ArrowUpRight size={22} color="#f97316" />
-              </View>
-              <View>
-                <Text style={styles.statLabel}>Today's Pending</Text>
-                <Text style={[styles.statValue, { color: textColor }]}>
-                  ₹ {walletData.stats.today}
-                </Text>
-              </View>
-            </GlassView>
-
-            <GlassView
-              intensity={70}
-              style={[styles.statCardLarge, { borderColor }]}
-              tint={isDark ? "dark" : "light"}
-            >
-              <View
-                style={[
-                  styles.iconCircle,
-                  { backgroundColor: "rgba(168, 85, 247, 0.1)" },
-                ]}
-              >
-                <ArrowDownLeft size={22} color="#a855f7" />
-              </View>
-              <View>
-                <Text style={styles.statLabel}>This Month</Text>
-                <Text style={[styles.statValue, { color: textColor }]}>
-                  ₹ {walletData.stats.monthly}
-                </Text>
-              </View>
-            </GlassView>
-          </View>
-
-          <View style={styles.metricsRow}>
-            <GlassView
-              intensity={50}
-              style={[styles.metricCard, { borderColor }]}
-              tint={isDark ? "dark" : "light"}
-            >
-              <View style={[styles.metricIcon, { backgroundColor: "#f0fdf4" }]}>
-                <BarChart2 size={18} color="#16a34a" />
-              </View>
-              <Text style={[styles.metricValue, { color: textColor }]}>
-                ₹ {walletData.stats.approved}
-              </Text>
-              <Text style={styles.metricLabel}>Approved</Text>
-            </GlassView>
-
-            <GlassView
-              intensity={50}
-              style={[styles.metricCard, { borderColor }]}
-              tint={isDark ? "dark" : "light"}
-            >
-              <View style={[styles.metricIcon, { backgroundColor: "#fff7ed" }]}>
-                <RefreshCw size={18} color="#f97316" />
-              </View>
-              <Text style={[styles.metricValue, { color: textColor }]}>
-                ₹ {walletData.stats.pending}
-              </Text>
-              <Text style={styles.metricLabel}>Pending</Text>
-            </GlassView>
-
-            <GlassView
-              intensity={50}
-              style={[styles.metricCard, { borderColor }]}
-              tint={isDark ? "dark" : "light"}
-            >
-              <View style={[styles.metricIcon, { backgroundColor: "#eff6ff" }]}>
-                <CreditCard size={18} color="#3b82f6" />
-              </View>
-              <Text style={[styles.metricValue, { color: textColor }]}>
-                ₹ {walletData.stats.total}
-              </Text>
-              <Text style={styles.metricLabel}>Total</Text>
-            </GlassView>
-
-            <GlassView
-              intensity={50}
-              style={[styles.metricCard, { borderColor }]}
-              tint={isDark ? "dark" : "light"}
-            >
-              <View style={[styles.metricIcon, { backgroundColor: "#f5f3ff" }]}>
-                <Award size={18} color="#8b5cf6" />
-              </View>
-              <Text style={[styles.metricValue, { color: textColor }]}>
-                ₹ {walletData.stats.payout}
-              </Text>
-              <Text style={styles.metricLabel}>Payout</Text>
-            </GlassView>
-          </View>
-
-          {/* Payout Section - Dark Premium Card */}
-          <View style={styles.section}>
-            <LinearGradient
-              colors={["#1e293b", "#0f172a"]}
-              style={styles.payoutCard}
-            >
-              <View style={styles.payoutHeader}>
-                <Text style={styles.payoutTitle}>Withdraw Funds</Text>
-                <HelpCircle size={20} color="#94a3b8" />
-              </View>
-
-              <View style={styles.payoutStats}>
-                <View>
-                  <Text style={styles.payoutLabel}>Min. Payout</Text>
-                  <Text style={styles.payoutValue}>₹ 500</Text>
-                </View>
-                <View style={styles.verticalLine} />
-                <View>
-                  <Text style={styles.payoutLabel}>Pending</Text>
-                  <Text style={styles.payoutValue}>
-                    ₹ {walletData.stats.pending}
-                  </Text>
-                </View>
-              </View>
-
-              <TouchableOpacity
-                style={[
-                  styles.withdrawBtn,
-                  walletData.stats.approved < 500 && styles.withdrawBtnDisabled,
-                ]}
-                disabled={walletData.stats.approved < 500}
-                onPress={() => Alert.alert("Payout", "Payout request logic")}
-              >
-                <Text
-                  style={[
-                    styles.withdrawBtnText,
-                    walletData.stats.approved < 500 && { color: "#94a3b8" },
-                  ]}
-                >
-                  {walletData.stats.approved < 500
-                    ? "Balance below ₹500"
-                    : "Request Payout"}
-                </Text>
-                {walletData.stats.approved >= 500 && (
-                  <ArrowUpRight size={18} color="#0f172a" />
-                )}
-              </TouchableOpacity>
-            </LinearGradient>
-          </View>
-
-          {/* Bank Account Section */}
-          <View style={styles.section}>
-            <GlassView
-              intensity={60}
-              style={[
-                styles.bankCard,
-                { backgroundColor: cardBg, borderColor },
-              ]}
-              tint={isDark ? "dark" : "light"}
-            >
-              <View style={styles.cardHeader}>
-                <Text style={[styles.cardTitle, { color: textColor }]}>
-                  Bank Details
-                </Text>
-                {!isEditing && (
+          {loading ? (
+            <WalletSkeleton />
+          ) : (
+            <>
+              <View style={styles.headerContainer}>
+                {/* Top Bar: Menu, KYC & Bell */}
+                <View style={styles.headerTop}>
                   <TouchableOpacity
-                    style={styles.editBtn}
-                    onPress={() => setIsEditing(true)}
+                    style={[
+                      styles.menuBtn,
+                      isDark && { backgroundColor: "rgba(30,41,59,0.5)" },
+                    ]}
+                    onPress={() =>
+                      navigation.dispatch(DrawerActions.toggleDrawer())
+                    }
                   >
-                    <Edit2 size={16} color="#64748b" />
+                    <Menu size={24} color={iconColor} />
                   </TouchableOpacity>
-                )}
-              </View>
 
-              {isEditing ? (
-                <View style={styles.formContainer}>
-                  <TextInput
-                    style={styles.input}
-                    placeholder="Account Holder Name"
-                    placeholderTextColor="#94a3b8"
-                    value={formData.holder_name}
-                    onChangeText={(t) =>
-                      setFormData({ ...formData, holder_name: t })
-                    }
-                  />
-                  <TextInput
-                    style={styles.input}
-                    placeholder="Bank Name"
-                    placeholderTextColor="#94a3b8"
-                    value={formData.bank_name}
-                    onChangeText={(t) =>
-                      setFormData({ ...formData, bank_name: t })
-                    }
-                  />
-                  <TextInput
-                    style={styles.input}
-                    placeholder="Account Number"
-                    placeholderTextColor="#94a3b8"
-                    value={formData.account_number}
-                    onChangeText={(text) =>
-                      setFormData({ ...formData, account_number: text })
-                    }
-                    keyboardType="number-pad"
-                  />
-                  <TextInput
-                    style={styles.input}
-                    placeholder="Confirm Account Number"
-                    placeholderTextColor="#94a3b8"
-                    value={formData.confirm_account_number}
-                    onChangeText={(text) =>
-                      setFormData({ ...formData, confirm_account_number: text })
-                    }
-                    keyboardType="number-pad"
-                  />
-                  <TextInput
-                    style={styles.input}
-                    placeholder="IFSC Code"
-                    placeholderTextColor="#94a3b8"
-                    value={formData.ifsc_code}
-                    onChangeText={(t) =>
-                      setFormData({ ...formData, ifsc_code: t })
-                    }
-                    autoCapitalize="characters"
-                  />
-
-                  <View style={styles.formActions}>
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      alignItems: "center",
+                      gap: 12,
+                    }}
+                  >
                     <TouchableOpacity
-                      style={styles.cancelBtn}
-                      onPress={() => setIsEditing(false)}
+                      activeOpacity={0.8}
+                      style={[
+                        styles.kycBadge,
+                        kycStatus === "verified"
+                          ? {
+                              backgroundColor: "#dcfce7",
+                              borderColor: "#bbf7d0",
+                            } // Green
+                          : kycStatus === "rejected"
+                            ? {
+                                backgroundColor: "#fee2e2",
+                                borderColor: "#fecaca",
+                              } // Red
+                            : {
+                                backgroundColor: "#ffedd5",
+                                borderColor: "#fed7aa",
+                              }, // Orange
+                        { marginBottom: 0 }, // Reset margin for top bar placement
+                      ]}
+                      onPress={() => {
+                        if (kycStatus !== "verified") setKycModalVisible(true);
+                      }}
                     >
-                      <Text style={styles.cancelBtnText}>Cancel</Text>
+                      {kycStatus === "verified" ? (
+                        <CheckCircle size={14} color="#16a34a" />
+                      ) : kycStatus === "rejected" ? (
+                        <AlertCircle size={14} color="#ef4444" />
+                      ) : (
+                        <AlertCircle size={14} color="#f97316" />
+                      )}
+                      <Text
+                        style={[
+                          styles.kycText,
+                          kycStatus === "verified"
+                            ? { color: "#16a34a" }
+                            : kycStatus === "rejected"
+                              ? { color: "#ef4444" }
+                              : { color: "#c2410c" },
+                        ]}
+                      >
+                        {kycStatus === "verified" ? "Verified" : "KYC"}
+                      </Text>
                     </TouchableOpacity>
+
                     <TouchableOpacity
-                      style={styles.saveBtn}
-                      onPress={handleSaveBank}
+                      style={[
+                        styles.bellBtn,
+                        isDark && { backgroundColor: "rgba(30,41,59,0.5)" },
+                      ]}
                     >
-                      <Text style={styles.saveBtnText}>Save Details</Text>
+                      <Bell size={22} color={iconColor} />
+                      <View style={styles.notificationDot} />
                     </TouchableOpacity>
                   </View>
                 </View>
-              ) : (
-                <View style={styles.bankInfo}>
-                  {bankDetails ? (
-                    <View style={styles.bankDetailsGrid}>
-                      <View style={styles.bankDetailItem}>
-                        <Text style={styles.bankLabel}>Holder Name</Text>
-                        <Text style={[styles.bankValue, { color: textColor }]}>
-                          {bankDetails.holder_name}
-                        </Text>
-                      </View>
-                      <View style={styles.bankDetailItem}>
-                        <Text style={styles.bankLabel}>Bank</Text>
-                        <Text style={[styles.bankValue, { color: textColor }]}>
-                          {bankDetails.bank_name}
-                        </Text>
-                      </View>
-                      <View style={styles.bankDetailItem}>
-                        <Text style={styles.bankLabel}>Account No.</Text>
-                        <Text style={[styles.bankValue, { color: textColor }]}>
-                          •••• {bankDetails.account_number?.slice(-4)}
-                        </Text>
-                      </View>
-                      <View style={styles.bankDetailItem}>
-                        <Text style={styles.bankLabel}>IFSC</Text>
-                        <Text style={[styles.bankValue, { color: textColor }]}>
-                          {bankDetails.ifsc_code}
-                        </Text>
-                      </View>
-                    </View>
-                  ) : (
-                    <View style={styles.noBankState}>
-                      <Text style={styles.noBankText}>
-                        No bank account linked yet.
-                      </Text>
-                    </View>
-                  )}
+              </View>
 
-                  {!bankDetails && (
-                    <TouchableOpacity
-                      style={styles.addBankBtn}
-                      onPress={() => setIsEditing(true)}
-                    >
-                      <Text style={styles.addBankText}>Add Bank Account</Text>
-                    </TouchableOpacity>
-                  )}
-                </View>
-              )}
-            </GlassView>
-          </View>
-
-          {/* Transactions */}
-          <View style={styles.section}>
-            <Text style={[styles.sectionTitle, { color: textColor }]}>
-              Recent Transactions
-            </Text>
-            {walletData.transactions.length > 0 ? (
-              walletData.transactions.map((t: any) => (
+              {/* Stats Grid - Premium Glass */}
+              <View style={styles.statsGrid}>
                 <GlassView
-                  key={t.id}
-                  style={[
-                    styles.transactionCard,
-                    { backgroundColor: cardBg, borderColor },
-                  ]}
-                  intensity={40}
+                  intensity={70}
+                  style={[styles.statCardLarge, { borderColor }]}
                   tint={isDark ? "dark" : "light"}
                 >
-                  <View style={styles.transLeft}>
-                    <View style={styles.transIconBox}>
-                      {getIcon(t.icon_type)}
-                    </View>
+                  <View
+                    style={[
+                      styles.iconCircle,
+                      { backgroundColor: "rgba(249, 115, 22, 0.1)" },
+                    ]}
+                  >
+                    <ArrowUpRight size={22} color="#f97316" />
+                  </View>
+                  <View>
+                    <Text style={styles.statLabel}>Today's Pending</Text>
+                    <Text style={[styles.statValue, { color: textColor }]}>
+                      ₹ {walletData.stats.today}
+                    </Text>
+                  </View>
+                </GlassView>
+
+                <GlassView
+                  intensity={70}
+                  style={[styles.statCardLarge, { borderColor }]}
+                  tint={isDark ? "dark" : "light"}
+                >
+                  <View
+                    style={[
+                      styles.iconCircle,
+                      { backgroundColor: "rgba(168, 85, 247, 0.1)" },
+                    ]}
+                  >
+                    <ArrowDownLeft size={22} color="#a855f7" />
+                  </View>
+                  <View>
+                    <Text style={styles.statLabel}>This Month</Text>
+                    <Text style={[styles.statValue, { color: textColor }]}>
+                      ₹ {walletData.stats.monthly}
+                    </Text>
+                  </View>
+                </GlassView>
+              </View>
+
+              <View style={styles.metricsRow}>
+                <GlassView
+                  intensity={50}
+                  style={[styles.metricCard, { borderColor }]}
+                  tint={isDark ? "dark" : "light"}
+                >
+                  <View
+                    style={[styles.metricIcon, { backgroundColor: "#f0fdf4" }]}
+                  >
+                    <BarChart2 size={18} color="#16a34a" />
+                  </View>
+                  <Text style={[styles.metricValue, { color: textColor }]}>
+                    ₹ {walletData.stats.approved}
+                  </Text>
+                  <Text style={styles.metricLabel}>Approved</Text>
+                </GlassView>
+
+                <GlassView
+                  intensity={50}
+                  style={[styles.metricCard, { borderColor }]}
+                  tint={isDark ? "dark" : "light"}
+                >
+                  <View
+                    style={[styles.metricIcon, { backgroundColor: "#fff7ed" }]}
+                  >
+                    <RefreshCw size={18} color="#f97316" />
+                  </View>
+                  <Text style={[styles.metricValue, { color: textColor }]}>
+                    ₹ {walletData.stats.pending}
+                  </Text>
+                  <Text style={styles.metricLabel}>Pending</Text>
+                </GlassView>
+
+                <GlassView
+                  intensity={50}
+                  style={[styles.metricCard, { borderColor }]}
+                  tint={isDark ? "dark" : "light"}
+                >
+                  <View
+                    style={[styles.metricIcon, { backgroundColor: "#eff6ff" }]}
+                  >
+                    <CreditCard size={18} color="#3b82f6" />
+                  </View>
+                  <Text style={[styles.metricValue, { color: textColor }]}>
+                    ₹ {walletData.stats.total}
+                  </Text>
+                  <Text style={styles.metricLabel}>Total</Text>
+                </GlassView>
+
+                <GlassView
+                  intensity={50}
+                  style={[styles.metricCard, { borderColor }]}
+                  tint={isDark ? "dark" : "light"}
+                >
+                  <View
+                    style={[styles.metricIcon, { backgroundColor: "#f5f3ff" }]}
+                  >
+                    <Award size={18} color="#8b5cf6" />
+                  </View>
+                  <Text style={[styles.metricValue, { color: textColor }]}>
+                    ₹ {walletData.stats.payout}
+                  </Text>
+                  <Text style={styles.metricLabel}>Payout</Text>
+                </GlassView>
+              </View>
+
+              {/* Payout Section - Dark Premium Card */}
+              <View style={styles.section}>
+                <LinearGradient
+                  colors={["#1e293b", "#0f172a"]}
+                  style={styles.payoutCard}
+                >
+                  <View style={styles.payoutHeader}>
+                    <Text style={styles.payoutTitle}>Withdraw Funds</Text>
+                    <HelpCircle size={20} color="#94a3b8" />
+                  </View>
+
+                  <View style={styles.payoutStats}>
                     <View>
-                      <Text style={[styles.transTitle, { color: textColor }]}>
-                        {t.title}
-                      </Text>
-                      <Text
-                        style={[styles.transSubtitle, { color: subTextColor }]}
-                      >
-                        {t.sub_title}
+                      <Text style={styles.payoutLabel}>Min. Payout</Text>
+                      <Text style={styles.payoutValue}>₹ 500</Text>
+                    </View>
+                    <View style={styles.verticalLine} />
+                    <View>
+                      <Text style={styles.payoutLabel}>Pending</Text>
+                      <Text style={styles.payoutValue}>
+                        ₹ {walletData.stats.pending}
                       </Text>
                     </View>
                   </View>
-                  <Text
+
+                  <TouchableOpacity
                     style={[
-                      styles.transAmount,
-                      t.amount > 0
-                        ? { color: "#16a34a" }
-                        : { color: "#ef4444" },
+                      styles.withdrawBtn,
+                      walletData.stats.approved < 500 &&
+                        styles.withdrawBtnDisabled,
                     ]}
+                    disabled={walletData.stats.approved < 500}
+                    onPress={() =>
+                      Alert.alert("Payout", "Payout request logic")
+                    }
                   >
-                    {t.amount > 0 ? "+" : ""} ₹ {Math.abs(t.amount)}
-                  </Text>
-                </GlassView>
-              ))
-            ) : (
-              <View style={styles.emptyTrans}>
-                <Text style={styles.emptyTransText}>
-                  No recent transactions.
-                </Text>
+                    <Text
+                      style={[
+                        styles.withdrawBtnText,
+                        walletData.stats.approved < 500 && { color: "#94a3b8" },
+                      ]}
+                    >
+                      {walletData.stats.approved < 500
+                        ? "Balance below ₹500"
+                        : "Request Payout"}
+                    </Text>
+                    {walletData.stats.approved >= 500 && (
+                      <ArrowUpRight size={18} color="#0f172a" />
+                    )}
+                  </TouchableOpacity>
+                </LinearGradient>
               </View>
-            )}
-          </View>
+
+              {/* Bank Account Section */}
+              <View style={styles.section}>
+                <GlassView
+                  intensity={60}
+                  style={[
+                    styles.bankCard,
+                    { backgroundColor: cardBg, borderColor },
+                  ]}
+                  tint={isDark ? "dark" : "light"}
+                >
+                  <View style={styles.cardHeader}>
+                    <Text style={[styles.cardTitle, { color: textColor }]}>
+                      Bank Details
+                    </Text>
+                    {!isEditing && (
+                      <TouchableOpacity
+                        style={styles.editBtn}
+                        onPress={() => setIsEditing(true)}
+                      >
+                        <Edit2 size={16} color="#64748b" />
+                      </TouchableOpacity>
+                    )}
+                  </View>
+
+                  {isEditing ? (
+                    <View style={styles.formContainer}>
+                      <TextInput
+                        style={styles.input}
+                        placeholder="Account Holder Name"
+                        placeholderTextColor="#94a3b8"
+                        value={formData.holder_name}
+                        onChangeText={(t) =>
+                          setFormData({ ...formData, holder_name: t })
+                        }
+                      />
+                      <TextInput
+                        style={styles.input}
+                        placeholder="Bank Name"
+                        placeholderTextColor="#94a3b8"
+                        value={formData.bank_name}
+                        onChangeText={(t) =>
+                          setFormData({ ...formData, bank_name: t })
+                        }
+                      />
+                      <TextInput
+                        style={styles.input}
+                        placeholder="Account Number"
+                        placeholderTextColor="#94a3b8"
+                        value={formData.account_number}
+                        onChangeText={(text) =>
+                          setFormData({ ...formData, account_number: text })
+                        }
+                        keyboardType="number-pad"
+                      />
+                      <TextInput
+                        style={styles.input}
+                        placeholder="Confirm Account Number"
+                        placeholderTextColor="#94a3b8"
+                        value={formData.confirm_account_number}
+                        onChangeText={(text) =>
+                          setFormData({
+                            ...formData,
+                            confirm_account_number: text,
+                          })
+                        }
+                        keyboardType="number-pad"
+                      />
+                      <TextInput
+                        style={styles.input}
+                        placeholder="IFSC Code"
+                        placeholderTextColor="#94a3b8"
+                        value={formData.ifsc_code}
+                        onChangeText={(t) =>
+                          setFormData({ ...formData, ifsc_code: t })
+                        }
+                        autoCapitalize="characters"
+                      />
+
+                      <View style={styles.formActions}>
+                        <TouchableOpacity
+                          style={styles.cancelBtn}
+                          onPress={() => setIsEditing(false)}
+                        >
+                          <Text style={styles.cancelBtnText}>Cancel</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                          style={styles.saveBtn}
+                          onPress={handleSaveBank}
+                        >
+                          <Text style={styles.saveBtnText}>Save Details</Text>
+                        </TouchableOpacity>
+                      </View>
+                    </View>
+                  ) : (
+                    <View style={styles.bankInfo}>
+                      {bankDetails ? (
+                        <View style={styles.bankDetailsGrid}>
+                          <View style={styles.bankDetailItem}>
+                            <Text style={styles.bankLabel}>Holder Name</Text>
+                            <Text
+                              style={[styles.bankValue, { color: textColor }]}
+                            >
+                              {bankDetails.holder_name}
+                            </Text>
+                          </View>
+                          <View style={styles.bankDetailItem}>
+                            <Text style={styles.bankLabel}>Bank</Text>
+                            <Text
+                              style={[styles.bankValue, { color: textColor }]}
+                            >
+                              {bankDetails.bank_name}
+                            </Text>
+                          </View>
+                          <View style={styles.bankDetailItem}>
+                            <Text style={styles.bankLabel}>Account No.</Text>
+                            <Text
+                              style={[styles.bankValue, { color: textColor }]}
+                            >
+                              •••• {bankDetails.account_number?.slice(-4)}
+                            </Text>
+                          </View>
+                          <View style={styles.bankDetailItem}>
+                            <Text style={styles.bankLabel}>IFSC</Text>
+                            <Text
+                              style={[styles.bankValue, { color: textColor }]}
+                            >
+                              {bankDetails.ifsc_code}
+                            </Text>
+                          </View>
+                        </View>
+                      ) : (
+                        <View style={styles.noBankState}>
+                          <Text style={styles.noBankText}>
+                            No bank account linked yet.
+                          </Text>
+                        </View>
+                      )}
+
+                      {!bankDetails && (
+                        <TouchableOpacity
+                          style={styles.addBankBtn}
+                          onPress={() => setIsEditing(true)}
+                        >
+                          <Text style={styles.addBankText}>
+                            Add Bank Account
+                          </Text>
+                        </TouchableOpacity>
+                      )}
+                    </View>
+                  )}
+                </GlassView>
+              </View>
+
+              {/* Transactions */}
+              <View style={styles.section}>
+                <Text style={[styles.sectionTitle, { color: textColor }]}>
+                  Recent Transactions
+                </Text>
+                {walletData.transactions.length > 0 ? (
+                  walletData.transactions.map((t: any) => (
+                    <GlassView
+                      key={t.id}
+                      style={[
+                        styles.transactionCard,
+                        { backgroundColor: cardBg, borderColor },
+                      ]}
+                      intensity={40}
+                      tint={isDark ? "dark" : "light"}
+                    >
+                      <View style={styles.transLeft}>
+                        <View style={styles.transIconBox}>
+                          {getIcon(t.icon_type)}
+                        </View>
+                        <View>
+                          <Text
+                            style={[styles.transTitle, { color: textColor }]}
+                          >
+                            {t.title}
+                          </Text>
+                          <Text
+                            style={[
+                              styles.transSubtitle,
+                              { color: subTextColor },
+                            ]}
+                          >
+                            {t.sub_title}
+                          </Text>
+                        </View>
+                      </View>
+                      <Text
+                        style={[
+                          styles.transAmount,
+                          t.amount > 0
+                            ? { color: "#16a34a" }
+                            : { color: "#ef4444" },
+                        ]}
+                      >
+                        {t.amount > 0 ? "+" : ""} ₹ {Math.abs(t.amount)}
+                      </Text>
+                    </GlassView>
+                  ))
+                ) : (
+                  <View style={styles.emptyTrans}>
+                    <Text style={styles.emptyTransText}>
+                      No recent transactions.
+                    </Text>
+                  </View>
+                )}
+              </View>
+            </>
+          )}
         </ScrollView>
 
         <KYCModal

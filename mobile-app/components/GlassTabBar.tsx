@@ -6,7 +6,7 @@ import {
   StyleSheet,
   Platform,
 } from "react-native";
-import { BottomTabBarProps } from "@react-navigation/bottom-tabs";
+import { MaterialTopTabBarProps } from "@react-navigation/material-top-tabs";
 import { GlassView } from "./GlassView";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useTheme } from "@/lib/ThemeContext";
@@ -130,7 +130,7 @@ export function GlassTabBar({
   state,
   descriptors,
   navigation,
-}: BottomTabBarProps) {
+}: MaterialTopTabBarProps) {
   const insets = useSafeAreaInsets();
   const { theme } = useTheme();
   const isDark = theme === "dark";

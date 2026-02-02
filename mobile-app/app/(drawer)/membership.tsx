@@ -9,6 +9,7 @@ import {
   Dimensions,
   ImageBackground,
   ActivityIndicator,
+  RefreshControl,
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { Stack, useRouter, useNavigation } from "expo-router";
@@ -33,6 +34,7 @@ import { useTheme } from "../../lib/ThemeContext";
 import { BlurView } from "expo-blur";
 import { supabase } from "../../lib/supabase";
 import { GlassView } from "../../components/GlassView";
+import { Skeleton } from "../../components/Skeleton";
 
 const { width } = Dimensions.get("window");
 
@@ -68,6 +70,7 @@ export default function Membership() {
   );
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [alert, setAlert] = useState({
     visible: false,
     title: "",
@@ -136,21 +139,46 @@ export default function Membership() {
     } catch (error) {
       console.error("Error fetching profile:", error);
     } finally {
-      setLoading(false);
+      if (!refreshing) setLoading(false);
+      setRefreshing(false);
+      if (refreshing) setTimeout(() => setLoading(false), 500);
     }
   };
 
+  const onRefresh = React.useCallback(() => {
+    setLoading(true);
+    setRefreshing(true);
+    fetchProfile();
+  }, []);
+
   const handleBuyNow = () => {
+    // 1. Check if already subscribed to same plan
     if (
-      profile?.membership_type?.toUpperCase() === billingCycle.toUpperCase()
+      profile?.membership_type?.toUpperCase() === billingCycle.toUpperCase() &&
+      new Date(profile?.membership_expiry) > new Date()
     ) {
       showAlert(
-        "Already Enrolled",
-        `You are already enrolled in the ${billingCycle} membership.`,
+        "Already Active",
+        `You already have an active ${billingCycle} membership.`,
         "info",
       );
       return;
     }
+
+    // 2. Prevent Downgrade (Yearly -> Monthly)
+    if (
+      profile?.membership_type?.toUpperCase() === "YEARLY" &&
+      billingCycle === "monthly" &&
+      new Date(profile?.membership_expiry) > new Date()
+    ) {
+      showAlert(
+        "Downgrade Restricted",
+        "You cannot switch to Monthly while you have an active Yearly plan. Please wait for your current plan to expire.",
+        "error",
+      );
+      return;
+    }
+
     initiatePayment();
   };
 
@@ -238,23 +266,31 @@ export default function Membership() {
               "Membership purchased successfully!",
               "success",
               () => {
-                fetchProfile();
+                fetchProfile(); // Refresh profile to show new status
                 handleOpenDrawer();
               },
             );
-          } catch (verifyErr: any) {
-            showAlert("Verification Failed", verifyErr.message, "error");
-          }
-        })
-        .catch((error: any) => {
-          if (error.code !== 2) {
+          } catch (verifyError: any) {
+            console.error("Verification Error:", verifyError);
             showAlert(
-              "Payment Failed",
-              error.description || "The payment was not completed.",
+              "Error",
+              verifyError.message || "Verification Failed",
               "error",
             );
           }
-        });
+        })
+        .catch((err: any) => {
+          if (err.code !== 2) {
+            // err.code === 2 means payment was cancelled by user
+            console.error("Payment Error:", err);
+            showAlert(
+              "Error",
+              err.description || err.message || "Payment Failed",
+              "error",
+            );
+          }
+        })
+        .finally(() => setLoading(false));
     } catch (error: any) {
       showAlert(
         "Error",
@@ -262,7 +298,7 @@ export default function Membership() {
         "error",
       );
     } finally {
-      setLoading(false);
+      // setLoading(false); // This setLoading is handled by the RazorpayCheckout promise chain
     }
   };
 
@@ -295,6 +331,29 @@ export default function Membership() {
   const textColor = isDark ? "#f1f5f9" : "#1e293b";
   const subTextColor = isDark ? "#94a3b8" : "#64748b";
   const borderColor = isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.05)";
+
+  const MembershipSkeleton = () => (
+    <View style={{ padding: 20, gap: 24 }}>
+      {/* Header */}
+      <View>
+        <Skeleton width={200} height={32} style={{ marginBottom: 10 }} />
+        <Skeleton width="100%" height={20} />
+      </View>
+
+      {/* Toggles */}
+      <Skeleton width="100%" height={56} borderRadius={16} />
+
+      {/* Golden Card */}
+      <Skeleton width="100%" height={220} borderRadius={24} />
+
+      {/* Benefits */}
+      <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 16 }}>
+        {[1, 2, 3, 4].map((i) => (
+          <Skeleton key={i} width="47%" height={150} borderRadius={20} />
+        ))}
+      </View>
+    </View>
+  );
 
   return (
     <View style={{ flex: 1, backgroundColor: bgColor }}>
@@ -330,166 +389,179 @@ export default function Membership() {
         <ScrollView
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              tintColor="#4F46E5"
+            />
+          }
         >
-          <View style={styles.pageHeader}>
-            <Text style={[styles.title, { color: textColor }]}>
-              Mudralaya Membership
-            </Text>
-            <Text style={[styles.subtitle, { color: subTextColor }]}>
-              Become our member and Gain these benefits of membership
-            </Text>
+          {loading ? (
+            <MembershipSkeleton />
+          ) : (
+            <>
+              <View style={styles.pageHeader}>
+                <Text style={[styles.title, { color: textColor }]}>
+                  Mudralaya Membership
+                </Text>
+                <Text style={[styles.subtitle, { color: subTextColor }]}>
+                  Become our member and Gain these benefits of membership
+                </Text>
 
-            <View
-              style={[
-                styles.toggleContainer,
-                { backgroundColor: isDark ? "#1e293b" : "#f4f4f5" },
-              ]}
-            >
-              <TouchableOpacity
-                style={[
-                  styles.toggleBtn,
-                  billingCycle === "yearly" && [
-                    styles.activeToggleBtn,
-                    { backgroundColor: isDark ? "#4F46E5" : "#fff" },
-                  ],
-                ]}
-                onPress={() => setBillingCycle("yearly")}
-              >
-                <Text
+                <View
                   style={[
-                    styles.toggleText,
-                    billingCycle === "yearly" && [
-                      styles.activeToggleText,
-                      { color: isDark ? "#fff" : "#111" },
-                    ],
+                    styles.toggleContainer,
+                    { backgroundColor: isDark ? "#1e293b" : "#f4f4f5" },
                   ]}
                 >
-                  Yearly <Text style={styles.discountBadge}>-20%</Text>
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[
-                  styles.toggleBtn,
-                  billingCycle === "monthly" && [
-                    styles.activeToggleBtn,
-                    { backgroundColor: isDark ? "#4F46E5" : "#fff" },
-                  ],
-                ]}
-                onPress={() => setBillingCycle("monthly")}
-              >
-                <Text
-                  style={[
-                    styles.toggleText,
-                    billingCycle === "monthly" && [
-                      styles.activeToggleText,
-                      { color: isDark ? "#fff" : "#111" },
-                    ],
-                  ]}
-                >
-                  Monthly
-                </Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-
-          {/* Golden Card */}
-          <View style={styles.cardContainer}>
-            <LinearGradient
-              colors={["#FFD700", "#DAA520", "#B8860B"]}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              style={styles.goldenCard}
-            >
-              <View style={styles.cardOverlay} />
-
-              <View style={styles.cardTop}>
-                <View style={styles.chip} />
-                <View style={styles.logoRow}>
-                  <Crown color="#fff" size={24} />
-                  <Text style={styles.logoText}>Mudralaya</Text>
-                </View>
-              </View>
-
-              <View style={styles.cardBody}>
-                <Text style={styles.membershipLabel}>GOLD MEMBERSHIP</Text>
-                <Text style={styles.cardNumber}>•••• •••• •••• 8842</Text>
-              </View>
-
-              <View style={styles.cardBottom}>
-                <View>
-                  <Text style={styles.cardLabel}>Member Since</Text>
-                  <Text style={styles.cardValue}>
-                    {profile?.membership_start_date
-                      ? profile.membership_start_date.split(",")[0]
-                      : "DD/MM/YY"}
-                  </Text>
-                </View>
-                <View>
-                  <Text style={styles.cardLabel}>Expires</Text>
-                  <Text style={styles.cardValue}>
-                    {profile?.membership_expiry
-                      ? profile.membership_expiry.includes(",")
-                        ? profile.membership_expiry.split(",")[0]
-                        : profile.membership_expiry.split("T")[0] // Handle ISO fallback
-                      : "MM/YY"}
-                  </Text>
-                </View>
-              </View>
-            </LinearGradient>
-
-            {queuedPlanInfo && (
-              <View style={styles.stackedBadge}>
-                <Sparkles size={14} color="#DAA520" />
-                <Text style={styles.stackedText}>
-                  Your {queuedPlanInfo.type} plan will get started in{" "}
-                  {queuedPlanInfo.days} days
-                </Text>
-              </View>
-            )}
-          </View>
-
-          {/* Benefits */}
-          <View style={styles.benefitsGrid}>
-            {BENEFITS.map((benefit) => (
-              <View
-                key={benefit.id}
-                style={[
-                  styles.benefitCard,
-                  {
-                    backgroundColor: isDark
-                      ? "rgba(30, 41, 59, 0.5)"
-                      : "rgba(255,255,255,0.6)",
-                    borderColor: borderColor,
-                  },
-                ]}
-              >
-                <View style={styles.benefitHeader}>
-                  <View
+                  <TouchableOpacity
                     style={[
-                      styles.benefitIdBox,
-                      { backgroundColor: isDark ? "#312e81" : "#EEF2FF" },
+                      styles.toggleBtn,
+                      billingCycle === "yearly" && [
+                        styles.activeToggleBtn,
+                        { backgroundColor: isDark ? "#4F46E5" : "#fff" },
+                      ],
                     ]}
+                    onPress={() => setBillingCycle("yearly")}
                   >
                     <Text
                       style={[
-                        styles.benefitId,
-                        { color: isDark ? "#818cf8" : "#4F46E5" },
+                        styles.toggleText,
+                        billingCycle === "yearly" && [
+                          styles.activeToggleText,
+                          { color: isDark ? "#fff" : "#111" },
+                        ],
                       ]}
                     >
-                      {benefit.id}
+                      Yearly <Text style={styles.discountBadge}>-20%</Text>
+                    </Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[
+                      styles.toggleBtn,
+                      billingCycle === "monthly" && [
+                        styles.activeToggleBtn,
+                        { backgroundColor: isDark ? "#4F46E5" : "#fff" },
+                      ],
+                    ]}
+                    onPress={() => setBillingCycle("monthly")}
+                  >
+                    <Text
+                      style={[
+                        styles.toggleText,
+                        billingCycle === "monthly" && [
+                          styles.activeToggleText,
+                          { color: isDark ? "#fff" : "#111" },
+                        ],
+                      ]}
+                    >
+                      Monthly
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+
+              {/* Golden Card */}
+              <View style={styles.cardContainer}>
+                <LinearGradient
+                  colors={["#FFD700", "#DAA520", "#B8860B"]}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={styles.goldenCard}
+                >
+                  <View style={styles.cardOverlay} />
+
+                  <View style={styles.cardTop}>
+                    <View style={styles.chip} />
+                    <View style={styles.logoRow}>
+                      <Crown color="#fff" size={24} />
+                      <Text style={styles.logoText}>Mudralaya</Text>
+                    </View>
+                  </View>
+
+                  <View style={styles.cardBody}>
+                    <Text style={styles.membershipLabel}>GOLD MEMBERSHIP</Text>
+                    <Text style={styles.cardNumber}>•••• •••• •••• 8842</Text>
+                  </View>
+
+                  <View style={styles.cardBottom}>
+                    <View>
+                      <Text style={styles.cardLabel}>Member Since</Text>
+                      <Text style={styles.cardValue}>
+                        {profile?.membership_start_date
+                          ? profile.membership_start_date.split(",")[0]
+                          : "DD/MM/YY"}
+                      </Text>
+                    </View>
+                    <View>
+                      <Text style={styles.cardLabel}>Expires</Text>
+                      <Text style={styles.cardValue}>
+                        {profile?.membership_expiry
+                          ? profile.membership_expiry.includes(",")
+                            ? profile.membership_expiry.split(",")[0]
+                            : profile.membership_expiry.split("T")[0] // Handle ISO fallback
+                          : "MM/YY"}
+                      </Text>
+                    </View>
+                  </View>
+                </LinearGradient>
+
+                {queuedPlanInfo && (
+                  <View style={styles.stackedBadge}>
+                    <Sparkles size={14} color="#DAA520" />
+                    <Text style={styles.stackedText}>
+                      Your {queuedPlanInfo.type} plan will get started in{" "}
+                      {queuedPlanInfo.days} days
                     </Text>
                   </View>
-                  <CheckCircle2 size={20} color="#10b981" />
-                </View>
-                <Text style={[styles.benefitTitle, { color: textColor }]}>
-                  {benefit.title}
-                </Text>
-                <Text style={[styles.benefitDesc, { color: subTextColor }]}>
-                  {benefit.desc}
-                </Text>
+                )}
               </View>
-            ))}
-          </View>
+
+              {/* Benefits */}
+              <View style={styles.benefitsGrid}>
+                {BENEFITS.map((benefit) => (
+                  <View
+                    key={benefit.id}
+                    style={[
+                      styles.benefitCard,
+                      {
+                        backgroundColor: isDark
+                          ? "rgba(30, 41, 59, 0.5)"
+                          : "rgba(255,255,255,0.6)",
+                        borderColor: borderColor,
+                      },
+                    ]}
+                  >
+                    <View style={styles.benefitHeader}>
+                      <View
+                        style={[
+                          styles.benefitIdBox,
+                          { backgroundColor: isDark ? "#312e81" : "#EEF2FF" },
+                        ]}
+                      >
+                        <Text
+                          style={[
+                            styles.benefitId,
+                            { color: isDark ? "#818cf8" : "#4F46E5" },
+                          ]}
+                        >
+                          {benefit.id}
+                        </Text>
+                      </View>
+                      <CheckCircle2 size={20} color="#10b981" />
+                    </View>
+                    <Text style={[styles.benefitTitle, { color: textColor }]}>
+                      {benefit.title}
+                    </Text>
+                    <Text style={[styles.benefitDesc, { color: subTextColor }]}>
+                      {benefit.desc}
+                    </Text>
+                  </View>
+                ))}
+              </View>
+            </>
+          )}
         </ScrollView>
 
         {/* Footer */}

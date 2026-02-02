@@ -9,6 +9,7 @@ import {
   Switch,
   Alert,
   ActivityIndicator,
+  RefreshControl,
 } from "react-native";
 import { Stack, useRouter, useNavigation } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -40,6 +41,7 @@ import { supabase } from "../../lib/supabase";
 import { GlassView } from "../../components/GlassView";
 import { StatusBar } from "expo-status-bar";
 import { useTheme } from "../../lib/ThemeContext";
+import { Skeleton } from "../../components/Skeleton";
 import { BlurView } from "expo-blur";
 
 export default function Settings() {
@@ -66,10 +68,19 @@ export default function Settings() {
   // Notifications State
   const [notifications, setNotifications] = useState<any[]>([]);
   const [notificationLoading, setNotificationLoading] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     fetchProfile();
     fetchNotifications();
+  }, []);
+
+  const onRefresh = React.useCallback(async () => {
+    setLoading(true);
+    setRefreshing(true);
+    await Promise.all([fetchProfile(), fetchNotifications()]);
+    setRefreshing(false);
+    setTimeout(() => setLoading(false), 500);
   }, []);
 
   const fetchProfile = async () => {
@@ -94,7 +105,7 @@ export default function Settings() {
     } catch (error) {
       console.error("Error fetching profile:", error);
     } finally {
-      setLoading(false);
+      if (!refreshing) setLoading(false);
     }
   };
 
@@ -718,6 +729,49 @@ export default function Settings() {
   const borderColor = isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.05)";
   const labelColor = isDark ? "#cbd5e1" : "#475569"; // Lighter color for dark mode labels
 
+  const SettingsSkeleton = () => (
+    <View style={{ padding: 20 }}>
+      {/* Tabs Skeleton */}
+      <View style={{ flexDirection: "row", gap: 10, marginBottom: 24 }}>
+        <Skeleton width={100} height={40} borderRadius={20} />
+        <Skeleton width={120} height={40} borderRadius={20} />
+        <Skeleton width={110} height={40} borderRadius={20} />
+      </View>
+
+      {/* Membership Card Skeleton */}
+      <Skeleton
+        width="100%"
+        height={180}
+        borderRadius={24}
+        style={{ marginBottom: 24 }}
+      />
+
+      {/* Section Title */}
+      <Skeleton width={150} height={24} style={{ marginBottom: 20 }} />
+
+      {/* Avatar */}
+      <View style={{ alignItems: "center", marginBottom: 24 }}>
+        <Skeleton
+          width={100}
+          height={100}
+          borderRadius={50}
+          style={{ marginBottom: 12 }}
+        />
+        <Skeleton width={180} height={16} />
+      </View>
+
+      {/* Form Fields */}
+      <View style={{ gap: 20 }}>
+        {[1, 2, 3, 4].map((i) => (
+          <View key={i}>
+            <Skeleton width={100} height={16} style={{ marginBottom: 8 }} />
+            <Skeleton width="100%" height={50} borderRadius={12} />
+          </View>
+        ))}
+      </View>
+    </View>
+  );
+
   return (
     <View style={{ flex: 1, backgroundColor: bgColor }}>
       <Stack.Screen options={{ headerShown: false }} />
@@ -804,7 +858,19 @@ export default function Settings() {
             </ScrollView>
           </View>
 
-          <ScrollView style={styles.mainContent}>{renderContent()}</ScrollView>
+          <ScrollView
+            contentContainerStyle={styles.scrollContent}
+            showsVerticalScrollIndicator={false}
+            refreshControl={
+              <RefreshControl
+                refreshing={refreshing}
+                onRefresh={onRefresh}
+                tintColor="#4F46E5"
+              />
+            }
+          >
+            {loading ? <SettingsSkeleton /> : renderContent()}
+          </ScrollView>
         </View>
       </SafeAreaView>
     </View>
@@ -1196,5 +1262,8 @@ const styles = StyleSheet.create({
     width: 6,
     height: 6,
     borderRadius: 3,
+  },
+  scrollContent: {
+    paddingBottom: 40,
   },
 });
