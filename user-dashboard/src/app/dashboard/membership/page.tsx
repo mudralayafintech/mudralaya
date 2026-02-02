@@ -202,9 +202,7 @@ export default function Membership() {
             // Debugging Transaction Issues
             console.log("Payment Verification Response:", verifyData);
 
-            alert(
-              `Success! Transaction Debug: ${JSON.stringify(verifyData?.debug || "No Debug Info")}`,
-            );
+            alert("Membership purchased successfully!");
             window.location.reload();
           } catch (err) {
             console.error("Verification Error:", err);
