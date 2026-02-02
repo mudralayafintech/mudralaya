@@ -7,17 +7,12 @@ const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
 
 const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-// Placeholder for Service Account - will be replaced when user uploads file
-let serviceAccount;
+import serviceAccount from './service-account.json' assert { type: 'json' };
 
-try {
-  // We will place the service-account.json in the same directory
-  // In production, you might want to use Deno.env.get("FIREBASE_SERVICE_ACCOUNT")
-  const serviceAccountText = Deno.readTextFileSync(new URL("./service-account.json", import.meta.url));
-  serviceAccount = JSON.parse(serviceAccountText);
-} catch (e) {
-  console.error("Service account file not found or invalid:", e);
-}
+// Hardcoded Service Account removed in favor of import
+
+
+// ...
 
 if (serviceAccount && admin.apps.length === 0) {
   admin.initializeApp({
@@ -27,9 +22,7 @@ if (serviceAccount && admin.apps.length === 0) {
 
 serve(async (req: Request) => {
   try {
-    if (!serviceAccount) {
-        return new Response(JSON.stringify({ error: "Service Account not configured" }), { status: 500, headers: { "Content-Type": "application/json" } });
-    }
+    // Service Account check removed as it is hardcoded
 
     const payload = await req.json();
     let { title, body, token, topic, data } = payload;
@@ -56,15 +49,7 @@ serve(async (req: Request) => {
               type: task.task_type || 'task',
               metadata: data,
               is_global: true,
-              // user_id is nullable? If not, we might need a dummy ID or handle schema constraint.
-              // Assuming user_id is NULLABLE or we can omit it for global.
-              // If user_id is NOT NULL, we need to change schema or use a system user ID.
-              // Let's assume it allows NULL if we are doing this.
-              // Checking previous schema: "user_id" usually references auth.users.
-              // Safest bet: If schema enforces user_id, user needs to make it nullable.
-              // We just pushed a migration. Let's hope user_id is nullable.
-              // If not, this insert will fail.
-              // Let's add user_id: null if possible.
+              user_id: null // Explicitly set null for global
            });
            console.log("Global Notification saved to DB");
         } catch (dbError) {
@@ -80,6 +65,15 @@ serve(async (req: Request) => {
         data: data || {},
         // Can send to either a specific device token OR a topic
         ...(token ? { token } : { topic: topic || "all_users" }),
+        android: {
+            priority: "high",
+            notification: {
+                channelId: "default",
+                priority: "high",
+                defaultSound: true,
+                defaultVibrateTimings: true
+            }
+        }
     };
 
     const response = await admin.messaging().send(message);

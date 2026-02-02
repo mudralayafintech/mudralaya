@@ -820,16 +820,19 @@ export default function Settings() {
                   key={tab.id}
                   style={[
                     styles.tab,
-                    activeTab === tab.id && [
-                      styles.activeTab,
-                      { backgroundColor: "#4F46E5" },
-                    ],
-                    {
-                      backgroundColor: isDark
-                        ? "rgba(30, 41, 59, 0.5)"
-                        : "#f1f5f9",
-                      borderColor: isDark ? "rgba(255,255,255,0.1)" : "#e2e8f0",
-                    },
+                    activeTab === tab.id && styles.activeTab,
+                    activeTab === tab.id
+                      ? {
+                          backgroundColor: isDark ? "#4F46E5" : "#1e293b",
+                        }
+                      : {
+                          backgroundColor: isDark
+                            ? "rgba(30, 41, 59, 0.5)"
+                            : "#f1f5f9",
+                          borderColor: isDark
+                            ? "rgba(255,255,255,0.1)"
+                            : "#e2e8f0",
+                        },
                   ]}
                   onPress={() => setActiveTab(tab.id)}
                 >

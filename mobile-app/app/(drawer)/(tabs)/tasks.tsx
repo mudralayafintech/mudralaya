@@ -33,7 +33,12 @@ import { GlassView } from "@/components/GlassView";
 import { Skeleton } from "@/components/Skeleton";
 import { useTheme } from "@/lib/ThemeContext";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { DrawerActions, useNavigation } from "@react-navigation/native";
+import {
+  DrawerActions,
+  useNavigation,
+  useFocusEffect,
+} from "@react-navigation/native";
+import { useRouter } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import { StatusBar } from "expo-status-bar";
 
@@ -60,6 +65,7 @@ interface Task {
 
 export default function TasksScreen() {
   const navigation = useNavigation();
+  const router = useRouter();
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -107,9 +113,39 @@ export default function TasksScreen() {
     ? "rgba(30, 41, 59, 0.6)"
     : "rgba(255, 255, 255, 0.6)";
 
+  const [unreadCount, setUnreadCount] = useState(0);
+
   useEffect(() => {
     fetchTasks();
   }, []);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchUnreadCount();
+    }, []),
+  );
+
+  const fetchUnreadCount = async () => {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) return;
+
+    // Count unread notifications
+    // Simple verification against DB count
+    const { count } = await supabase
+      .from("notifications")
+      .select("*", { count: "exact", head: true })
+      .eq("user_id", user.id)
+      .is("read_at", null);
+
+    // Note: This doesn't account for 'global' reads stored locally,
+    // but for badge consistency with Home, it's safer to stick to DB for now
+    // or implement the same local storage logic if needed.
+    // For now, let's use the DB count for consistency.
+
+    if (count !== null) setUnreadCount(count);
+  };
 
   const fetchTasks = async () => {
     try {
@@ -252,9 +288,16 @@ export default function TasksScreen() {
             styles.bellBtn,
             isDark && { backgroundColor: "rgba(30,41,59,0.5)" },
           ]}
+          onPress={() => router.push("/notifications")}
         >
           <Bell size={22} color={iconColor} />
-          <View style={styles.notificationDot} />
+          {unreadCount > 0 && (
+            <View style={styles.notificationBadge}>
+              <Text style={styles.notificationCountText}>
+                {unreadCount > 99 ? "99+" : unreadCount}
+              </Text>
+            </View>
+          )}
         </TouchableOpacity>
       </View>
 
@@ -845,17 +888,26 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.05,
     shadowRadius: 4,
+    position: "relative",
   },
-  notificationDot: {
+  notificationBadge: {
     position: "absolute",
-    top: 8,
-    right: 8,
-    width: 8,
-    height: 8,
-    borderRadius: 4,
+    top: -4,
+    right: -4,
+    minWidth: 16,
+    height: 16,
+    borderRadius: 8,
     backgroundColor: "#ef4444",
+    justifyContent: "center",
+    alignItems: "center",
     borderWidth: 1.5,
     borderColor: "#fff",
+    paddingHorizontal: 2,
+  },
+  notificationCountText: {
+    color: "#fff",
+    fontSize: 9,
+    fontWeight: "800",
   },
   header: {
     flexDirection: "row",

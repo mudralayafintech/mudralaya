@@ -17,3 +17,7 @@ Thumbs.db
 *.sw?
 mudralya/package-lock.json
 /user-dashboard-legacy
+
+# Firebase sensitive files
+**/service-account.json
+**/google-services.json
