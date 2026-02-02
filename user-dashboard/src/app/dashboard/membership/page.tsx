@@ -137,9 +137,8 @@ export default function Membership() {
         handler: async function (response: any) {
           // 3. Verify Payment
           try {
-            const { error: verifyError } = await supabase.functions.invoke(
-              "razorpay-api",
-              {
+            const { data: verifyData, error: verifyError } =
+              await supabase.functions.invoke("razorpay-api", {
                 body: {
                   action: "verify-payment",
                   data: {
@@ -151,15 +150,17 @@ export default function Membership() {
                     plan: billingCycle,
                   },
                 },
-              },
-            );
+              });
 
             if (verifyError) throw verifyError;
 
+            // Debugging Transaction Issues
+            console.log("Payment Verification Response:", verifyData);
+
             alert(
-              "Membership processed successfully! Welcome to Mudralaya Gold.",
+              `Success! Transaction Debug: ${JSON.stringify(verifyData?.debug || "No Debug Info")}`,
             );
-            window.location.reload(); // Reload to fetch new profile data
+            window.location.reload();
           } catch (err) {
             console.error("Verification Error:", err);
             alert("Payment verification failed. Please contact support.");

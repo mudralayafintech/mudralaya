@@ -240,12 +240,16 @@ serve(async (req: Request): Promise<Response> => {
           console.error('User Membership Update Exception:', e);
         }
 
-        console.log("Razorpay API Handler V19.0 - Time: 2026-01-31 16:38");
+        console.log("Razorpay API Handler V19.1 - Time: 2026-02-02 14:30");
 
         return new Response(JSON.stringify({ 
           success: true, 
           message: isStacked ? 'Membership stacked successfully.' : 'Membership recorded.',
-          expiry: istExpiryString
+          expiry: istExpiryString,
+          debug: {
+            payload: txPayload,
+            insertError: txError
+          }
         }), {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
           status: 200,
