@@ -387,13 +387,25 @@ export default function TasksPage() {
       }
 
       // Task Type Filter (Daily/Dedicated buttons)
-      const taskType = task.type || "Daily"; // Default to Daily if not specified
+      // Use task_type if available, otherwise fall back to checking title/category
+      const taskType = task.type || task.task_type || "Daily";
+
       if (activeTaskType === "Daily") {
         // Show Daily tasks (anything that's not Dedicated)
-        if (taskType === "Dedicated") return false;
+        if (
+          taskType === "Dedicated" ||
+          taskType?.toLowerCase().includes("dedicated")
+        ) {
+          return false;
+        }
       } else {
         // Show Dedicated tasks only
-        if (taskType !== "Dedicated") return false;
+        if (
+          taskType !== "Dedicated" &&
+          !taskType?.toLowerCase().includes("dedicated")
+        ) {
+          return false;
+        }
       }
 
       // Tab filter (All Task, Completed, Ongoing)
