@@ -379,7 +379,7 @@ export default function Membership() {
 
   return (
     <View style={{ flex: 1, backgroundColor: bgColor }}>
-      <Stack.Screen options={{ headerShown: false }} />
+      {/* <Stack.Screen options={{ headerShown: false }} /> */}
       <StatusBar style={isDark ? "light" : "dark"} />
       <SafeAreaView style={styles.container}>
         <View
