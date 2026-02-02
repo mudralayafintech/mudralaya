@@ -30,6 +30,7 @@ export default function Plans() {
   const [user, setUser] = useState<any>(null);
 
   const [loading, setLoading] = useState(true);
+  const [paymentProcessing, setPaymentProcessing] = useState(false);
   const supabase = createClient();
 
   useEffect(() => {
@@ -93,55 +94,60 @@ export default function Plans() {
       }
 
       try {
-        // 1. Create Order
-        const finalAmount =
-          plan.id === 2 && hasLaptop
-            ? 5000
-            : typeof plan.price === "number"
-              ? plan.price
-              : 0;
+          
+          // 1. Create Order
+          setPaymentProcessing(true); // Start loading
+          try {
+            const finalAmount =
+            plan.id === 2 && hasLaptop
+                ? 5000
+                : typeof plan.price === "number"
+                ? plan.price
+                : 0;
 
-        // Get session for auth headers
-        const {
-          data: { session },
-        } = await supabase.auth.getSession();
+            // Get session for auth headers
+            const {
+            data: { session },
+            } = await supabase.auth.getSession();
 
-        const orderRes = await fetch(
-          `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/razorpay-api`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ""}`,
-              apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "",
+            const orderRes = await fetch(
+            `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/razorpay-api`,
+            {
+                method: "POST",
+                headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ""}`,
+                apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "",
+                },
+                body: JSON.stringify({
+                action: "create-order",
+                data: {
+                    amount: finalAmount,
+                    currency: "INR",
+                    receipt: `plan_ind_${Date.now()}`,
+                    userId: user?.id,
+                    planType: 'individual'
+                },
+                }),
             },
-            body: JSON.stringify({
-              action: "create-order",
-              data: {
-                amount: finalAmount,
-                currency: "INR",
-                receipt: `plan_ind_${Date.now()}`,
-              },
-            }),
-          },
-        );
+            );
 
-        const orderData = await orderRes.json();
-        const orderError = !orderRes.ok ? orderData : null;
+            const orderData = await orderRes.json();
+            const orderError = !orderRes.ok ? orderData : null;
 
-        if (orderError) throw orderError;
-        if (!orderData) throw new Error("No order data returned");
+            if (orderError) throw orderError;
+            if (!orderData) throw new Error("No order data returned");
 
-        // 2. Open Razorpay Checkout
-        const options = {
-          key: orderData.keyId,
-          amount: orderData.amount,
-          currency: orderData.currency,
-          name: "Mudralaya Fintech Private Limited",
-          description: `Purchase ${plan.name} Plan`,
-          image: "/logo.png",
-          order_id: orderData.id,
-          handler: async function (response: any) {
+            // 2. Open Razorpay Checkout
+            const options = {
+            key: orderData.keyId,
+            amount: orderData.amount,
+            currency: orderData.currency,
+            name: "Mudralaya Fintech Private Limited",
+            description: `Purchase ${plan.name} Plan`,
+            image: "/logo.png",
+            order_id: orderData.id,
+            handler: async function (response: any) {
             try {
               // 3. Verify Payment
               const {
@@ -198,6 +204,7 @@ export default function Plans() {
         const rzp1 = new window.Razorpay(options);
         rzp1.on("payment.failed", function (response: any) {
           alert(response.error.description);
+          setPaymentProcessing(false);
         });
         rzp1.open();
       } catch (err: any) {
@@ -205,6 +212,7 @@ export default function Plans() {
         alert(
           `Payment initialization failed: ${err.message || JSON.stringify(err)}`,
         );
+        setPaymentProcessing(false);
       }
     } else {
       // Business / Startup -> Contact Support
@@ -332,6 +340,40 @@ export default function Plans() {
 
   return (
     <div className={styles.plansPage}>
+      {paymentProcessing && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0,0,0,0.7)',
+          zIndex: 9999,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          color: 'white'
+        }}>
+          <div className="loader" style={{
+            border: '4px solid #f3f3f3',
+            borderTop: '4px solid #3498db',
+            borderRadius: '50%',
+            width: '40px',
+            height: '40px',
+            animation: 'spin 1s linear infinite',
+            marginBottom: '1rem'
+          }}></div>
+           <style>{`
+            @keyframes spin {
+              0% { transform: rotate(0deg); }
+              100% { transform: rotate(360deg); }
+            }
+          `}</style>
+          <h2>Processing Payment...</h2>
+          <p>Please do not close this window.</p>
+        </div>
+      )}
       <header className={styles.plansHeader}>
         <h1>Mudralaya Plans</h1>
         <p className={styles.subtitle}>
