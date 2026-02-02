@@ -40,7 +40,6 @@ import { StatusBar } from "expo-status-bar";
 interface Task {
   id: string;
   title: string;
-  category?: string;
   type?: string;
   task_type?: string; // Added task_type
   target_audience?: string[];
@@ -224,16 +223,11 @@ export default function TasksScreen() {
     const taskType = task.task_type || "Daily"; // Default to Daily if null
 
     if (isDailyTab) {
-      // Show if type is Daily OR if it's not explicitly Dedicated (safety net)
+      // Show if type is Daily
       if (taskType === "Dedicated") return false;
-      if (task.category?.toLowerCase().includes("dedicated")) return false;
     } else {
       // Dedicated Tab
-      if (
-        taskType !== "Dedicated" &&
-        !task.category?.toLowerCase().includes("dedicated")
-      )
-        return false;
+      if (taskType !== "Dedicated") return false;
     }
 
     return professionMatch; // Removed old typeMatch
@@ -513,7 +507,7 @@ export default function TasksScreen() {
                               isDark && { color: "#cbd5e1" },
                             ]}
                           >
-                            {item.category || item.type}
+                            {item.task_type || "Daily"}
                           </Text>
                         </View>
                       </View>

@@ -15,7 +15,6 @@ interface Task {
   reward_info?: string;
   type: string;
   task_type?: string; // Daily or Dedicated
-  category?: string;
 }
 
 interface Participant {

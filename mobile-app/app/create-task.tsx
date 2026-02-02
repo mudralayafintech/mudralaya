@@ -39,7 +39,6 @@ export default function CreateTaskPage() {
   const [formData, setFormData] = useState({
     title: "",
     description: "",
-    category: "",
     reward_member: "",
     reward_free: "",
     icon_type: "",
@@ -81,7 +80,6 @@ export default function CreateTaskPage() {
       const { error } = await supabase.from("tasks").insert({
         title: formData.title,
         description: formData.description,
-        category: formData.category,
         reward_member: parseFloat(formData.reward_member) || 0,
         reward_free: parseFloat(formData.reward_free) || 0,
         icon_type: formData.icon_type,
@@ -91,6 +89,7 @@ export default function CreateTaskPage() {
         action_link: formData.action_link,
         target_audience: [formData.target_audience], // Format as array
         is_active: true,
+        task_type: "Daily", // Default to Daily
       });
 
       if (error) throw error;
@@ -123,12 +122,6 @@ export default function CreateTaskPage() {
               onChangeText={(t) => updateField("description", t)}
               placeholder="Describe what users need to do..."
               multiline
-            />
-            <Input
-              label="Category"
-              value={formData.category}
-              onChangeText={(t) => updateField("category", t)}
-              placeholder="e.g., Education, Social"
             />
           </View>
         );
@@ -213,12 +206,12 @@ export default function CreateTaskPage() {
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
-      <StatusBar style="light" />
+      <StatusBar style="dark" />
 
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={handleBack} style={styles.backBtn}>
-          <ArrowLeft size={24} color="#fff" />
+          <ArrowLeft size={24} color="#0f172a" />
         </TouchableOpacity>
         <View style={styles.progressContainer}>
           <View
@@ -302,7 +295,7 @@ function Input({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#0f172a",
+    backgroundColor: "#f8fafc",
   },
   header: {
     flexDirection: "row",
@@ -313,12 +306,14 @@ const styles = StyleSheet.create({
   backBtn: {
     padding: 8,
     borderRadius: 20,
-    backgroundColor: "rgba(255,255,255,0.1)",
+    backgroundColor: "#fff",
+    borderWidth: 1,
+    borderColor: "#e2e8f0",
   },
   progressContainer: {
     flex: 1,
     height: 4,
-    backgroundColor: "rgba(255,255,255,0.1)",
+    backgroundColor: "#e2e8f0",
     borderRadius: 2,
     overflow: "hidden",
   },
@@ -327,7 +322,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#2563eb",
   },
   stepCounter: {
-    color: "#94a3b8",
+    color: "#64748b",
     fontWeight: "600",
   },
   scrollContent: {
@@ -339,24 +334,24 @@ const styles = StyleSheet.create({
   stepTitle: {
     fontSize: 24,
     fontWeight: "bold",
-    color: "#fff",
+    color: "#0f172a",
     marginBottom: 8,
   },
   inputGroup: {
     gap: 8,
   },
   label: {
-    color: "#bae6fd",
+    color: "#334155",
     fontSize: 14,
     fontWeight: "600",
   },
   input: {
-    backgroundColor: "rgba(30, 41, 59, 0.8)",
-    borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.1)",
+    backgroundColor: "#fff",
+    borderWidth: 1.5,
+    borderColor: "#cbd5e1",
     borderRadius: 12,
     padding: 16,
-    color: "#fff",
+    color: "#0f172a",
     fontSize: 16,
   },
   textArea: {
@@ -366,7 +361,8 @@ const styles = StyleSheet.create({
   footer: {
     padding: 24,
     borderTopWidth: 1,
-    borderTopColor: "rgba(255,255,255,0.05)",
+    borderTopColor: "#e2e8f0",
+    backgroundColor: "#fff",
   },
   nextBtn: {
     backgroundColor: "#2563eb",

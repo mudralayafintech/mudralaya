@@ -36,11 +36,11 @@ import { StatusBar } from "expo-status-bar";
 interface Task {
   id: string;
   title: string;
-  category: string;
+  reward_free: number;
+  task_type?: string;
   icon_type: string;
   action_link?: string;
   reward_member?: number;
-  reward_free?: number;
   reward_info?: string;
 }
 
@@ -464,7 +464,7 @@ export default function DashboardHome() {
                           {data.ongoingTask.title}
                         </Text>
                         <Text style={styles.ongoingCategory}>
-                          {data.ongoingTask.category}
+                          {data.ongoingTask.task_type || "Daily"}
                         </Text>
                       </View>
                     </View>
@@ -531,7 +531,7 @@ export default function DashboardHome() {
                               { color: subTextColor },
                             ]}
                           >
-                            {task.category}
+                            {task.task_type || "Daily"}
                           </Text>
                         </View>
                       </View>
