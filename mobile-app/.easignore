@@ -1,0 +1,14 @@
+node_modules/
+.expo/
+dist/
+web-build/
+
+# Ignored Build Artifacts (Keep native source!)
+android/app/build/
+android/build/
+ios/build/
+ios/Pods/
+
+# Git
+.git/
+*.map

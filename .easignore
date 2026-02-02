@@ -1,0 +1,17 @@
+# dependencies
+node_modules/
+**/node_modules/
+
+# Expo
+.expo/
+dist/
+web-build/
+
+# Native
+/ios
+/android
+**/ios
+**/android
+
+# Git
+.git/
