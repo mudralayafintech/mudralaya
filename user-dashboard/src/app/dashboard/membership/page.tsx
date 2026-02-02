@@ -116,6 +116,8 @@ export default function Membership() {
               amount: price,
               currency: "INR",
               receipt: `mem_${billingCycle}_${Date.now()}`,
+              userId: user?.id,
+              planType: billingCycle,
             },
           },
         });

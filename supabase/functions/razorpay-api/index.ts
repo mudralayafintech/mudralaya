@@ -42,7 +42,7 @@ serve(async (req: Request): Promise<Response> => {
     }
 
     if (action === 'create-order') {
-      const { amount, currency, receipt } = data || {}
+      const { amount, currency, receipt, userId, planType } = data || {}
       
       if (!amount) {
         return new Response(JSON.stringify({ error: "Amount is required" }), {
@@ -51,7 +51,7 @@ serve(async (req: Request): Promise<Response> => {
         });
       }
 
-      console.log(`Creating order: ${amount} ${currency || 'INR'}`);
+      console.log(`Creating order: ${amount} ${currency || 'INR'} for user: ${userId}`);
 
       const razorAuth = btoa(`${RAZORPAY_KEY_ID}:${RAZORPAY_KEY_SECRET}`);
       const response = await fetch('https://api.razorpay.com/v1/orders', {
@@ -82,6 +82,39 @@ serve(async (req: Request): Promise<Response> => {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
           status: response.status,
         });
+      }
+
+      // 1. Insert PENDING Transaction
+      if (userId) {
+        const title = planType === 'individual' ? 'Individual Plan Purchase' : 'Mudralaya Membership';
+        const type = planType === 'individual' ? 'PLAN' : 'membership';
+
+        const { error: pendingError } = await supabaseClient
+          .from('transactions')
+          .insert({
+            user_id: userId,
+            title: title,
+            sub_title: 'Payment Initiated',
+            amount: amount,
+            type: type,
+            status: 'pending',
+            transaction_id: order.id, // Temporary ID matches order
+            razorpay_order_id: order.id,
+            plan_name: planType // 'yearly', 'monthly', or 'INDIVIDUAL'
+          });
+        
+          if (pendingError) {
+            console.error("Error creating pending transaction:", pendingError);
+            // We verify logging but don't block order creation? 
+            // Better to block so we guarantee the record exists as per user request.
+            return new Response(JSON.stringify({ 
+              error: "Database Transaction Init Failed", 
+              details: pendingError 
+            }), {
+              headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+              status: 500,
+            });
+          }
       }
 
       return new Response(JSON.stringify({
@@ -202,27 +235,45 @@ serve(async (req: Request): Promise<Response> => {
 
         console.log(`Membership ${isStacked ? 'STACKED' : 'NEW'}: ${plan} for ${userId}. Expiry (IST): ${istExpiryString}`);
 
-        // 2. Record Transaction (V19.0)
+        // 2. Update status to COMPLETED (Upsert)
         const txPayload: any = {
           user_id: userId,
           title: 'Mudralaya Membership',
           sub_title: `${isYearly ? 'Yearly' : 'Monthly'} Membership ${isStacked ? '(Stacked)' : ''}`,
           amount: amount || (isYearly ? 999 : 99),
           type: 'membership',
-          status: 'completed',
+          status: 'completed', // Update to success
           plan_name: isYearly ? 'yearly' : 'monthly',
           transaction_id: razorpay_payment_id,
           razorpay_order_id: razorpay_order_id,
-          razorpay_payment_id: razorpay_payment_id
+          razorpay_payment_id: razorpay_payment_id,
+          updated_at: new Date().toISOString()
         };
 
-        const { error: txError } = await supabaseClient
+        // We search by razorpay_order_id. If not found (legacy), we insert. 
+        // Note: 'transactions' table might not have unique constraint on razorpay_order_id.
+        // For safety, we try to UPDATE using razorpay_order_id first.
+
+        let txError: any = null;
+
+        // Try Update First
+        const { data: updatedTx, error: updateError } = await supabaseClient
           .from('transactions')
-          .insert(txPayload);
+          .update(txPayload)
+          .eq('razorpay_order_id', razorpay_order_id)
+          .select();
+        
+        if (updateError || !updatedTx || updatedTx.length === 0) {
+            console.log("Update failed or no record found. Inserting new record.");
+             const { error: insertError } = await supabaseClient
+            .from('transactions')
+            .insert(txPayload);
+            txError = insertError;
+        }
 
         if (txError) {
-          console.error('CRITICAL: Transaction Recording Error (V19.0):', txError);
-          throw new Error(`Transaction Recording Failed: ${txError.message || JSON.stringify(txError)}`);
+          console.error('CRITICAL: Transaction Verification Error (V20.0):', txError);
+          throw new Error(`Transaction Verification Failed: ${txError.message}`);
         }
 
         // 3. Update User Membership
@@ -264,7 +315,7 @@ serve(async (req: Request): Promise<Response> => {
         
         console.log('Using amount from frontend:', finalAmount);
 
-        // 1. Record Transaction (STRICTLY matching user schema + transaction_id)
+        // 1. Update status to COMPLETED (Plan)
         const txPayload: any = {
           user_id: userId,
           title: 'Individual Plan Purchase',
@@ -275,17 +326,31 @@ serve(async (req: Request): Promise<Response> => {
           icon_type: 'shield',
           plan_name: 'INDIVIDUAL',
           currency: 'INR',
-          transaction_id: razorpay_payment_id, // Added transaction_id
+          transaction_id: razorpay_payment_id,
           razorpay_order_id: razorpay_order_id,
-          razorpay_payment_id: razorpay_payment_id
+          razorpay_payment_id: razorpay_payment_id,
+          updated_at: now.toISOString()
         };
 
-        const { error: txError } = await supabaseClient
+        let txError: any = null;
+
+        // Try Update First
+        const { data: updatedTx, error: updateError } = await supabaseClient
           .from('transactions')
-          .insert(txPayload);
+          .update(txPayload)
+          .eq('razorpay_order_id', razorpay_order_id)
+          .select();
+
+        if (updateError || !updatedTx || updatedTx.length === 0) {
+             const { error: insertError } = await supabaseClient
+            .from('transactions')
+            .insert(txPayload);
+            txError = insertError;
+        }
 
         if (txError) {
-          console.error('CRITICAL: Transaction Recording Error (V16.0):', txError);
+           console.error('CRITICAL: Transaction Verification Error (Plan):', txError);
+           throw new Error(`Transaction Verification Failed: ${txError.message}`);
         }
 
         // 2. Update User Plan & Laptop Status
