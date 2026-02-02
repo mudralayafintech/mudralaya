@@ -313,11 +313,50 @@ export default function Membership() {
           <div className={styles.goldenCard}>
             <div className={styles.cardShine}></div>
             <div className={styles.cardTop}>
-              <div className={styles.cardChip}>
-                <div className={styles.chipLine}></div>
-                <div className={styles.chipLine}></div>
-                <div className={styles.chipLine}></div>
-                <div className={styles.chipLine}></div>
+              <div className={styles.cardChipContainer}>
+                <svg
+                  width="48"
+                  height="36"
+                  viewBox="0 0 48 36"
+                  style={{ borderRadius: "6px" }}
+                >
+                  <defs>
+                    <linearGradient
+                      id="webGoldGrad"
+                      x1="0"
+                      y1="0"
+                      x2="1"
+                      y2="1"
+                    >
+                      <stop offset="0%" stopColor="#FFD700" />
+                      <stop offset="100%" stopColor="#B8860B" />
+                    </linearGradient>
+                  </defs>
+                  <rect
+                    x="0"
+                    y="0"
+                    width="48"
+                    height="36"
+                    rx="6"
+                    fill="url(#webGoldGrad)"
+                  />
+                  <path
+                    d="M24 0 V36 M0 12 H18 M30 12 H48 M0 24 H18 M30 24 H48"
+                    stroke="#5c4033"
+                    strokeWidth="1.5"
+                    fill="none"
+                  />
+                  <rect
+                    x="18"
+                    y="12"
+                    width="12"
+                    height="12"
+                    rx="3"
+                    stroke="#5c4033"
+                    strokeWidth="1.5"
+                    fill="none"
+                  />
+                </svg>
               </div>
               <div className={styles.cardLogo}>
                 <Crown /> <span>Mudralaya</span>

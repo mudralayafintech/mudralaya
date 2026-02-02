@@ -35,6 +35,13 @@ import { BlurView } from "expo-blur";
 import { supabase } from "../../lib/supabase";
 import { GlassView } from "../../components/GlassView";
 import { Skeleton } from "../../components/Skeleton";
+import Svg, {
+  Rect,
+  Path,
+  Defs,
+  LinearGradient as SvgGradient,
+  Stop,
+} from "react-native-svg";
 
 const { width } = Dimensions.get("window");
 
@@ -60,6 +67,34 @@ const BENEFITS = [
     desc: "A FREE training course worth ₹10,000 to support your journey toward financial independence",
   },
 ];
+
+const GoldChip = () => (
+  <Svg width={48} height={36} viewBox="0 0 48 36" style={{ borderRadius: 6 }}>
+    <Defs>
+      <SvgGradient id="goldGrad" x1="0" y1="0" x2="1" y2="1">
+        <Stop offset="0" stopColor="#FFD700" />
+        <Stop offset="1" stopColor="#B8860B" />
+      </SvgGradient>
+    </Defs>
+    <Rect x="0" y="0" width="48" height="36" rx="6" fill="url(#goldGrad)" />
+    <Path
+      d="M24 0 V36 M0 12 H18 M30 12 H48 M0 24 H18 M30 24 H48"
+      stroke="#5c4033"
+      strokeWidth="1.5"
+      fill="none"
+    />
+    <Rect
+      x="18"
+      y="12"
+      width="12"
+      height="12"
+      rx="3"
+      stroke="#5c4033"
+      strokeWidth="1.5"
+      fill="none"
+    />
+  </Svg>
+);
 
 export default function Membership() {
   const router = useRouter();
@@ -495,11 +530,8 @@ export default function Membership() {
                   <View style={styles.cardOverlay} />
 
                   <View style={styles.cardTop}>
-                    <View style={styles.cardChip}>
-                      <View style={styles.chipLine} />
-                      <View style={styles.chipLine} />
-                      <View style={styles.chipLine} />
-                      <View style={styles.chipLine} />
+                    <View style={{ marginRight: "auto" }}>
+                      <GoldChip />
                     </View>
                     <View style={styles.logoRow}>
                       <Crown color="#fff" size={24} />
