@@ -134,7 +134,16 @@ export default function Membership() {
           .select("*")
           .eq("id", user.id)
           .single();
-        setProfile(data);
+        if (data) {
+          setProfile(data);
+          if (data.membership_type) {
+            setBillingCycle(
+              data.membership_type.toLowerCase() === "yearly"
+                ? "yearly"
+                : "monthly",
+            );
+          }
+        }
       }
     } catch (error) {
       console.error("Error fetching profile:", error);

@@ -62,6 +62,14 @@ export default function Membership() {
         .single();
       if (profileData) {
         setProfile(profileData);
+        // Smart Default: Set tab to match active plan
+        if (profileData.membership_type) {
+          setBillingCycle(
+            profileData.membership_type.toLowerCase() === "yearly"
+              ? "yearly"
+              : "monthly",
+          );
+        }
       }
     }
     setLoading(false);
@@ -81,6 +89,18 @@ export default function Membership() {
     const res = await importRazorpay();
     if (!res) {
       alert("Razorpay SDK failed to load. Are you online?");
+      return;
+    }
+
+    // Downgrade Guard
+    if (
+      profile?.membership_type?.toLowerCase() === "yearly" &&
+      billingCycle === "monthly" &&
+      new Date(profile?.membership_expiry) > new Date()
+    ) {
+      alert(
+        "You cannot switch to Monthly while you have an active Yearly plan.",
+      );
       return;
     }
 
