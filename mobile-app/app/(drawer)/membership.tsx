@@ -335,6 +335,19 @@ export default function Membership() {
   const price = billingCycle === "yearly" ? 999 : 99;
   const period = billingCycle === "yearly" ? "Year" : "30 Days";
 
+  const expiryDate = profile?.membership_expiry
+    ? typeof profile.membership_expiry === "string" &&
+      profile.membership_expiry.includes(",")
+      ? parseISTDate(profile.membership_expiry)
+      : new Date(profile?.membership_expiry)
+    : null;
+  const isActive = expiryDate ? expiryDate > new Date() : false;
+
+  const isDowngrade =
+    profile?.membership_type?.toUpperCase() === "YEARLY" &&
+    billingCycle === "monthly" &&
+    isActive;
+
   const isDark = theme === "dark";
   const bgColor = isDark ? "#0f172a" : "#f8fafc";
   const textColor = isDark ? "#f1f5f9" : "#1e293b";

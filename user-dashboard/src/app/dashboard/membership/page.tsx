@@ -209,7 +209,6 @@ export default function Membership() {
   };
 
   const expiryDate = getExpiryDate(profile?.membership_expiry);
-  const expiryDate = getExpiryDate(profile?.membership_expiry);
   const isActive = expiryDate ? expiryDate > new Date() : false;
 
   const isDowngrade =
