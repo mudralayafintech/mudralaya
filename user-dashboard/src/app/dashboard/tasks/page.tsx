@@ -25,6 +25,7 @@ interface Task {
   title: string;
   category?: string;
   type?: string;
+  task_type?: string;
   target_audience?: string[];
   icon_type: string;
   status?: string;
