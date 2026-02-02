@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import messaging from "@react-native-firebase/messaging";
 import {
   View,
   Text,
@@ -10,7 +9,6 @@ import {
   ActivityIndicator,
   Dimensions,
   Platform,
-  Alert,
 } from "react-native";
 import {
   DrawerActions,

@@ -34,12 +34,7 @@ import {
 import { GlassView } from "@/components/GlassView";
 import { Skeleton } from "@/components/Skeleton";
 import { SafeAreaView } from "react-native-safe-area-context";
-import {
-  DrawerActions,
-  useNavigation,
-  useFocusEffect,
-} from "@react-navigation/native";
-import { useRouter } from "expo-router";
+import { DrawerActions, useNavigation } from "@react-navigation/native";
 import { LinearGradient } from "expo-linear-gradient";
 import { StatusBar } from "expo-status-bar";
 import KYCModal from "@/components/KYCModal";
@@ -49,7 +44,6 @@ import { useTheme } from "@/lib/ThemeContext";
 export default function WalletScreen() {
   const { theme } = useTheme();
   const navigation = useNavigation();
-  const router = useRouter();
   const [bankDetails, setBankDetails] = useState<any>(null);
   const [userId, setUserId] = useState<string>("");
   const [kycModalVisible, setKycModalVisible] = useState(false);
@@ -76,32 +70,10 @@ export default function WalletScreen() {
   });
 
   const [kycStatus, setKycStatus] = useState<string | null>(null);
-  const [unreadCount, setUnreadCount] = useState(0);
 
   useEffect(() => {
     fetchInitialData();
   }, []);
-
-  useFocusEffect(
-    React.useCallback(() => {
-      fetchUnreadCount();
-    }, []),
-  );
-
-  const fetchUnreadCount = async () => {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    if (!user) return;
-
-    const { count } = await supabase
-      .from("notifications")
-      .select("*", { count: "exact", head: true })
-      .eq("user_id", user.id)
-      .is("read_at", null);
-
-    if (count !== null) setUnreadCount(count);
-  };
 
   const fetchInitialData = async () => {
     try {
@@ -378,16 +350,9 @@ export default function WalletScreen() {
                         styles.bellBtn,
                         isDark && { backgroundColor: "rgba(30,41,59,0.5)" },
                       ]}
-                      onPress={() => router.push("/notifications")}
                     >
                       <Bell size={22} color={iconColor} />
-                      {unreadCount > 0 && (
-                        <View style={styles.notificationBadge}>
-                          <Text style={styles.notificationCountText}>
-                            {unreadCount > 99 ? "99+" : unreadCount}
-                          </Text>
-                        </View>
-                      )}
+                      <View style={styles.notificationDot} />
                     </TouchableOpacity>
                   </View>
                 </View>
