@@ -144,7 +144,6 @@ export default function Membership() {
         throw new Error(orderData.error || "Failed to create order");
       }
 
-      if (orderError) throw orderError;
       if (!orderData) throw new Error("No order data returned");
 
       // 2. Open Razorpay Checkout
@@ -161,22 +160,30 @@ export default function Membership() {
         handler: async function (response: any) {
           // 3. Verify Payment
           try {
-            const { data: verifyData, error: verifyError } =
-              await supabase.functions.invoke("razorpay-api", {
-                body: {
-                  action: "verify-payment",
-                  data: {
-                    razorpay_payment_id: response.razorpay_payment_id,
-                    razorpay_order_id: response.razorpay_order_id,
-                    razorpay_signature: response.razorpay_signature,
-                    type: "membership",
-                    userId: user?.id,
-                    plan: billingCycle,
-                  },
+            const verifyRes = await fetch(functionUrl, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+              },
+              body: JSON.stringify({
+                action: "verify-payment",
+                data: {
+                  razorpay_payment_id: response.razorpay_payment_id,
+                  razorpay_order_id: response.razorpay_order_id,
+                  razorpay_signature: response.razorpay_signature,
+                  type: "membership",
+                  userId: user?.id,
+                  plan: billingCycle,
                 },
-              });
+              }),
+            });
 
-            if (verifyError) throw verifyError;
+            const verifyData = await verifyRes.json();
+
+            if (!verifyRes.ok) {
+              throw new Error(verifyData.error || "Verification failed");
+            }
 
             // Debugging Transaction Issues
             console.log("Payment Verification Response:", verifyData);
