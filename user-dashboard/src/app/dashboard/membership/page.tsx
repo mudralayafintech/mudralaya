@@ -229,7 +229,7 @@ export default function Membership() {
       startDate = new Date(
         parseInt(ddmmyyyy[3], 10),
         parseInt(ddmmyyyy[2], 10) - 1,
-        parseInt(ddmmyyyy[1], 10)
+        parseInt(ddmmyyyy[1], 10),
       );
     } else {
       const d = new Date(dateStr);
@@ -240,16 +240,15 @@ export default function Membership() {
 
     const now = new Date();
     if (startDate > now) {
-        const diffMs = startDate.getTime() - now.getTime();
-        const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
-        return {
-          days: diffDays,
-          type: profile.membership_type,
-        };
+      const diffMs = startDate.getTime() - now.getTime();
+      const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+      return {
+        days: diffDays,
+        type: profile.membership_type,
+      };
     }
     return null;
   }, [profile]);
-
 
   if (loading && !profile)
     return (
@@ -351,7 +350,6 @@ export default function Membership() {
                     : "MM/YY"}
                 </span>
               </div>
-            </div>
             </div>
           </div>
           {queuedPlanInfo && (

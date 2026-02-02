@@ -495,7 +495,12 @@ export default function Membership() {
                   <View style={styles.cardOverlay} />
 
                   <View style={styles.cardTop}>
-                    <View style={styles.chip} />
+                    <View style={styles.cardChip}>
+                      <View style={styles.chipLine} />
+                      <View style={styles.chipLine} />
+                      <View style={styles.chipLine} />
+                      <View style={styles.chipLine} />
+                    </View>
                     <View style={styles.logoRow}>
                       <Crown color="#fff" size={24} />
                       <Text style={styles.logoText}>Mudralaya</Text>
@@ -762,9 +767,25 @@ const styles = StyleSheet.create({
   cardTop: {
     flexDirection: "row",
     justifyContent: "space-between",
-    alignItems: "center",
+    alignItems: "flex-start", // align to top so chip is at top
+  },
+  cardChip: {
+    width: 48,
+    height: 36,
+    backgroundColor: "rgba(255, 255, 255, 0.2)",
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: "rgba(255, 255, 255, 0.3)",
+    justifyContent: "space-evenly",
+    paddingHorizontal: 4,
+  },
+  chipLine: {
+    height: 1,
+    backgroundColor: "rgba(255, 255, 255, 0.3)",
+    width: "100%",
   },
   chip: {
+    // Backwards compatibility if needed, though unused
     width: 50,
     height: 35,
     backgroundColor: "rgba(255,255,255,0.2)",
