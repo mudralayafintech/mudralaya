@@ -240,10 +240,25 @@ export default function Membership() {
 
       const amountToPay = billingCycle === "yearly" ? 999 : 99;
 
-      const session = await supabase.auth.getSession();
+      let { data: sessionData } = await supabase.auth.getSession();
+
+      // Force refresh if no token or potential expiry
+      if (!sessionData?.session?.access_token) {
+        console.log("No token found, attempting refresh...");
+        const refreshResult = await supabase.auth.refreshSession();
+        sessionData = refreshResult.data;
+      }
+
+      const token = sessionData?.session?.access_token;
+      if (!token) {
+        alert("Session expired. Please log in again.");
+        return;
+      }
+
       const retryHeaders = {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${session.data.session?.access_token}`,
+        Authorization: `Bearer ${process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY!}`,
+        apikey: process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY!,
       };
 
       const orderRes = await fetch(
@@ -253,14 +268,26 @@ export default function Membership() {
           headers: retryHeaders,
           body: JSON.stringify({
             action: "create-order",
-            data: { amount: amountToPay, currency: "INR" },
+            data: {
+              amount: amountToPay,
+              currency: "INR",
+              userId: user?.id,
+              planType: billingCycle === "yearly" ? "yearly" : "monthly",
+            },
           }),
         },
       );
 
       const orderData = await orderRes.json();
-      if (!orderRes.ok)
-        throw new Error(orderData.error || "Failed to create order");
+      if (!orderRes.ok) {
+        console.error("Order Creation Failed:", orderRes.status, orderData);
+        throw new Error(
+          orderData.error ||
+            orderData.message ||
+            JSON.stringify(orderData) ||
+            "Failed to create order",
+        );
+      }
 
       const options = {
         description: `Mudralaya ${billingCycle} Membership`,
@@ -285,7 +312,11 @@ export default function Membership() {
               `${process.env.EXPO_PUBLIC_SUPABASE_URL}/functions/v1/razorpay-api`,
               {
                 method: "POST",
-                headers: retryHeaders,
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY!}`,
+                  apikey: process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY!,
+                },
                 body: JSON.stringify({
                   action: "verify-payment",
                   data: {

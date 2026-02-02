@@ -490,6 +490,8 @@ export default function PlansScreen() {
               amount: amount,
               currency: "INR",
               receipt: `plan_ind_${Date.now()}`,
+              userId: user.id,
+              planType: "individual",
             },
           }),
         },

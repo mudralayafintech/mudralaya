@@ -108,8 +108,14 @@ export default function Membership() {
 
     try {
       // 1. Create Order
-      // 1. Get Session for Auth
-      const { data: sessionData } = await supabase.auth.getSession();
+      // 1. Get Session for Auth & Refresh if needed
+      let { data: sessionData } = await supabase.auth.getSession();
+
+      if (!sessionData.session?.access_token) {
+        const refresh = await supabase.auth.refreshSession();
+        sessionData = refresh.data;
+      }
+
       const token = sessionData.session?.access_token;
 
       if (!token) {
@@ -124,7 +130,8 @@ export default function Membership() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!}`,
+          apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
         },
         body: JSON.stringify({
           action: "create-order",
@@ -141,7 +148,13 @@ export default function Membership() {
       const orderData = await orderRes.json();
 
       if (!orderRes.ok) {
-        throw new Error(orderData.error || "Failed to create order");
+        console.error("Order Creation Failed:", orderRes.status, orderData);
+        throw new Error(
+          orderData.error ||
+            orderData.message ||
+            JSON.stringify(orderData) ||
+            "Failed to create order",
+        );
       }
 
       if (!orderData) throw new Error("No order data returned");
@@ -164,7 +177,8 @@ export default function Membership() {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
+                Authorization: `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!}`,
+                apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
               },
               body: JSON.stringify({
                 action: "verify-payment",

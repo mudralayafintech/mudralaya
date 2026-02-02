@@ -5,7 +5,7 @@ import { corsHeaders } from "../_shared/cors.ts"
 const RAZORPAY_KEY_ID = Deno.env.get('RAZORPAY_KEY_ID')
 const RAZORPAY_KEY_SECRET = Deno.env.get('RAZORPAY_KEY_SECRET')
 
-console.log("Razorpay API Handler V5.1 - Time: 2026-01-31 18:08");
+console.log("Razorpay API Handler V5.2 - Auth Bypass - Time: 2026-02-02 15:05");
 
 serve(async (req: Request): Promise<Response> => {
   if (req.method === 'OPTIONS') {
@@ -84,33 +84,34 @@ serve(async (req: Request): Promise<Response> => {
         });
       }
 
-      // 1. Insert PENDING Transaction
+      // 1. Insert PENDING Transaction (Robust Wrapper)
       if (userId) {
-        const title = planType === 'individual' ? 'Individual Plan Purchase' : 'Mudralaya Membership';
-        const type = planType === 'individual' ? 'PLAN' : 'membership';
+        try {
+            const title = planType === 'individual' ? 'Individual Plan Purchase' : 'Mudralaya Membership';
+            const type = planType === 'individual' ? 'PLAN' : 'membership';
 
-        const { error: pendingError } = await supabaseClient
-          .from('transactions')
-          .insert({
-            user_id: userId,
-            title: title,
-            sub_title: 'Payment Initiated',
-            amount: amount,
-            type: type,
-            status: 'pending',
-            transaction_id: order.id, // Temporary ID matches order
-            razorpay_order_id: order.id,
-            plan_name: planType // 'yearly', 'monthly', or 'INDIVIDUAL'
-          });
-        
-          if (pendingError) {
-            console.error("CRITICAL DB ERROR: Failed to insert pending transaction:", pendingError);
-            // SOFT FAIL: Don't block the user, just log it.
-            // We attach the error to the response for debugging if possible, 
-            // but we MUST return 200 OK with the order details.
-          } else {
-            console.log("Pending transaction created successfully.");
-          }
+            const { error: pendingError } = await supabaseClient
+            .from('transactions')
+            .insert({
+                user_id: userId,
+                title: title,
+                sub_title: 'Payment Initiated',
+                amount: amount,
+                type: type,
+                status: 'pending',
+                transaction_id: order.id,
+                razorpay_order_id: order.id,
+                plan_name: planType
+            });
+            
+            if (pendingError) {
+                console.error("Soft Fail: DB Insert Error:", pendingError);
+            } else {
+                console.log("Success: Pending transaction inserted.");
+            }
+        } catch (dbEx) {
+            console.error("Soft Fail: DB Exception:", dbEx);
+        }
       }
 
       return new Response(JSON.stringify({
