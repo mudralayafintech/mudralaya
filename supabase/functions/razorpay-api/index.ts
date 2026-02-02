@@ -205,7 +205,7 @@ serve(async (req: Request): Promise<Response> => {
         // 2. Record Transaction (V19.0)
         const txPayload: any = {
           user_id: userId,
-          title: 'mudralaya mebership',
+          title: 'Mudralaya Membership',
           sub_title: `${isYearly ? 'Yearly' : 'Monthly'} Membership ${isStacked ? '(Stacked)' : ''}`,
           amount: amount || (isYearly ? 999 : 99),
           type: 'membership',
@@ -221,7 +221,8 @@ serve(async (req: Request): Promise<Response> => {
           .insert(txPayload);
 
         if (txError) {
-          console.error('CRITICAL: Transaction Recording Error (V18.0):', txError);
+          console.error('CRITICAL: Transaction Recording Error (V19.0):', txError);
+          throw new Error(`Transaction Recording Failed: ${txError.message || JSON.stringify(txError)}`);
         }
 
         // 3. Update User Membership
