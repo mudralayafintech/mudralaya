@@ -602,7 +602,9 @@ export default function Membership() {
             onPress={handleBuyNow}
             disabled={
               profile?.membership_type?.toUpperCase() ===
-                billingCycle.toUpperCase() || loading
+                billingCycle.toUpperCase() ||
+              loading ||
+              isDowngrade
             }
           >
             {loading ? (
@@ -613,12 +615,13 @@ export default function Membership() {
                   {profile?.membership_type?.toUpperCase() ===
                   billingCycle.toUpperCase()
                     ? "ENROLLED"
-                    : "Buy Now"}
+                    : isDowngrade
+                      ? "Downgrade Restricted"
+                      : "Buy Now"}
                 </Text>
                 {profile?.membership_type?.toUpperCase() !==
-                  billingCycle.toUpperCase() && (
-                  <ArrowRight color="#fff" size={20} />
-                )}
+                  billingCycle.toUpperCase() &&
+                  !isDowngrade && <ArrowRight color="#fff" size={20} />}
               </>
             )}
           </TouchableOpacity>

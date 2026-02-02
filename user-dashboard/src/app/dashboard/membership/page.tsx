@@ -209,7 +209,13 @@ export default function Membership() {
   };
 
   const expiryDate = getExpiryDate(profile?.membership_expiry);
+  const expiryDate = getExpiryDate(profile?.membership_expiry);
   const isActive = expiryDate ? expiryDate > new Date() : false;
+
+  const isDowngrade =
+    profile?.membership_type?.toLowerCase() === "yearly" &&
+    billingCycle === "monthly" &&
+    isActive;
 
   if (loading && !profile)
     return (
@@ -331,19 +337,22 @@ export default function Membership() {
         <button
           className={styles.buyBtn}
           onClick={handleBuyNow}
-          disabled={isCurrentPlanActive}
+          disabled={isCurrentPlanActive || isDowngrade}
           style={{
-            opacity: isCurrentPlanActive ? 0.7 : 1,
-            cursor: isCurrentPlanActive ? "not-allowed" : "pointer",
+            opacity: isCurrentPlanActive || isDowngrade ? 0.7 : 1,
+            cursor:
+              isCurrentPlanActive || isDowngrade ? "not-allowed" : "pointer",
             backgroundColor: isCurrentPlanActive ? "#22c55e" : undefined,
           }}
         >
           {isCurrentPlanActive
             ? "Membership Active"
-            : isActive
-              ? "Upgrade / Extend"
-              : "Buy Now"}{" "}
-          <ArrowRight />
+            : isDowngrade
+              ? "Downgrade Restricted"
+              : isActive
+                ? "Upgrade / Extend"
+                : "Buy Now"}{" "}
+          {!isDowngrade && <ArrowRight />}
         </button>
       </footer>
     </div>
