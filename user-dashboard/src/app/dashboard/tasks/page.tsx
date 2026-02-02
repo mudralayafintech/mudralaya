@@ -601,14 +601,37 @@ export default function TasksPage() {
               <div style={{ flex: 1 }} />
 
               {/* All Task / Completed / Ongoing Tabs */}
-              <div style={{ display: "flex", gap: "12px" }}>
+              <div
+                style={{
+                  display: "flex",
+                  gap: "12px",
+                  background: "rgba(255, 255, 255, 0.7)",
+                  padding: "6px",
+                  borderRadius: "50px",
+                  border: "1px solid #fff",
+                  backdropFilter: "blur(10px)",
+                }}
+              >
                 {["All Task", "Completed", "Ongoing"].map((tab) => (
                   <button
                     key={tab}
                     onClick={() => setActiveTab(tab)}
-                    className={
-                      activeTab === tab ? styles.tabActive : styles.tabButton
-                    }
+                    style={{
+                      background: activeTab === tab ? "#fff" : "transparent",
+                      border: "none",
+                      color:
+                        activeTab === tab ? "#2563eb" : "rgb(148, 163, 184)",
+                      padding: "8px 20px",
+                      borderRadius: "40px",
+                      fontSize: "14px",
+                      fontWeight: "600",
+                      transition: "all 0.3s ease",
+                      cursor: "pointer",
+                      boxShadow:
+                        activeTab === tab
+                          ? "0 4px 12px rgba(0, 0, 0, 0.05)"
+                          : "none",
+                    }}
                   >
                     {tab}
                   </button>
