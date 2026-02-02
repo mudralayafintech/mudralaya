@@ -432,6 +432,7 @@ export default function PlansScreen() {
 
       const headers: Record<string, string> = {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || ""}`,
         apikey: process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || "",
       };
 
@@ -491,6 +492,7 @@ export default function PlansScreen() {
 
             const verifyHeaders: Record<string, string> = {
               "Content-Type": "application/json",
+              Authorization: `Bearer ${process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || ""}`,
               apikey: process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || "",
             };
 
