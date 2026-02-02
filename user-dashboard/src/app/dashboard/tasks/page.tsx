@@ -12,11 +12,8 @@ import {
   Info,
   ChevronDown,
   ChevronUp,
-  Youtube,
   FileText,
-  Gem,
   Loader2,
-  Plus,
 } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
 import styles from "./tasks.module.css";
@@ -70,27 +67,11 @@ export default function TasksPage() {
 
   const [sortOption, setSortOption] = useState("newest");
   const [activeTab, setActiveTab] = useState("All Task");
+  const [activeTaskType, setActiveTaskType] = useState<"Daily" | "Dedicated">(
+    "Daily",
+  );
   const [expandedTaskId, setExpandedTaskId] = useState<string | null>(null);
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
-
-  // Create Task Modal State
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const [createStep, setCreateStep] = useState<"type" | "details">("type");
-  const [newTaskType, setNewTaskType] = useState<"Daily" | "Dedicated" | null>(
-    null,
-  );
-  const [newTaskData, setNewTaskData] = useState({
-    title: "",
-    description: "",
-    category: "",
-    reward_free: "",
-    reward_member: "",
-    video_url: "",
-    pdf_url: "",
-    action_link: "",
-    icon_type: "group",
-  });
-  const [isCreating, setIsCreating] = useState(false);
 
   useEffect(() => {
     const fetchTasks = async () => {
@@ -239,58 +220,6 @@ export default function TasksPage() {
     }
   };
 
-  const handleCreateTask = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newTaskType) return;
-    setIsCreating(true);
-
-    try {
-      const { data, error } = await supabase
-        .from("tasks")
-        .insert({
-          title: newTaskData.title,
-          description: newTaskData.description,
-          category: newTaskData.category || newTaskType, // Default category to type if empty
-          task_type: newTaskType,
-          reward_free: Number(newTaskData.reward_free) || 0,
-          reward_member: Number(newTaskData.reward_member) || 0,
-          video_url: newTaskData.video_url || null,
-          pdf_url: newTaskData.pdf_url || null,
-          action_link: newTaskData.action_link || null,
-          icon_type: newTaskData.icon_type,
-          status: "active",
-          created_at: new Date().toISOString(),
-        })
-        .select()
-        .single();
-
-      if (error) throw error;
-
-      alert("Task created successfully!");
-      setTasks([data, ...tasks]);
-      setIsCreateModalOpen(false);
-      // Reset State
-      setCreateStep("type");
-      setNewTaskType(null);
-      setNewTaskData({
-        title: "",
-        description: "",
-        category: "",
-        reward_free: "",
-        reward_member: "",
-        video_url: "",
-        pdf_url: "",
-        action_link: "",
-        icon_type: "group",
-      });
-    } catch (err: any) {
-      console.error("Error creating task:", err);
-      alert("Failed to create task: " + err.message);
-    } finally {
-      setIsCreating(false);
-    }
-  };
-
   const getIcon = (type: string) => {
     switch (type) {
       case "group":
@@ -420,55 +349,73 @@ export default function TasksPage() {
   // Filtering Logic
   const filteredTasks = tasks
     .filter((task) => {
-      // 1. Tab Filter
-      if (activeTab === "Completed" && task.status !== "completed")
+      // Search filter
+      if (
+        searchQuery &&
+        !task.title.toLowerCase().includes(searchQuery.toLowerCase())
+      ) {
         return false;
+      }
+
+      // Profession filter
+      const selectedProfs = Object.keys(selectedProfessions).filter(
+        (k) => selectedProfessions[k],
+      );
+      if (
+        !selectedProfs.includes("All") &&
+        task.target_audience &&
+        !task.target_audience.some((prof) => selectedProfs.includes(prof))
+      ) {
+        return false;
+      }
+
+      // Type filter (sidebar checkboxes - keeping for backward compatibility)
+      const selectedTypesArray = Object.keys(selectedTypes).filter(
+        (k) => selectedTypes[k],
+      );
+      if (
+        !selectedTypesArray.includes("All") &&
+        task.type &&
+        !selectedTypesArray.includes(task.type)
+      ) {
+        return false;
+      }
+
+      // Task Type Filter (Daily/Dedicated buttons)
+      const taskType = task.type || "Daily"; // Default to Daily if not specified
+      if (activeTaskType === "Daily") {
+        // Show Daily tasks (anything that's not Dedicated)
+        if (taskType === "Dedicated") return false;
+      } else {
+        // Show Dedicated tasks only
+        if (taskType !== "Dedicated") return false;
+      }
+
+      // Tab filter (All Task, Completed, Ongoing)
+      if (activeTab === "Completed" && task.status !== "approved") {
+        return false;
+      }
       if (
         activeTab === "Ongoing" &&
         task.status !== "ongoing" &&
         task.status !== "in_progress"
-      )
+      ) {
         return false;
+      }
 
-      // 2. Profession Filter
-      const activeProfessions = Object.keys(selectedProfessions).filter(
-        (k) => k !== "All" && selectedProfessions[k],
-      );
-
-      // Only filter by profession IF specific professions are selected
-      const professionMatch =
-        selectedProfessions["All"] ||
-        (task.target_audience &&
-          task.target_audience.some((aud) =>
-            activeProfessions.includes(aud),
-          )) ||
-        !task.target_audience ||
-        activeProfessions.length === 0;
-
-      // 3. Type Filter
-      const activeTypes = Object.keys(selectedTypes).filter(
-        (k) => k !== "All" && selectedTypes[k],
-      );
-      const typeMatch =
-        selectedTypes["All"] ||
-        activeTypes.some(
-          (t) =>
-            task.category &&
-            task.category.toLowerCase().includes(t.toLowerCase()),
-        ) ||
-        activeTypes.length === 0;
-
-      return professionMatch && typeMatch;
+      return true;
     })
     .sort((a, b) => {
-      if (sortOption === "reward_high")
-        return (b.reward_free || 0) - (a.reward_free || 0);
-      if (sortOption === "reward_low")
-        return (a.reward_free || 0) - (b.reward_free || 0);
-      // newest
-      return (
-        new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-      );
+      if (sortOption === "newest") {
+        return (
+          new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+        );
+      } else if (sortOption === "reward") {
+        return (
+          (b.reward_free || b.reward || 0) - (a.reward_free || a.reward || 0)
+        );
+      }
+      return 0;
     });
 
   return (
@@ -590,39 +537,78 @@ export default function TasksPage() {
 
         {/* Task List */}
         <div className={styles.colLg9}>
-          <div className={styles.taskHeaderControls}>
-            <div className={styles.taskTabs}>
-              {["All Task", "Completed", "Ongoing"].map((tab) => (
-                <button
-                  key={tab}
-                  className={`${styles.taskTab} ${
-                    activeTab === tab ? styles.active : ""
-                  }`}
-                  onClick={() => setActiveTab(tab)}
-                >
-                  {tab}
-                </button>
-              ))}
-            </div>
-            <div className={styles.taskActions}>
+          {/* Main Content */}
+          <div className={styles.mainContent}>
+            {/* Task Type Tabs + Tabs Row */}
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "12px",
+                marginBottom: "20px",
+              }}
+            >
+              {/* Daily Task Button */}
               <button
-                className={styles.btnPrimary}
-                onClick={() => setIsCreateModalOpen(true)}
+                onClick={() => setActiveTaskType("Daily")}
                 style={{
-                  backgroundColor: "#0f172a",
-                  color: "white",
-                  border: "none",
-                  padding: "8px 16px",
+                  padding: "10px 24px",
                   borderRadius: "8px",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "8px",
+                  border:
+                    activeTaskType === "Daily" ? "none" : "1px solid #e2e8f0",
+                  backgroundColor:
+                    activeTaskType === "Daily" ? "#2563eb" : "#fff",
+                  color: activeTaskType === "Daily" ? "#fff" : "#64748b",
+                  fontWeight: "600",
                   cursor: "pointer",
-                  marginRight: "12px",
+                  transition: "all 0.2s",
+                  fontSize: "14px",
                 }}
               >
-                <Plus size={16} /> Create Task
+                Daily Task
               </button>
+
+              {/* Dedicated Task Button */}
+              <button
+                onClick={() => setActiveTaskType("Dedicated")}
+                style={{
+                  padding: "10px 24px",
+                  borderRadius: "8px",
+                  border:
+                    activeTaskType === "Dedicated"
+                      ? "none"
+                      : "1px solid #e2e8f0",
+                  backgroundColor:
+                    activeTaskType === "Dedicated" ? "#db2777" : "#fff",
+                  color: activeTaskType === "Dedicated" ? "#fff" : "#64748b",
+                  fontWeight: "600",
+                  cursor: "pointer",
+                  transition: "all 0.2s",
+                  fontSize: "14px",
+                }}
+              >
+                Dedicated Task
+              </button>
+
+              {/* Spacer */}
+              <div style={{ flex: 1 }} />
+
+              {/* All Task / Completed / Ongoing Tabs */}
+              <div style={{ display: "flex", gap: "12px" }}>
+                {["All Task", "Completed", "Ongoing"].map((tab) => (
+                  <button
+                    key={tab}
+                    onClick={() => setActiveTab(tab)}
+                    className={
+                      activeTab === tab ? styles.tabActive : styles.tabButton
+                    }
+                  >
+                    {tab}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div className={styles.taskActions}>
               <select
                 className={styles.sortSelect}
                 value={sortOption}
@@ -809,321 +795,6 @@ export default function TasksPage() {
           </div>
         </div>
       </div>
-
-      {/* Create Task Modal */}
-      {isCreateModalOpen && (
-        <div
-          style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            backgroundColor: "rgba(0,0,0,0.5)",
-            zIndex: 1000,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <div
-            style={{
-              backgroundColor: "white",
-              padding: "24px",
-              borderRadius: "16px",
-              width: "90%",
-              maxWidth: "500px",
-              maxHeight: "90vh",
-              overflowY: "auto",
-            }}
-          >
-            <h2
-              style={{
-                fontSize: "20px",
-                fontWeight: "bold",
-                marginBottom: "16px",
-              }}
-            >
-              Create New Task
-            </h2>
-
-            {createStep === "type" ? (
-              <div
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "1fr 1fr",
-                  gap: "16px",
-                }}
-              >
-                <button
-                  onClick={() => {
-                    setNewTaskType("Daily");
-                    setCreateStep("details");
-                  }}
-                  style={{
-                    padding: "24px",
-                    borderRadius: "12px",
-                    border: "2px solid #e2e8f0",
-                    backgroundColor: "white",
-                    cursor: "pointer",
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                    gap: "8px",
-                  }}
-                >
-                  <div
-                    style={{
-                      padding: "12px",
-                      borderRadius: "50%",
-                      backgroundColor: "#dbeafe",
-                    }}
-                  >
-                    <Rocket size={24} color="#2563eb" />
-                  </div>
-                  <span style={{ fontWeight: "600" }}>Daily Task</span>
-                </button>
-
-                <button
-                  onClick={() => {
-                    setNewTaskType("Dedicated");
-                    setCreateStep("details");
-                  }}
-                  style={{
-                    padding: "24px",
-                    borderRadius: "12px",
-                    border: "2px solid #e2e8f0",
-                    backgroundColor: "white",
-                    cursor: "pointer",
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                    gap: "8px",
-                  }}
-                >
-                  <div
-                    style={{
-                      padding: "12px",
-                      borderRadius: "50%",
-                      backgroundColor: "#fce7f3",
-                    }}
-                  >
-                    <Gem size={24} color="#db2777" />
-                  </div>
-                  <span style={{ fontWeight: "600" }}>Dedicated Task</span>
-                </button>
-              </div>
-            ) : (
-              <form
-                onSubmit={handleCreateTask}
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: "12px",
-                }}
-              >
-                <div
-                  style={{
-                    padding: "8px 12px",
-                    backgroundColor: "#f1f5f9",
-                    borderRadius: "8px",
-                    marginBottom: "8px",
-                  }}
-                >
-                  <span style={{ fontSize: "12px", color: "#64748b" }}>
-                    Selected Type:{" "}
-                  </span>
-                  <span style={{ fontWeight: "600" }}>{newTaskType}</span>
-                  <button
-                    type="button"
-                    onClick={() => setCreateStep("type")}
-                    style={{
-                      float: "right",
-                      border: "none",
-                      background: "none",
-                      color: "#2563eb",
-                      cursor: "pointer",
-                      fontSize: "12px",
-                    }}
-                  >
-                    Change
-                  </button>
-                </div>
-
-                <input
-                  placeholder="Task Title"
-                  required
-                  value={newTaskData.title}
-                  onChange={(e) =>
-                    setNewTaskData({ ...newTaskData, title: e.target.value })
-                  }
-                  style={{
-                    padding: "10px",
-                    borderRadius: "8px",
-                    border: "1px solid #cbd5e1",
-                  }}
-                />
-
-                <textarea
-                  placeholder="Description"
-                  value={newTaskData.description}
-                  onChange={(e) =>
-                    setNewTaskData({
-                      ...newTaskData,
-                      description: e.target.value,
-                    })
-                  }
-                  style={{
-                    padding: "10px",
-                    borderRadius: "8px",
-                    border: "1px solid #cbd5e1",
-                    minHeight: "80px",
-                  }}
-                />
-
-                <input
-                  placeholder="Category (e.g. Marketing, Reviews)"
-                  value={newTaskData.category}
-                  onChange={(e) =>
-                    setNewTaskData({ ...newTaskData, category: e.target.value })
-                  }
-                  style={{
-                    padding: "10px",
-                    borderRadius: "8px",
-                    border: "1px solid #cbd5e1",
-                  }}
-                />
-
-                <div
-                  style={{
-                    display: "grid",
-                    gridTemplateColumns: "1fr 1fr",
-                    gap: "12px",
-                  }}
-                >
-                  <input
-                    placeholder="Free Reward (₹)"
-                    type="number"
-                    value={newTaskData.reward_free}
-                    onChange={(e) =>
-                      setNewTaskData({
-                        ...newTaskData,
-                        reward_free: e.target.value,
-                      })
-                    }
-                    style={{
-                      padding: "10px",
-                      borderRadius: "8px",
-                      border: "1px solid #cbd5e1",
-                    }}
-                  />
-                  <input
-                    placeholder="Member Reward (₹)"
-                    type="number"
-                    value={newTaskData.reward_member}
-                    onChange={(e) =>
-                      setNewTaskData({
-                        ...newTaskData,
-                        reward_member: e.target.value,
-                      })
-                    }
-                    style={{
-                      padding: "10px",
-                      borderRadius: "8px",
-                      border: "1px solid #cbd5e1",
-                    }}
-                  />
-                </div>
-
-                <input
-                  placeholder="Action Link (URL)"
-                  value={newTaskData.action_link}
-                  onChange={(e) =>
-                    setNewTaskData({
-                      ...newTaskData,
-                      action_link: e.target.value,
-                    })
-                  }
-                  style={{
-                    padding: "10px",
-                    borderRadius: "8px",
-                    border: "1px solid #cbd5e1",
-                  }}
-                />
-
-                <input
-                  placeholder="Video URL (Optional)"
-                  value={newTaskData.video_url}
-                  onChange={(e) =>
-                    setNewTaskData({
-                      ...newTaskData,
-                      video_url: e.target.value,
-                    })
-                  }
-                  style={{
-                    padding: "10px",
-                    borderRadius: "8px",
-                    border: "1px solid #cbd5e1",
-                  }}
-                />
-
-                <div
-                  style={{ display: "flex", gap: "12px", marginTop: "16px" }}
-                >
-                  <button
-                    type="button"
-                    onClick={() => setIsCreateModalOpen(false)}
-                    style={{
-                      flex: 1,
-                      padding: "12px",
-                      border: "1px solid #cbd5e1",
-                      borderRadius: "8px",
-                      backgroundColor: "white",
-                      cursor: "pointer",
-                    }}
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    disabled={isCreating}
-                    style={{
-                      flex: 1,
-                      padding: "12px",
-                      border: "none",
-                      borderRadius: "8px",
-                      backgroundColor: "#0f172a",
-                      color: "white",
-                      cursor: "pointer",
-                      opacity: isCreating ? 0.7 : 1,
-                    }}
-                  >
-                    {isCreating ? "Creating..." : "Create Task"}
-                  </button>
-                </div>
-              </form>
-            )}
-
-            {createStep === "type" && (
-              <button
-                type="button"
-                onClick={() => setIsCreateModalOpen(false)}
-                style={{
-                  width: "100%",
-                  marginTop: "16px",
-                  padding: "12px",
-                  border: "none",
-                  borderRadius: "8px",
-                  backgroundColor: "#f1f5f9",
-                  cursor: "pointer",
-                }}
-              >
-                Cancel
-              </button>
-            )}
-          </div>
-        </div>
-      )}
     </div>
   );
 }

@@ -278,15 +278,17 @@ export default function TasksScreen() {
         </GlassView>
       </View>
 
-      {/* Task Type Tabs */}
+      {/* Task Type Tabs + Filter Button Row */}
       <View
         style={{
           flexDirection: "row",
           paddingHorizontal: 20,
           marginBottom: 16,
           gap: 12,
+          alignItems: "center",
         }}
       >
+        {/* Daily Task Tab */}
         <TouchableOpacity
           style={{
             flex: 1,
@@ -321,6 +323,7 @@ export default function TasksScreen() {
           </Text>
         </TouchableOpacity>
 
+        {/* Dedicated Task Tab */}
         <TouchableOpacity
           style={{
             flex: 1,
@@ -354,10 +357,8 @@ export default function TasksScreen() {
             Dedicated Task
           </Text>
         </TouchableOpacity>
-      </View>
 
-      <View style={styles.searchRow}>
-        {/* Hidden Filter Btn if not needed anymore, or keep for Professions */}
+        {/* Filter Button */}
         <TouchableOpacity
           style={[
             styles.filterBtn,
