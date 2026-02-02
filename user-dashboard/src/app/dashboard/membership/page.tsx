@@ -108,19 +108,41 @@ export default function Membership() {
 
     try {
       // 1. Create Order
-      const { data: orderData, error: orderError } =
-        await supabase.functions.invoke("razorpay-api", {
-          body: {
-            action: "create-order",
-            data: {
-              amount: price,
-              currency: "INR",
-              receipt: `mem_${billingCycle}_${Date.now()}`,
-              userId: user?.id,
-              planType: billingCycle,
-            },
+      // 1. Get Session for Auth
+      const { data: sessionData } = await supabase.auth.getSession();
+      const token = sessionData.session?.access_token;
+
+      if (!token) {
+        alert("Authentication failed. Please log in again.");
+        return;
+      }
+
+      // 2. Create Order (Manual Fetch to fix 401)
+      const functionUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/razorpay-api`;
+
+      const orderRes = await fetch(functionUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          action: "create-order",
+          data: {
+            amount: price,
+            currency: "INR",
+            receipt: `mem_${billingCycle}_${Date.now()}`,
+            userId: user?.id,
+            planType: billingCycle,
           },
-        });
+        }),
+      });
+
+      const orderData = await orderRes.json();
+
+      if (!orderRes.ok) {
+        throw new Error(orderData.error || "Failed to create order");
+      }
 
       if (orderError) throw orderError;
       if (!orderData) throw new Error("No order data returned");
