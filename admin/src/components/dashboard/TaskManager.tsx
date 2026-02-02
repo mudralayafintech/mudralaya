@@ -14,6 +14,7 @@ interface Task {
   reward: number; // Fallback
   reward_info?: string;
   type: string;
+  task_type?: string; // Daily or Dedicated
   category?: string;
 }
 
@@ -43,7 +44,8 @@ export default function TaskManager() {
     reward_min: "",
     reward_max: "",
     reward_info: "",
-    type: "Daily Task",
+    type: "Daily",
+    task_type: "Daily", // Explicitly added
     video_link: "",
     pdf_url: "",
     action_link: "",
@@ -104,7 +106,11 @@ export default function TaskManager() {
   };
 
   const handleApproveTask = async (userTaskId: string) => {
-    if (!confirm("Are you sure you want to approve this task? The reward will be added to the user's wallet.")) {
+    if (
+      !confirm(
+        "Are you sure you want to approve this task? The reward will be added to the user's wallet.",
+      )
+    ) {
       return;
     }
     try {
@@ -122,7 +128,10 @@ export default function TaskManager() {
   const handleRejectTask = async (userTaskId: string) => {
     const reason = prompt("Please provide a reason for rejection (optional):");
     try {
-      await adminApiRequest("reject-task", { userTaskId, reason: reason || null });
+      await adminApiRequest("reject-task", {
+        userTaskId,
+        reason: reason || null,
+      });
       alert("Task rejected.");
       // Refresh participants list
       if (selectedTask) {
@@ -206,15 +215,17 @@ export default function TaskManager() {
                   <label className={styles.label}>Type</label>
                   <select
                     className={styles.select}
-                    value={newTask.type}
+                    value={newTask.task_type}
                     onChange={(e) =>
-                      setNewTask({ ...newTask, type: e.target.value })
+                      setNewTask({
+                        ...newTask,
+                        task_type: e.target.value,
+                        type: e.target.value,
+                      })
                     }
                   >
-                    <option>Daily Task</option>
-                    <option>Weekly Task</option>
-                    <option>One-time</option>
-                    <option>Dedicated Task</option>
+                    <option value="Daily">Daily Task</option>
+                    <option value="Dedicated">Dedicated Task</option>
                   </select>
                 </div>
 
@@ -294,15 +305,21 @@ export default function TaskManager() {
                         </span>
                       )}
                     </div>
-                    <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+                    <div
+                      style={{
+                        display: "flex",
+                        gap: "8px",
+                        alignItems: "center",
+                      }}
+                    >
                       <span
                         className={clsx(
                           styles.statusPill,
                           p.status === "completed" || p.status === "approved"
                             ? styles.completed
                             : p.status === "rejected"
-                            ? styles.rejected
-                            : styles.pending
+                              ? styles.rejected
+                              : styles.pending,
                         )}
                       >
                         {p.status}

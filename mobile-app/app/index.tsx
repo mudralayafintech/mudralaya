@@ -10,7 +10,7 @@ export default function LandingPage() {
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
-      <StatusBar style="light" />
+      <StatusBar style="dark" />
 
       {/* Background with Gradient or Solid Color */}
       <View style={styles.background} />
@@ -48,7 +48,7 @@ export default function LandingPage() {
             style={[styles.btn, styles.secondaryBtn]}
             onPress={() => router.push("/create-task")}
           >
-            <Text style={styles.secondaryBtnText}>Add Task</Text>
+            <Text style={styles.secondaryBtnText}>Have a Task</Text>
           </TouchableOpacity>
         </Animated.View>
       </View>
@@ -59,11 +59,11 @@ export default function LandingPage() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#0f172a",
+    backgroundColor: "#ffffff",
   },
   background: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: "#0f172a",
+    backgroundColor: "#f8fafc",
   },
   content: {
     flex: 1,
@@ -78,14 +78,19 @@ const styles = StyleSheet.create({
   logoContainer: {
     width: 80,
     height: 80,
-    backgroundColor: "rgba(255,255,255,0.1)",
+    backgroundColor: "#fff",
     borderRadius: 20,
     justifyContent: "center",
     alignItems: "center",
     marginBottom: 24,
     borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.2)",
+    borderColor: "#e2e8f0",
     overflow: "hidden", // Ensure image stays inside rounded corners
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 3,
   },
   logoImage: {
     width: "100%",
@@ -95,12 +100,12 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 32,
     fontWeight: "bold",
-    color: "#fff",
+    color: "#0f172a",
     marginBottom: 12,
   },
   subtitle: {
     fontSize: 16,
-    color: "#94a3b8",
+    color: "#64748b",
     textAlign: "center",
     lineHeight: 24,
   },
@@ -122,9 +127,9 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
   secondaryBtn: {
-    backgroundColor: "rgba(255,255,255,0.1)",
-    borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.2)",
+    backgroundColor: "#fff",
+    borderWidth: 1.5,
+    borderColor: "#cbd5e1",
   },
   primaryBtnText: {
     color: "#fff",
@@ -132,7 +137,7 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
   secondaryBtnText: {
-    color: "#fff",
+    color: "#0f172a",
     fontSize: 18,
     fontWeight: "600",
   },

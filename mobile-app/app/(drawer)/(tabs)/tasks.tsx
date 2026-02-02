@@ -42,6 +42,7 @@ interface Task {
   title: string;
   category?: string;
   type?: string;
+  task_type?: string; // Added task_type
   target_audience?: string[];
   icon_type: string;
   status?: string;
@@ -81,12 +82,16 @@ export default function TasksScreen() {
   const [selectedTypes, setSelectedTypes] = useState<{
     [key: string]: boolean;
   }>({
-    All: true,
-    Daily: false,
+    All: false, // Default to false
+    Daily: true, // Default to true
     Weekly: false,
     Company: false,
     Dedicated: false,
   });
+  // Tabs State
+  const [activeTypeTab, setActiveTypeTab] = useState<"Daily" | "Dedicated">(
+    "Daily",
+  );
 
   const { theme } = useTheme();
   const isDark = theme === "dark";
@@ -212,18 +217,26 @@ export default function TasksScreen() {
       task.target_audience.some((aud) => activeProfessions.includes(aud)) ||
       activeProfessions.length === 0;
 
-    // Type Filter
-    const activeTypes = Object.keys(selectedTypes).filter(
-      (k) => k !== "All" && selectedTypes[k],
-    );
-    const typeMatch =
-      selectedTypes["All"] ||
-      activeTypes.some((t) =>
-        task.category?.toLowerCase().includes(t.toLowerCase()),
-      ) ||
-      activeTypes.length === 0;
+    // Type Filter (Tab Based)
+    // If Daily: Show task_type='Daily' (or null/empty/not dedicated for backward compat)
+    // If Dedicated: Show task_type='Dedicated'
+    const isDailyTab = activeTypeTab === "Daily";
+    const taskType = task.task_type || "Daily"; // Default to Daily if null
 
-    return professionMatch && typeMatch;
+    if (isDailyTab) {
+      // Show if type is Daily OR if it's not explicitly Dedicated (safety net)
+      if (taskType === "Dedicated") return false;
+      if (task.category?.toLowerCase().includes("dedicated")) return false;
+    } else {
+      // Dedicated Tab
+      if (
+        taskType !== "Dedicated" &&
+        !task.category?.toLowerCase().includes("dedicated")
+      )
+        return false;
+    }
+
+    return professionMatch; // Removed old typeMatch
   });
 
   const renderHeader = () => (
@@ -269,6 +282,88 @@ export default function TasksScreen() {
             onChangeText={setSearchQuery}
           />
         </GlassView>
+      </View>
+
+      {/* Task Type Tabs */}
+      <View
+        style={{
+          flexDirection: "row",
+          paddingHorizontal: 20,
+          marginBottom: 16,
+          gap: 12,
+        }}
+      >
+        <TouchableOpacity
+          style={{
+            flex: 1,
+            paddingVertical: 12,
+            borderRadius: 12,
+            backgroundColor:
+              activeTypeTab === "Daily"
+                ? isDark
+                  ? "#3b82f6"
+                  : "#2563eb"
+                : isDark
+                  ? "rgba(30,41,59,0.5)"
+                  : "#fff",
+            alignItems: "center",
+            borderWidth: 1,
+            borderColor:
+              activeTypeTab === "Daily"
+                ? "transparent"
+                : isDark
+                  ? "rgba(255,255,255,0.1)"
+                  : "#e2e8f0",
+          }}
+          onPress={() => setActiveTypeTab("Daily")}
+        >
+          <Text
+            style={{
+              fontWeight: "700",
+              color: activeTypeTab === "Daily" ? "#fff" : subTextColor,
+            }}
+          >
+            Daily Task
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={{
+            flex: 1,
+            paddingVertical: 12,
+            borderRadius: 12,
+            backgroundColor:
+              activeTypeTab === "Dedicated"
+                ? isDark
+                  ? "#db2777"
+                  : "#db2777"
+                : isDark
+                  ? "rgba(30,41,59,0.5)"
+                  : "#fff",
+            alignItems: "center",
+            borderWidth: 1,
+            borderColor:
+              activeTypeTab === "Dedicated"
+                ? "transparent"
+                : isDark
+                  ? "rgba(255,255,255,0.1)"
+                  : "#e2e8f0",
+          }}
+          onPress={() => setActiveTypeTab("Dedicated")}
+        >
+          <Text
+            style={{
+              fontWeight: "700",
+              color: activeTypeTab === "Dedicated" ? "#fff" : subTextColor,
+            }}
+          >
+            Dedicated Task
+          </Text>
+        </TouchableOpacity>
+      </View>
+
+      <View style={styles.searchRow}>
+        {/* Hidden Filter Btn if not needed anymore, or keep for Professions */}
         <TouchableOpacity
           style={[
             styles.filterBtn,

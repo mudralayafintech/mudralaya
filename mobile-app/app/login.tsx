@@ -136,7 +136,7 @@ export default function Login() {
 
   return (
     <LinearGradient
-      colors={["#0f172a", "#1e293b", "#0e7490"]}
+      colors={["#f8fafc", "#e0f2fe", "#bae6fd"]}
       start={{ x: 0, y: 0 }}
       end={{ x: 1, y: 1 }}
       style={styles.container}
@@ -153,7 +153,7 @@ export default function Login() {
             entering={FadeInDown.springify().damping(15)}
             style={styles.cardContainer}
           >
-            <GlassView intensity={40} tint="dark" style={styles.glassCard}>
+            <GlassView intensity={60} tint="light" style={styles.glassCard}>
               <View style={styles.logoContainer}>
                 <Animated.Image
                   source={require("../assets/splash-icon.png")}
@@ -187,7 +187,7 @@ export default function Login() {
                           }
                           value={phone.replace("+91", "")}
                           placeholder="Enter 10-digit number"
-                          placeholderTextColor="rgba(255,255,255,0.4)"
+                          placeholderTextColor="#94a3b8"
                           keyboardType="phone-pad"
                           maxLength={10}
                           editable={!loading}
@@ -229,7 +229,7 @@ export default function Login() {
                       <View style={styles.inputWrapper}>
                         <Lock
                           size={20}
-                          color="rgba(255,255,255,0.6)"
+                          color="#64748b"
                           style={styles.inputIcon}
                         />
                         <TextInput
@@ -238,7 +238,7 @@ export default function Login() {
                           value={otp}
                           keyboardType="number-pad"
                           placeholder="Enter 6-digit OTP"
-                          placeholderTextColor="rgba(255,255,255,0.4)"
+                          placeholderTextColor="#94a3b8"
                           editable={!loading}
                           cursorColor="#06b6d4"
                           autoFocus
@@ -324,8 +324,14 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     padding: 24,
     borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.1)",
+    borderColor: "rgba(0,0,0,0.05)",
+    backgroundColor: "rgba(255,255,255,0.9)",
     overflow: "hidden",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
+    elevation: 4,
   },
   logoContainer: {
     alignItems: "center",
@@ -339,19 +345,19 @@ const styles = StyleSheet.create({
   appName: {
     fontSize: 24,
     fontWeight: "bold",
-    color: "#fff",
+    color: "#0f172a",
     letterSpacing: 0.5,
   },
   title: {
     fontSize: 28,
     fontWeight: "bold",
-    color: "#fff",
+    color: "#0f172a",
     marginBottom: 8,
     textAlign: "center",
   },
   subtitle: {
     fontSize: 16,
-    color: "rgba(255,255,255,0.7)",
+    color: "#64748b",
     textAlign: "center",
     marginBottom: 32,
   },
@@ -363,7 +369,7 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 14,
-    color: "rgba(255,255,255,0.8)",
+    color: "#334155",
     marginBottom: 8,
     fontWeight: "600",
     marginLeft: 4,
@@ -371,10 +377,10 @@ const styles = StyleSheet.create({
   phoneInputWrapper: {
     flexDirection: "row",
     height: 56,
-    backgroundColor: "rgba(0,0,0,0.2)",
+    backgroundColor: "#f1f5f9",
     borderRadius: 16,
-    borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.1)",
+    borderWidth: 1.5,
+    borderColor: "#cbd5e1",
     overflow: "hidden",
   },
   prefixContainer: {
@@ -382,28 +388,28 @@ const styles = StyleSheet.create({
     alignItems: "center",
     width: 60,
     borderRightWidth: 1,
-    borderRightColor: "rgba(255,255,255,0.1)",
-    backgroundColor: "rgba(255,255,255,0.05)",
+    borderRightColor: "#cbd5e1",
+    backgroundColor: "#e2e8f0",
   },
   prefixText: {
     fontSize: 16,
-    color: "#fff",
+    color: "#0f172a",
     fontWeight: "600",
   },
   phoneInput: {
     flex: 1,
     paddingHorizontal: 16,
     fontSize: 18,
-    color: "#fff",
+    color: "#0f172a",
     fontWeight: "500",
   },
   inputWrapper: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "rgba(0,0,0,0.2)",
+    backgroundColor: "#f1f5f9",
     borderRadius: 16,
-    borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.1)",
+    borderWidth: 1.5,
+    borderColor: "#cbd5e1",
     height: 56,
     paddingHorizontal: 16,
   },
@@ -414,7 +420,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 18,
     height: "100%",
-    color: "#fff",
+    color: "#0f172a",
     fontWeight: "500",
     letterSpacing: 2,
   },
@@ -449,7 +455,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   timerText: {
-    color: "rgba(255,255,255,0.5)",
+    color: "#94a3b8",
     fontSize: 14,
   },
   linkText: {
@@ -458,14 +464,14 @@ const styles = StyleSheet.create({
     fontSize: 15,
   },
   disabledLink: {
-    color: "rgba(255,255,255,0.3)",
+    color: "#cbd5e1",
   },
   changePhoneBtn: {
     marginTop: 16,
     alignItems: "center",
   },
   secondaryLinkText: {
-    color: "rgba(255,255,255,0.6)",
+    color: "#64748b",
     fontSize: 14,
   },
 });

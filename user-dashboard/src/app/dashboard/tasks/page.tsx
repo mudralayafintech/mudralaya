@@ -16,6 +16,7 @@ import {
   FileText,
   Gem,
   Loader2,
+  Plus,
 } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
 import styles from "./tasks.module.css";
@@ -72,6 +73,25 @@ export default function TasksPage() {
   const [expandedTaskId, setExpandedTaskId] = useState<string | null>(null);
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
 
+  // Create Task Modal State
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [createStep, setCreateStep] = useState<"type" | "details">("type");
+  const [newTaskType, setNewTaskType] = useState<"Daily" | "Dedicated" | null>(
+    null,
+  );
+  const [newTaskData, setNewTaskData] = useState({
+    title: "",
+    description: "",
+    category: "",
+    reward_free: "",
+    reward_member: "",
+    video_url: "",
+    pdf_url: "",
+    action_link: "",
+    icon_type: "group",
+  });
+  const [isCreating, setIsCreating] = useState(false);
+
   useEffect(() => {
     const fetchTasks = async () => {
       try {
@@ -79,7 +99,7 @@ export default function TasksPage() {
           "dashboard-api",
           {
             body: { action: "get-tasks" },
-          }
+          },
         );
 
         if (error) throw error;
@@ -113,8 +133,8 @@ export default function TasksPage() {
       } else {
         setTasks((prevTasks) =>
           prevTasks.map((t) =>
-            t.id === task.id ? { ...t, status: "ongoing" } : t
-          )
+            t.id === task.id ? { ...t, status: "ongoing" } : t,
+          ),
         );
       }
     } catch (err) {
@@ -153,8 +173,8 @@ export default function TasksPage() {
       // Update local state
       setTasks((prevTasks) =>
         prevTasks.map((t) =>
-          t.id === task.id ? { ...t, status: "completed" } : t
-        )
+          t.id === task.id ? { ...t, status: "completed" } : t,
+        ),
       );
       alert("Task completed! Waiting for admin approval.");
     } catch (err) {
@@ -169,7 +189,11 @@ export default function TasksPage() {
       if (task.action_link) window.open(task.action_link, "_blank");
       // Small delay to let user see the action link open
       setTimeout(() => {
-        if (confirm("Have you completed the task? Click OK to submit for approval.")) {
+        if (
+          confirm(
+            "Have you completed the task? Click OK to submit for approval.",
+          )
+        ) {
           handleCompleteTask(task);
         }
       }, 500);
@@ -212,6 +236,58 @@ export default function TasksPage() {
         [type]: !prev[type],
         All: false,
       }));
+    }
+  };
+
+  const handleCreateTask = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newTaskType) return;
+    setIsCreating(true);
+
+    try {
+      const { data, error } = await supabase
+        .from("tasks")
+        .insert({
+          title: newTaskData.title,
+          description: newTaskData.description,
+          category: newTaskData.category || newTaskType, // Default category to type if empty
+          task_type: newTaskType,
+          reward_free: Number(newTaskData.reward_free) || 0,
+          reward_member: Number(newTaskData.reward_member) || 0,
+          video_url: newTaskData.video_url || null,
+          pdf_url: newTaskData.pdf_url || null,
+          action_link: newTaskData.action_link || null,
+          icon_type: newTaskData.icon_type,
+          status: "active",
+          created_at: new Date().toISOString(),
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      alert("Task created successfully!");
+      setTasks([data, ...tasks]);
+      setIsCreateModalOpen(false);
+      // Reset State
+      setCreateStep("type");
+      setNewTaskType(null);
+      setNewTaskData({
+        title: "",
+        description: "",
+        category: "",
+        reward_free: "",
+        reward_member: "",
+        video_url: "",
+        pdf_url: "",
+        action_link: "",
+        icon_type: "group",
+      });
+    } catch (err: any) {
+      console.error("Error creating task:", err);
+      alert("Failed to create task: " + err.message);
+    } finally {
+      setIsCreating(false);
     }
   };
 
@@ -356,7 +432,7 @@ export default function TasksPage() {
 
       // 2. Profession Filter
       const activeProfessions = Object.keys(selectedProfessions).filter(
-        (k) => k !== "All" && selectedProfessions[k]
+        (k) => k !== "All" && selectedProfessions[k],
       );
 
       // Only filter by profession IF specific professions are selected
@@ -364,21 +440,21 @@ export default function TasksPage() {
         selectedProfessions["All"] ||
         (task.target_audience &&
           task.target_audience.some((aud) =>
-            activeProfessions.includes(aud)
+            activeProfessions.includes(aud),
           )) ||
         !task.target_audience ||
         activeProfessions.length === 0;
 
       // 3. Type Filter
       const activeTypes = Object.keys(selectedTypes).filter(
-        (k) => k !== "All" && selectedTypes[k]
+        (k) => k !== "All" && selectedTypes[k],
       );
       const typeMatch =
         selectedTypes["All"] ||
         activeTypes.some(
           (t) =>
             task.category &&
-            task.category.toLowerCase().includes(t.toLowerCase())
+            task.category.toLowerCase().includes(t.toLowerCase()),
         ) ||
         activeTypes.length === 0;
 
@@ -529,6 +605,24 @@ export default function TasksPage() {
               ))}
             </div>
             <div className={styles.taskActions}>
+              <button
+                className={styles.btnPrimary}
+                onClick={() => setIsCreateModalOpen(true)}
+                style={{
+                  backgroundColor: "#0f172a",
+                  color: "white",
+                  border: "none",
+                  padding: "8px 16px",
+                  borderRadius: "8px",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "8px",
+                  cursor: "pointer",
+                  marginRight: "12px",
+                }}
+              >
+                <Plus size={16} /> Create Task
+              </button>
               <select
                 className={styles.sortSelect}
                 value={sortOption}
@@ -641,7 +735,7 @@ export default function TasksPage() {
                             onClick={() =>
                               window.open(
                                 task.video_url || task.video_link,
-                                "_blank"
+                                "_blank",
                               )
                             }
                           >
@@ -682,21 +776,25 @@ export default function TasksPage() {
                     <div className="mt-3" style={{ marginTop: "16px" }}>
                       <button
                         className={`${styles.btnTakeTask} ${
-                          task.status === "approved" || task.status === "rejected"
+                          task.status === "approved" ||
+                          task.status === "rejected"
                             ? styles.btnDisabled
                             : ""
                         }`}
                         onClick={() => handleSmartAction(task)}
                         disabled={
-                          task.status === "approved" || task.status === "rejected"
+                          task.status === "approved" ||
+                          task.status === "rejected"
                         }
                         style={{
                           opacity:
-                            task.status === "approved" || task.status === "rejected"
+                            task.status === "approved" ||
+                            task.status === "rejected"
                               ? 0.6
                               : 1,
                           cursor:
-                            task.status === "approved" || task.status === "rejected"
+                            task.status === "approved" ||
+                            task.status === "rejected"
                               ? "not-allowed"
                               : "pointer",
                         }}
@@ -711,6 +809,321 @@ export default function TasksPage() {
           </div>
         </div>
       </div>
+
+      {/* Create Task Modal */}
+      {isCreateModalOpen && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: "rgba(0,0,0,0.5)",
+            zIndex: 1000,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <div
+            style={{
+              backgroundColor: "white",
+              padding: "24px",
+              borderRadius: "16px",
+              width: "90%",
+              maxWidth: "500px",
+              maxHeight: "90vh",
+              overflowY: "auto",
+            }}
+          >
+            <h2
+              style={{
+                fontSize: "20px",
+                fontWeight: "bold",
+                marginBottom: "16px",
+              }}
+            >
+              Create New Task
+            </h2>
+
+            {createStep === "type" ? (
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "1fr 1fr",
+                  gap: "16px",
+                }}
+              >
+                <button
+                  onClick={() => {
+                    setNewTaskType("Daily");
+                    setCreateStep("details");
+                  }}
+                  style={{
+                    padding: "24px",
+                    borderRadius: "12px",
+                    border: "2px solid #e2e8f0",
+                    backgroundColor: "white",
+                    cursor: "pointer",
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    gap: "8px",
+                  }}
+                >
+                  <div
+                    style={{
+                      padding: "12px",
+                      borderRadius: "50%",
+                      backgroundColor: "#dbeafe",
+                    }}
+                  >
+                    <Rocket size={24} color="#2563eb" />
+                  </div>
+                  <span style={{ fontWeight: "600" }}>Daily Task</span>
+                </button>
+
+                <button
+                  onClick={() => {
+                    setNewTaskType("Dedicated");
+                    setCreateStep("details");
+                  }}
+                  style={{
+                    padding: "24px",
+                    borderRadius: "12px",
+                    border: "2px solid #e2e8f0",
+                    backgroundColor: "white",
+                    cursor: "pointer",
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    gap: "8px",
+                  }}
+                >
+                  <div
+                    style={{
+                      padding: "12px",
+                      borderRadius: "50%",
+                      backgroundColor: "#fce7f3",
+                    }}
+                  >
+                    <Gem size={24} color="#db2777" />
+                  </div>
+                  <span style={{ fontWeight: "600" }}>Dedicated Task</span>
+                </button>
+              </div>
+            ) : (
+              <form
+                onSubmit={handleCreateTask}
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "12px",
+                }}
+              >
+                <div
+                  style={{
+                    padding: "8px 12px",
+                    backgroundColor: "#f1f5f9",
+                    borderRadius: "8px",
+                    marginBottom: "8px",
+                  }}
+                >
+                  <span style={{ fontSize: "12px", color: "#64748b" }}>
+                    Selected Type:{" "}
+                  </span>
+                  <span style={{ fontWeight: "600" }}>{newTaskType}</span>
+                  <button
+                    type="button"
+                    onClick={() => setCreateStep("type")}
+                    style={{
+                      float: "right",
+                      border: "none",
+                      background: "none",
+                      color: "#2563eb",
+                      cursor: "pointer",
+                      fontSize: "12px",
+                    }}
+                  >
+                    Change
+                  </button>
+                </div>
+
+                <input
+                  placeholder="Task Title"
+                  required
+                  value={newTaskData.title}
+                  onChange={(e) =>
+                    setNewTaskData({ ...newTaskData, title: e.target.value })
+                  }
+                  style={{
+                    padding: "10px",
+                    borderRadius: "8px",
+                    border: "1px solid #cbd5e1",
+                  }}
+                />
+
+                <textarea
+                  placeholder="Description"
+                  value={newTaskData.description}
+                  onChange={(e) =>
+                    setNewTaskData({
+                      ...newTaskData,
+                      description: e.target.value,
+                    })
+                  }
+                  style={{
+                    padding: "10px",
+                    borderRadius: "8px",
+                    border: "1px solid #cbd5e1",
+                    minHeight: "80px",
+                  }}
+                />
+
+                <input
+                  placeholder="Category (e.g. Marketing, Reviews)"
+                  value={newTaskData.category}
+                  onChange={(e) =>
+                    setNewTaskData({ ...newTaskData, category: e.target.value })
+                  }
+                  style={{
+                    padding: "10px",
+                    borderRadius: "8px",
+                    border: "1px solid #cbd5e1",
+                  }}
+                />
+
+                <div
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "1fr 1fr",
+                    gap: "12px",
+                  }}
+                >
+                  <input
+                    placeholder="Free Reward (₹)"
+                    type="number"
+                    value={newTaskData.reward_free}
+                    onChange={(e) =>
+                      setNewTaskData({
+                        ...newTaskData,
+                        reward_free: e.target.value,
+                      })
+                    }
+                    style={{
+                      padding: "10px",
+                      borderRadius: "8px",
+                      border: "1px solid #cbd5e1",
+                    }}
+                  />
+                  <input
+                    placeholder="Member Reward (₹)"
+                    type="number"
+                    value={newTaskData.reward_member}
+                    onChange={(e) =>
+                      setNewTaskData({
+                        ...newTaskData,
+                        reward_member: e.target.value,
+                      })
+                    }
+                    style={{
+                      padding: "10px",
+                      borderRadius: "8px",
+                      border: "1px solid #cbd5e1",
+                    }}
+                  />
+                </div>
+
+                <input
+                  placeholder="Action Link (URL)"
+                  value={newTaskData.action_link}
+                  onChange={(e) =>
+                    setNewTaskData({
+                      ...newTaskData,
+                      action_link: e.target.value,
+                    })
+                  }
+                  style={{
+                    padding: "10px",
+                    borderRadius: "8px",
+                    border: "1px solid #cbd5e1",
+                  }}
+                />
+
+                <input
+                  placeholder="Video URL (Optional)"
+                  value={newTaskData.video_url}
+                  onChange={(e) =>
+                    setNewTaskData({
+                      ...newTaskData,
+                      video_url: e.target.value,
+                    })
+                  }
+                  style={{
+                    padding: "10px",
+                    borderRadius: "8px",
+                    border: "1px solid #cbd5e1",
+                  }}
+                />
+
+                <div
+                  style={{ display: "flex", gap: "12px", marginTop: "16px" }}
+                >
+                  <button
+                    type="button"
+                    onClick={() => setIsCreateModalOpen(false)}
+                    style={{
+                      flex: 1,
+                      padding: "12px",
+                      border: "1px solid #cbd5e1",
+                      borderRadius: "8px",
+                      backgroundColor: "white",
+                      cursor: "pointer",
+                    }}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={isCreating}
+                    style={{
+                      flex: 1,
+                      padding: "12px",
+                      border: "none",
+                      borderRadius: "8px",
+                      backgroundColor: "#0f172a",
+                      color: "white",
+                      cursor: "pointer",
+                      opacity: isCreating ? 0.7 : 1,
+                    }}
+                  >
+                    {isCreating ? "Creating..." : "Create Task"}
+                  </button>
+                </div>
+              </form>
+            )}
+
+            {createStep === "type" && (
+              <button
+                type="button"
+                onClick={() => setIsCreateModalOpen(false)}
+                style={{
+                  width: "100%",
+                  marginTop: "16px",
+                  padding: "12px",
+                  border: "none",
+                  borderRadius: "8px",
+                  backgroundColor: "#f1f5f9",
+                  cursor: "pointer",
+                }}
+              >
+                Cancel
+              </button>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
