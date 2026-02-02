@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { ArrowRight, Crown, Loader2 } from "lucide-react";
+import { ArrowRight, Crown, Loader2, Sparkles } from "lucide-react";
 import Skeleton from "@/components/ui/Skeleton";
 import { createClient } from "@/utils/supabase/client";
 import styles from "./membership.module.css";
@@ -211,10 +211,45 @@ export default function Membership() {
   const expiryDate = getExpiryDate(profile?.membership_expiry);
   const isActive = expiryDate ? expiryDate > new Date() : false;
 
+  const isActive = expiryDate ? expiryDate > new Date() : false;
+
   const isDowngrade =
     profile?.membership_type?.toLowerCase() === "yearly" &&
     billingCycle === "monthly" &&
     isActive;
+
+  // Queued Plan Logic
+  const queuedPlanInfo = React.useMemo(() => {
+    if (!profile?.membership_start_date) return null;
+    // Handle DD/MM/YYYY or ISO
+    let startDate: Date | null = null;
+    const dateStr = profile.membership_start_date;
+    const ddmmyyyy = dateStr.match(/^(\d{2})\/(\d{2})\/(\d{4})/);
+    if (ddmmyyyy) {
+      startDate = new Date(
+        parseInt(ddmmyyyy[3], 10),
+        parseInt(ddmmyyyy[2], 10) - 1,
+        parseInt(ddmmyyyy[1], 10)
+      );
+    } else {
+      const d = new Date(dateStr);
+      startDate = isNaN(d.getTime()) ? null : d;
+    }
+
+    if (!startDate) return null;
+
+    const now = new Date();
+    if (startDate > now) {
+        const diffMs = startDate.getTime() - now.getTime();
+        const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+        return {
+          days: diffDays,
+          type: profile.membership_type,
+        };
+    }
+    return null;
+  }, [profile]);
+
 
   if (loading && !profile)
     return (
@@ -298,9 +333,11 @@ export default function Membership() {
             </div>
             <div className={styles.cardBottom}>
               <div className={styles.cardHolder}>
-                <span className={styles.label}>Card Holder</span>
+                <span className={styles.label}>MEMBER SINCE</span>
                 <span className={styles.value}>
-                  {profile?.full_name || "Your Name"}
+                  {profile?.membership_start_date
+                    ? profile.membership_start_date.split(",")[0]
+                    : "DD/MM/YY"}
                 </span>
               </div>
               <div className={styles.cardExpiry}>
@@ -315,7 +352,17 @@ export default function Membership() {
                 </span>
               </div>
             </div>
+            </div>
           </div>
+          {queuedPlanInfo && (
+            <div className={styles.stackedBadge}>
+              <Sparkles size={16} color="#DAA520" />
+              <span className={styles.stackedText}>
+                Your {queuedPlanInfo.type} plan will get started in{" "}
+                {queuedPlanInfo.days} days
+              </span>
+            </div>
+          )}
         </div>
 
         <div className={styles.benefitsGrid}>
