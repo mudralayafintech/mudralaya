@@ -15,7 +15,7 @@ serve(async (req: Request): Promise<Response> => {
   try {
     const supabaseUrl = Deno.env.get('SUPABASE_URL')
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
-    
+
     if (!supabaseUrl || !supabaseKey || !RAZORPAY_KEY_ID || !RAZORPAY_KEY_SECRET) {
       console.error("Missing Environment Variables");
       return new Response(JSON.stringify({ error: "Server configuration error: Missing Environment Variables" }), {
@@ -30,7 +30,7 @@ serve(async (req: Request): Promise<Response> => {
       console.error("JSON Parse Error:", e);
       return {};
     })
-    
+
     console.log("Processing Request:", JSON.stringify(body));
     const { action, data } = body
 
@@ -42,16 +42,46 @@ serve(async (req: Request): Promise<Response> => {
     }
 
     if (action === 'create-order') {
-      const { amount, currency, receipt, userId, planType } = data || {}
-      
-      if (!amount) {
+      const { amount, currency, receipt, userId, planType, couponCode } = data || {}
+
+      let finalAmount = amount;
+
+      // VALIDATE COUPON
+      if (couponCode?.toUpperCase() === 'MFONEYEAR') {
+        if (planType !== 'yearly') {
+          return new Response(JSON.stringify({ error: "Coupon valid only for Yearly plan" }), {
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+            status: 400,
+          });
+        }
+        // Server-side price enforcement
+        // 90% discount on 999 = 99.9 -> 99
+        finalAmount = 99;
+      } else if (couponCode) {
+        return new Response(JSON.stringify({ error: "Invalid Coupon Code" }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 400,
+        });
+      } else {
+        // Standard Price Validation
+        // If no coupon, ensure amount matches standard prices (basic security)
+        const expectedPrice = planType === 'yearly' ? 999 : 99;
+        if (Number(amount) !== expectedPrice && planType !== 'individual') {
+          console.warn(`Price Mismatch: Expected ${expectedPrice}, got ${amount}. Allowing for now but logging.`);
+          // You might strict enforce this later:
+          // finalAmount = expectedPrice; 
+        }
+      }
+
+
+      if (!finalAmount) {
         return new Response(JSON.stringify({ error: "Amount is required" }), {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
           status: 400,
         });
       }
 
-      console.log(`Creating order: ${amount} ${currency || 'INR'} for user: ${userId}`);
+      console.log(`Creating order: ${finalAmount} ${currency || 'INR'} for user: ${userId} (Coupon: ${couponCode})`);
 
       const razorAuth = btoa(`${RAZORPAY_KEY_ID}:${RAZORPAY_KEY_SECRET}`);
       const response = await fetch('https://api.razorpay.com/v1/orders', {
@@ -61,7 +91,7 @@ serve(async (req: Request): Promise<Response> => {
           'Authorization': `Basic ${razorAuth}`
         },
         body: JSON.stringify({
-          amount: Math.round(Number(amount) * 100),
+          amount: Math.round(Number(finalAmount) * 100),
           currency: currency || 'INR',
           receipt: receipt || `rcpt_${Date.now()}`
         })
@@ -75,7 +105,7 @@ serve(async (req: Request): Promise<Response> => {
 
       if (!response.ok) {
         console.error("Razorpay Error Details:", JSON.stringify(order));
-        return new Response(JSON.stringify({ 
+        return new Response(JSON.stringify({
           error: order.error?.description || "Razorpay order creation failed",
           details: order
         }), {
@@ -87,30 +117,30 @@ serve(async (req: Request): Promise<Response> => {
       // 1. Insert PENDING Transaction (Robust Wrapper)
       if (userId) {
         try {
-            const title = planType === 'individual' ? 'Individual Plan Purchase' : 'Mudralaya Membership';
-            const type = planType === 'individual' ? 'PLAN' : 'membership';
+          const title = planType === 'individual' ? 'Individual Plan Purchase' : 'Mudralaya Membership';
+          const type = planType === 'individual' ? 'PLAN' : 'membership';
 
-            const { error: pendingError } = await supabaseClient
+          const { error: pendingError } = await supabaseClient
             .from('transactions')
             .insert({
-                user_id: userId,
-                title: title,
-                sub_title: 'Payment Initiated',
-                amount: amount,
-                type: type,
-                status: 'pending',
-                transaction_id: order.id,
-                razorpay_order_id: order.id,
-                plan_name: planType
+              user_id: userId,
+              title: title,
+              sub_title: 'Payment Initiated',
+              amount: finalAmount,
+              type: type,
+              status: 'pending',
+              transaction_id: order.id,
+              razorpay_order_id: order.id,
+              plan_name: planType
             });
-            
-            if (pendingError) {
-                console.error("Soft Fail: DB Insert Error:", pendingError);
-            } else {
-                console.log("Success: Pending transaction inserted.");
-            }
+
+          if (pendingError) {
+            console.error("Soft Fail: DB Insert Error:", pendingError);
+          } else {
+            console.log("Success: Pending transaction inserted.");
+          }
         } catch (dbEx) {
-            console.error("Soft Fail: DB Exception:", dbEx);
+          console.error("Soft Fail: DB Exception:", dbEx);
         }
       }
 
@@ -163,7 +193,7 @@ serve(async (req: Request): Promise<Response> => {
       if (type === 'membership' && userId && plan) {
         const isYearly = plan === 'yearly' || plan === 'YEARLY';
         const daysToAdd = isYearly ? 365 : 30;
-        
+
         // 1. Fetch Current Expiry (to support stacking)
         let currentExpiryDate = new Date();
         let isStacked = false;
@@ -187,18 +217,18 @@ serve(async (req: Request): Promise<Response> => {
             .select('membership_expiry, membership_type')
             .eq('id', userId)
             .single();
-          
+
           if (userData?.membership_expiry) {
             const existingDate = parseAnyDate(userData.membership_expiry);
             if (existingDate && existingDate > new Date()) {
               // Active Membership Found
               const currentPlan = userData.membership_type || 'monthly'; // default to monthly if not set
-              
+
               // 1. Downgrade Guard: IF Active Yearly AND Trying Monthly -> BLOCK
               if (currentPlan.toLowerCase() === 'yearly' && !isYearly) {
-                 return new Response(JSON.stringify({ 
-                   error: "Cannot downgrade to Monthly while Yearly plan is active. Please wait for expiry." 
-                 }), {
+                return new Response(JSON.stringify({
+                  error: "Cannot downgrade to Monthly while Yearly plan is active. Please wait for expiry."
+                }), {
                   headers: { ...corsHeaders, 'Content-Type': 'application/json' },
                   status: 400,
                 });
@@ -260,13 +290,13 @@ serve(async (req: Request): Promise<Response> => {
           .update(txPayload)
           .eq('razorpay_order_id', razorpay_order_id)
           .select();
-        
+
         if (updateError || !updatedTx || updatedTx.length === 0) {
-            console.log("Update failed or no record found. Inserting new record.");
-             const { error: insertError } = await supabaseClient
+          console.log("Update failed or no record found. Inserting new record.");
+          const { error: insertError } = await supabaseClient
             .from('transactions')
             .insert(txPayload);
-            txError = insertError;
+          txError = insertError;
         }
 
         if (txError) {
@@ -291,8 +321,8 @@ serve(async (req: Request): Promise<Response> => {
 
         console.log("Razorpay API Handler V19.1 - Time: 2026-02-02 14:30");
 
-        return new Response(JSON.stringify({ 
-          success: true, 
+        return new Response(JSON.stringify({
+          success: true,
           message: isStacked ? 'Membership stacked successfully.' : 'Membership recorded.',
           expiry: istExpiryString,
           debug: {
@@ -310,7 +340,7 @@ serve(async (req: Request): Promise<Response> => {
       if (type === 'plan' && userId && plan === 'individual') {
         const now = new Date();
         const { amount: finalAmount, hasLaptop } = data || {};
-        
+
         console.log('Using amount from frontend:', finalAmount);
 
         // 1. Update status to COMPLETED (Plan)
@@ -340,15 +370,15 @@ serve(async (req: Request): Promise<Response> => {
           .select();
 
         if (updateError || !updatedTx || updatedTx.length === 0) {
-             const { error: insertError } = await supabaseClient
+          const { error: insertError } = await supabaseClient
             .from('transactions')
             .insert(txPayload);
-            txError = insertError;
+          txError = insertError;
         }
 
         if (txError) {
-           console.error('CRITICAL: Transaction Verification Error (Plan):', txError);
-           throw new Error(`Transaction Verification Failed: ${txError.message}`);
+          console.error('CRITICAL: Transaction Verification Error (Plan):', txError);
+          throw new Error(`Transaction Verification Failed: ${txError.message}`);
         }
 
         // 2. Update User Plan & Laptop Status

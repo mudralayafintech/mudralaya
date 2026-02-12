@@ -135,7 +135,7 @@ export default function Wallet() {
         });
       }
 
-      // Fetch Wallet Summary
+      // Fetch Wallet Summary (for stats)
       const { data: summary } = await supabase.functions.invoke(
         "dashboard-api",
         {
@@ -143,9 +143,22 @@ export default function Wallet() {
         }
       );
 
+      // Fetch Full Transaction List (for "task_earning" filtering)
+      const { data: allTransactions } = await supabase.functions.invoke(
+        "dashboard-api",
+        {
+          body: { action: "get-wallet" },
+        }
+      );
+
+      // Filter for Task Earnings
+      const taskTransactions = allTransactions?.filter(
+        (t: any) => t.type === "task_earning"
+      ) || [];
+
       if (summary) {
         setWalletData({
-          transactions: summary.transactions || [],
+          transactions: taskTransactions, // Use filtered transactions
           stats: {
             today: summary.stats?.today || 0,
             monthly: summary.stats?.monthly || 0,
