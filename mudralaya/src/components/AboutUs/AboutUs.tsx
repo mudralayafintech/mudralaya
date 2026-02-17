@@ -14,6 +14,8 @@ import {
   Briefcase,
   Zap,
   Laptop,
+  Building2, 
+  Settings,
 } from "lucide-react";
 import { useUI } from "@/context/UIContext";
 import styles from "./AboutUs.module.css";
@@ -33,15 +35,20 @@ const AboutUs = () => {
               className={styles.heroContent}
             >
               <h1 className={styles.heroTitle}>
-                About <span className={styles.accent}>Us</span>
+                About <span className={styles.accent}>Mudralaya</span>
               </h1>
               <h2 className={styles.heroSubtitle}>
                 Empowering Financial Simplicity Through AI.
               </h2>
               <p className={styles.heroText}>
-                Mudralaya is India&apos;s emerging financial entrepreneurship
-                platform, built to empower individuals — especially women — to
-                earn, grow, and build their own financial careers or franchises.
+               Mudralaya is a partner-based earning ecosystem that bridges the gap between B2B companies and verified local partners (workers).
+               Mudralaya Fintech creates safe, transparent, and structured earning opportunities for individuals—especially in Tier 2 & Tier 3 cities—where genuine income options are limited.
+               We are not a task app.
+               <br />
+               We are not cheap labour.
+               <br />
+               We are a trusted growth platform for earning + skill development + career building.
+
               </p>
               <div className={styles.heroActions}>
                 <button
@@ -81,8 +88,7 @@ const AboutUs = () => {
               Our <span className={styles.accent}>Mission</span>
             </h2>
             <p>
-              To create 1 lakh financial entrepreneurs across India through
-              simple earning models and structured training.
+              Mudralaya’s mission is to build India’s most trusted partner ecosystem by creating scam-free, structured earning opportunities that empower women financially, make students industry-ready through real work exposure, generate sustainable employment in Tier 2 and Tier 3 India, and enable scalable, efficient B2B growth across Bharat.
             </p>
           </div>
           <motion.div
@@ -119,7 +125,7 @@ const AboutUs = () => {
             </div>
             <div className={styles.contentCol}>
               <h2 className={styles.sideTitle}>
-                What We <span className={styles.accent}>Do</span>
+                Types of Partners at <span className={styles.accent}>Mudralaya</span>
               </h2>
               <p className={styles.sideDesc}>
                 We bridge the gap between financial services and the common man
@@ -128,20 +134,28 @@ const AboutUs = () => {
               <div className={styles.benefitList}>
                 <div className={styles.benefitItem}>
                   <HandHelping className={styles.benefitIcon} />
-                  <span>Start earning with zero investment</span>
+                  <span>Student & Early-Career Partners</span>
                 </div>
                 <div className={styles.benefitItem}>
                   <GraduationCap className={styles.benefitIcon} />
-                  <span>Become a trained professional</span>
+                  <span>Women Empowerment (Housewife) Partners</span>
                 </div>
                 <div className={styles.benefitItem}>
                   <Users className={styles.benefitIcon} />
-                  <span>Build leadership skills</span>
+                  <span>Educated Unemployed Youth</span>
                 </div>
                 <div className={styles.benefitItem}>
                   <Store className={styles.benefitIcon} />
-                  <span>Grow into a franchise owner</span>
+                  <span>Dedicated Salaried Partners</span>
                 </div>
+                 <div className={styles.benefitItem}>
+                   <Building2 className={styles.benefitIcon} />
+                  <span>Kiosk / Franchise Business Partners</span>
+                 </div>
+                    <div className={styles.benefitItem}>
+                      <Settings className={styles.benefitIcon} />
+                      <span>Resource & Operational Partners</span>
+                    </div>
               </div>
             </div>
           </div>
@@ -160,9 +174,7 @@ const AboutUs = () => {
                 Our <span className={styles.accent}>Vision</span>
               </h2>
               <p className={styles.sideDesc}>
-                To build a nationwide network of entrepreneurs and financial
-                leaders who uplift communities and shape the future of
-                India&apos;s financial ecosystem.
+                Mudralaya envisions an India where people can build meaningful careers from their hometowns without forced migration, where local talent drives national business growth, and where trust, transparency, and inclusive opportunity define the future of work.
               </p>
             </div>
             <div className={styles.illustrationCol}>
@@ -181,7 +193,7 @@ const AboutUs = () => {
         <div className="container">
           <div className={styles.sectionHeader}>
             <h2>
-              Why We <span className={styles.accent}>Exist</span>
+              Why <span className={styles.accent}>Mudralaya? (USP)</span>
             </h2>
             <p>
               Mudralaya bridges the gap by giving individuals a platform to
@@ -191,19 +203,19 @@ const AboutUs = () => {
           <div className={styles.featureGrid}>
             <div className={styles.featureCard}>
               <Users className={styles.featureIcon} size={32} />
-              <p>More women in entrepreneurship</p>
+              <p>Scam-free, verified partner ecosystem</p>
             </div>
             <div className={styles.featureCard}>
               <Briefcase className={styles.featureIcon} size={32} />
-              <p>Job alternatives beyond tradition</p>
+              <p>End-to-end enablement (training, tools, CRM, branding)</p>
             </div>
             <div className={styles.featureCard}>
               <Zap className={styles.featureIcon} size={32} />
-              <p>Multi-Product Earnings</p>
+              <p>Local execution at scale for B2B companies</p>
             </div>
             <div className={styles.featureCard}>
               <Laptop className={styles.featureIcon} size={32} />
-              <p>Training & Skill Growth</p>
+              <p>Career growth + earning from your hometown</p>
             </div>
           </div>
         </div>

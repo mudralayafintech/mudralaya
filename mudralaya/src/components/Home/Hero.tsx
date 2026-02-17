@@ -23,19 +23,19 @@ const Hero = () => {
           <div className={styles.content}>
             <div className={styles.badge}>
               <CheckCircle2 size={16} className={styles.badgeIcon} />
-              <span>100% TRUSTED PLATFORM</span>
+              <span>Flexible work</span>
             </div>
 
             <h1 className={styles.headline}>
               Choose Your Tasks. <br />
-              <span className={styles.gradientText}>Earn Your Way.</span> <br />
-              Zero Investment.
+              <span className={styles.gradientText}>Real income</span> <br />
+               Long-term growth
             </h1>
 
             <p className={styles.subheadline}>
-              Get daily, weekly & monthly tasks from multiple companies—select
-              what suits you and start earning instantly. Join the revolution
-              today.
+              India’s Trusted Partner-Based Earning & Business Ecosystem
+              Connecting B2B companies with verified local partners to create real, scam-free earning opportunities across Tier 2 & Tier 3 India.
+
             </p>
 
             <div className={styles.actions}>
@@ -43,11 +43,11 @@ const Hero = () => {
                 className={styles.primaryBtn}
                 onClick={() => openJoinUsModal()}
               >
-                Become Our Partner
+                Join as a Partner
                 <ArrowRight size={20} />
               </button>
               <Link href="/contact" className={styles.secondaryBtn}>
-                Talk to our Advisor
+                Partner with Us – B2B
               </Link>
             </div>
           </div>

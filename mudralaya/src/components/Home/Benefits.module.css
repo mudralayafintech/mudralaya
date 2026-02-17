@@ -14,6 +14,28 @@
   margin-bottom: 1rem;
 }
 
+.accent {
+  background: var(--heading-accent-gradient);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: inline-block;
+  position: relative;
+}
+
+.accent::after {
+  content: "";
+  position: absolute;
+  bottom: 0.15em;
+  left: 0;
+  width: 100%;
+  height: 0.25em;
+  background: var(--heading-accent-color);
+  opacity: 0.15;
+  z-index: -1;
+  border-radius: var(--radius-sm);
+}
+
 .subtitle {
   font-size: 1.125rem;
   color: var(--secondary);
@@ -21,7 +43,8 @@
 
 .grid {
   display: grid;
-  grid-template-columns: 1fr 1.15fr 1fr 1fr; /* Slightly wider for the second card */
+  grid-template-columns: 1fr 1.15fr 1fr 1fr;
+  /* Slightly wider for the second card */
   gap: 2rem;
   align-items: stretch;
 }
@@ -50,7 +73,8 @@
   box-shadow: 0 20px 40px -10px rgba(37, 99, 235, 0.15);
   transform: scale(1.05);
   z-index: 10;
-  padding: 3rem 2rem; /* Reduced from 4rem */
+  padding: 3rem 2rem;
+  /* Reduced from 4rem */
   background: linear-gradient(180deg, #ffffff 0%, #f8faff 100%);
 }
 
@@ -92,7 +116,8 @@
 .price {
   font-size: 2.75rem;
   font-weight: 800;
-  color: var(--foreground); /* Fallback */
+  color: var(--foreground);
+  /* Fallback */
   background: var(--gradient-text);
   -webkit-background-clip: text;
   background-clip: text;
@@ -200,7 +225,8 @@
   }
 
   .featured {
-    transform: scale(1.02); /* Keep it slightly larger even in 2-col */
+    transform: scale(1.02);
+    /* Keep it slightly larger even in 2-col */
   }
 }
 

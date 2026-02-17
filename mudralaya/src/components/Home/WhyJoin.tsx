@@ -15,30 +15,27 @@ import styles from "./WhyJoin.module.css";
 const features = [
   {
     icon: <Rocket size={24} />,
-    title: "Entrepreneurship for All",
-    description:
-      "Start earning from home and grow at your pace with our guided roadmap.",
+    title: "Trusted earning & business opportunities",
+
   },
   {
     icon: <ShieldCheck size={24} />,
-    title: "Women-Focused",
-    description:
-      "Supporting women in restarting careers or seeking financial independence.",
+    title: "Work from home task jobs",
+
   },
   {
     icon: <DollarSign size={24} />,
-    title: "Zero-Investment Options",
-    description: "Begin your journey without any upfront costs or hidden fees.",
+    title: "Step-by-step training & guidance",
+
   },
   {
     icon: <Zap size={24} />,
-    title: "Multi-Task Earnings",
-    description: "Complete tasks from multiple top companies & earn instantly.",
+    title: "Complete onboarding & growth support",
+
   },
   {
     icon: <Laptop size={24} />,
-    title: "Training and Skill Growth",
-    description: "Weekly sessions with daily guidance from industry experts.",
+    title: "Safe, transparent earning system",
   },
   {
     icon: <Handshake size={24} />,
@@ -54,7 +51,7 @@ const WhyJoin = () => {
       <div className="container">
         <div className={styles.header}>
           <h2 className={styles.title}>
-            Why Join <span className={styles.accent}>Mudralaya?</span>
+            What Mudralaya <span className={styles.accent}> Offers</span>
           </h2>
           <p className={styles.subtitle}>Work Smart. Earn Big. Live Free.</p>
         </div>

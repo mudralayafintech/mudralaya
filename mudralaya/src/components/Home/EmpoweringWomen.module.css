@@ -21,8 +21,10 @@
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  background: #fdf2f8; /* Pink-50 */
-  color: #db2777; /* Pink-600 */
+  background: #fdf2f8;
+  /* Pink-50 */
+  color: #db2777;
+  /* Pink-600 */
   padding: 0.5rem 1rem;
   border-radius: 99px;
   font-size: 0.75rem;
@@ -34,12 +36,31 @@
 .title {
   font-size: 3.5rem;
   font-weight: 800;
-  color: #0f172a; /* Slate-900 */
+  color: #0f172a;
+  /* Slate-900 */
   line-height: 1.1;
 }
 
 .highlight {
-  color: #2563eb; /* Blue-600 */
+  background: var(--heading-accent-gradient);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: inline-block;
+  position: relative;
+}
+
+.highlight::after {
+  content: "";
+  position: absolute;
+  bottom: 0.15em;
+  left: 0;
+  width: 100%;
+  height: 0.25em;
+  background: var(--heading-accent-color);
+  opacity: 0.15;
+  z-index: -1;
+  border-radius: var(--radius-sm);
 }
 
 .points {
@@ -54,19 +75,22 @@
   align-items: center;
   gap: 1rem;
   font-size: 1.125rem;
-  color: #64748b; /* Slate-500 */
+  color: #64748b;
+  /* Slate-500 */
   font-weight: 500;
 }
 
 .iconPink {
-  color: #db2777; /* Pink-600 */
+  color: #db2777;
+  /* Pink-600 */
   flex-shrink: 0;
 }
 
 .dot {
   width: 8px;
   height: 8px;
-  background: #2563eb; /* Blue-600 */
+  background: #2563eb;
+  /* Blue-600 */
   border-radius: 50%;
   flex-shrink: 0;
   margin-left: 6px;

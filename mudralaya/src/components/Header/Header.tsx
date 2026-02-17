@@ -9,6 +9,7 @@ import { Menu, X } from "lucide-react";
 import { useUI } from "@/context/UIContext";
 import { useAuth } from "@/context/AuthContext";
 import styles from "./Header.module.css";
+import FAQ from "../FAQ/FAQ";
 
 const Header = () => {
   const [scrolled, setScrolled] = useState(false);
@@ -33,7 +34,10 @@ const Header = () => {
   const navLinks = [
     { name: "Home", href: "/" },
     { name: "About Us", href: "/about" },
+    { name: "What We Do", href: "/what-we-do" },
     { name: "Career", href: "/career" },
+    { name: "Blog", href: "/blog" },
+    { name: "FAQ", href: "/faq" },
     { name: "Contact Us", href: "/contact" },
   ];
 
@@ -61,9 +65,8 @@ const Header = () => {
               <li key={link.href}>
                 <Link
                   href={link.href}
-                  className={`${styles.navLink} ${
-                    pathname === link.href ? styles.active : ""
-                  }`}
+                  className={`${styles.navLink} ${pathname === link.href ? styles.active : ""
+                    }`}
                 >
                   {link.name}
                   {pathname === link.href && (
@@ -148,9 +151,8 @@ const Header = () => {
                   <li key={link.href}>
                     <Link
                       href={link.href}
-                      className={`${styles.mobileNavLink} ${
-                        pathname === link.href ? styles.activeMobile : ""
-                      }`}
+                      className={`${styles.mobileNavLink} ${pathname === link.href ? styles.activeMobile : ""
+                        }`}
                     >
                       {link.name}
                     </Link>

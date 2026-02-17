@@ -83,7 +83,7 @@ const Benefits = () => {
     <section id="plans" className={styles.benefits}>
       <div className="container">
         <div className={styles.header}>
-          <h2 className={styles.title}>Flexible Plans for Your Journey</h2>
+          <h2 className={styles.title}>Flexible <span className={styles.accent}>Plans</span> for Your Journey</h2>
           <p className={styles.subtitle}>
             Choose a path that aligns with your entrepreneurial dreams
           </p>
@@ -100,9 +100,8 @@ const Benefits = () => {
               <motion.div
                 key={plan.key}
                 whileHover={{ y: -10 }}
-                className={`${styles.card} ${
-                  plan.featured ? styles.featured : ""
-                }`}
+                className={`${styles.card} ${plan.featured ? styles.featured : ""
+                  }`}
                 style={{ "--accent": plan.accent } as React.CSSProperties}
               >
                 {plan.featured && (
@@ -153,9 +152,8 @@ const Benefits = () => {
 
                 <button
                   onClick={() => handleChoosePlan(plan.key, currentPrice!)}
-                  className={`${styles.cta} ${
-                    plan.featured ? styles.ctaPrimary : styles.ctaSecondary
-                  }`}
+                  className={`${styles.cta} ${plan.featured ? styles.ctaPrimary : styles.ctaSecondary
+                    }`}
                 >
                   Choose {plan.title}
                 </button>

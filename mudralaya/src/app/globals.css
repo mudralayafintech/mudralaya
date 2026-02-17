@@ -9,8 +9,12 @@ body {
 }
 
 :root {
-  --font-primary: var(--font-inter), system-ui, -apple-system, sans-serif;
-  --font-heading: var(--font-outfit), sans-serif;
+  --font-primary: var(--font-roboto), system-ui, -apple-system, sans-serif;
+  --font-heading: var(--font-montserrat), sans-serif;
+
+  /* Heading Effect Variables */
+  --heading-accent-color: var(--primary);
+  --heading-accent-gradient: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
 
   /* Colors - Premium Blue/Slate Palette */
   --primary: #2563eb;
@@ -29,6 +33,7 @@ body {
     opacity: 0;
     transform: translateY(20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -40,11 +45,9 @@ body {
   --glass-border: rgba(255, 255, 255, 0.2);
 
   --gradient-primary: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
-  --gradient-surface: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 1) 0%,
-    rgba(248, 250, 252, 1) 100%
-  );
+  --gradient-surface: linear-gradient(135deg,
+      rgba(255, 255, 255, 1) 0%,
+      rgba(248, 250, 252, 1) 100%);
 
   --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
   --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
@@ -100,16 +103,27 @@ body {
 }
 
 h1 {
+  font-family: var(--font-heading);
   font-size: var(--font-size-4xl);
+  font-weight: 800;
 }
+
 h2 {
+  font-family: var(--font-heading);
   font-size: var(--font-size-3xl);
+  font-weight: 700;
 }
+
 h3 {
+  font-family: var(--font-heading);
   font-size: var(--font-size-2xl);
+  font-weight: 700;
 }
+
 h4 {
+  font-family: var(--font-heading);
   font-size: var(--font-size-xl);
+  font-weight: 600;
 }
 
 a {

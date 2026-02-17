@@ -47,7 +47,7 @@ const MemberBenefits = () => {
         <div className={styles.box}>
           <div className={styles.header}>
             <h2 className={styles.title}>
-              Become our early member <br />
+              Become our <span className={styles.accent}>early member</span> <br />
               <span className={styles.priceHighlight}>
                 <span className={styles.strike}>₹999</span> ₹99/-
               </span>
