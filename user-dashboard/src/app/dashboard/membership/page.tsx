@@ -46,7 +46,7 @@ export default function Membership() {
   const [couponCode, setCouponCode] = useState("");
   const [discountApplied, setDiscountApplied] = useState(false);
   const [couponError, setCouponError] = useState("");
-  const [finalPrice, setFinalPrice] = useState(999);
+  const [finalPrice, setFinalPrice] = useState(2499);
 
   useEffect(() => {
     fetchProfile();
@@ -108,7 +108,11 @@ export default function Membership() {
       return;
     }
 
-    const amountToPay = discountApplied ? 99 : (billingCycle === "yearly" ? 999 : 99);
+    const amountToPay = discountApplied
+      ? 99
+      : billingCycle === "yearly"
+        ? 2499
+        : 99;
 
     try {
       // 1. Create Order
@@ -156,9 +160,9 @@ export default function Membership() {
         console.error("Order Creation Failed:", orderRes.status, orderData);
         throw new Error(
           orderData.error ||
-          orderData.message ||
-          JSON.stringify(orderData) ||
-          "Failed to create order",
+            orderData.message ||
+            JSON.stringify(orderData) ||
+            "Failed to create order",
         );
       }
 
@@ -170,8 +174,9 @@ export default function Membership() {
         amount: orderData.amount,
         currency: orderData.currency,
         name: "Mudralaya Fintech Private Limited",
-        description: `${billingCycle === "yearly" ? "Yearly" : "Monthly"
-          } Membership`,
+        description: `${
+          billingCycle === "yearly" ? "Yearly" : "Monthly"
+        } Membership`,
         image: "/logo.png",
         order_id: orderData.id,
         handler: async function (response: any) {
@@ -251,7 +256,7 @@ export default function Membership() {
 
     if (couponCode.toUpperCase() === "MFONEYEAR") {
       setDiscountApplied(true);
-      setFinalPrice(99); // 90% off 999
+      setFinalPrice(99); // 95% off 2499
       alert("Coupon Applied! You check price update at bottom.");
     } else {
       setCouponError("Invalid Coupon Code");
@@ -262,7 +267,7 @@ export default function Membership() {
     setCouponCode("");
     setDiscountApplied(false);
     setCouponError("");
-    setFinalPrice(billingCycle === "yearly" ? 999 : 99);
+    setFinalPrice(billingCycle === "yearly" ? 2499 : 99);
   };
 
   useEffect(() => {
@@ -270,10 +275,10 @@ export default function Membership() {
     setDiscountApplied(false);
     setCouponCode("");
     setCouponError("");
-    setFinalPrice(billingCycle === "yearly" ? 999 : 99);
+    setFinalPrice(billingCycle === "yearly" ? 2499 : 99);
   }, [billingCycle]);
 
-  const price = discountApplied ? 99 : (billingCycle === "yearly" ? 999 : 99);
+  const price = discountApplied ? 99 : billingCycle === "yearly" ? 2499 : 99;
   const period = billingCycle === "yearly" ? "Year" : "30 Days";
 
   // Helper to parse expiry (handling potential formats)
@@ -372,15 +377,17 @@ export default function Membership() {
 
         <div className={styles.planToggle}>
           <button
-            className={`${styles.toggleOption} ${billingCycle === "yearly" ? styles.active : ""
-              }`}
+            className={`${styles.toggleOption} ${
+              billingCycle === "yearly" ? styles.active : ""
+            }`}
             onClick={() => setBillingCycle("yearly")}
           >
-            Yearly -20%
+            Yearly
           </button>
           <button
-            className={`${styles.toggleOption} ${billingCycle === "monthly" ? styles.active : ""
-              }`}
+            className={`${styles.toggleOption} ${
+              billingCycle === "monthly" ? styles.active : ""
+            }`}
             onClick={() => setBillingCycle("monthly")}
           >
             Monthly
@@ -464,9 +471,9 @@ export default function Membership() {
                 <span className={styles.value}>
                   {expiryDate
                     ? expiryDate.toLocaleDateString("en-US", {
-                      month: "2-digit",
-                      year: "2-digit",
-                    })
+                        month: "2-digit",
+                        year: "2-digit",
+                      })
                     : "MM/YY"}
                 </span>
               </div>
@@ -484,20 +491,32 @@ export default function Membership() {
         </div>
 
         {/* Coupon Section */}
-        <div style={{
-          maxWidth: '500px',
-          margin: '30px auto',
-          padding: '24px',
-          background: '#fff',
-          borderRadius: '16px',
-          boxShadow: '0 4px 20px rgba(0,0,0,0.05)',
-          border: '1px solid #e2e8f0',
-          textAlign: 'left'
-        }}>
-          <h3 style={{ margin: '0 0 16px 0', fontSize: '15px', fontWeight: '500', color: '#64748b', display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <div
+          style={{
+            maxWidth: "500px",
+            margin: "30px auto",
+            padding: "24px",
+            background: "#fff",
+            borderRadius: "16px",
+            boxShadow: "0 4px 20px rgba(0,0,0,0.05)",
+            border: "1px solid #e2e8f0",
+            textAlign: "left",
+          }}
+        >
+          <h3
+            style={{
+              margin: "0 0 16px 0",
+              fontSize: "15px",
+              fontWeight: "500",
+              color: "#64748b",
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+            }}
+          >
             <Sparkles size={16} color="#DAA520" /> Have a discount code?
           </h3>
-          <div style={{ display: 'flex', gap: '12px' }}>
+          <div style={{ display: "flex", gap: "12px" }}>
             <input
               type="text"
               placeholder="Enter Code (e.g. MFONEYEAR)"
@@ -505,34 +524,34 @@ export default function Membership() {
               onChange={(e) => setCouponCode(e.target.value)}
               style={{
                 flex: 1,
-                padding: '12px 16px',
-                borderRadius: '12px',
-                border: '1px solid #cbd5e1',
-                fontSize: '16px',
-                outline: 'none',
-                color: '#334155',
-                transition: 'all 0.2s',
-                backgroundColor: '#f8fafc'
+                padding: "12px 16px",
+                borderRadius: "12px",
+                border: "1px solid #cbd5e1",
+                fontSize: "16px",
+                outline: "none",
+                color: "#334155",
+                transition: "all 0.2s",
+                backgroundColor: "#f8fafc",
               }}
               disabled={discountApplied}
-              onFocus={(e) => e.target.style.borderColor = '#2563eb'}
-              onBlur={(e) => e.target.style.borderColor = '#cbd5e1'}
+              onFocus={(e) => (e.target.style.borderColor = "#2563eb")}
+              onBlur={(e) => (e.target.style.borderColor = "#cbd5e1")}
             />
             {discountApplied ? (
               <button
                 onClick={handleRemoveCoupon}
                 style={{
-                  padding: '12px 24px',
-                  borderRadius: '12px',
-                  border: 'none',
-                  backgroundColor: '#fee2e2',
-                  color: '#ef4444',
-                  cursor: 'pointer',
-                  fontWeight: '600',
-                  transition: 'all 0.2s',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '6px'
+                  padding: "12px 24px",
+                  borderRadius: "12px",
+                  border: "none",
+                  backgroundColor: "#fee2e2",
+                  color: "#ef4444",
+                  cursor: "pointer",
+                  fontWeight: "600",
+                  transition: "all 0.2s",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "6px",
                 }}
               >
                 Remove
@@ -541,15 +560,15 @@ export default function Membership() {
               <button
                 onClick={handleApplyCoupon}
                 style={{
-                  padding: '12px 24px',
-                  borderRadius: '12px',
-                  border: 'none',
-                  backgroundColor: '#10b981',
-                  color: 'white',
-                  cursor: 'pointer',
-                  fontWeight: '600',
-                  transition: 'all 0.2s',
-                  boxShadow: '0 4px 12px rgba(16, 185, 129, 0.2)'
+                  padding: "12px 24px",
+                  borderRadius: "12px",
+                  border: "none",
+                  backgroundColor: "#10b981",
+                  color: "white",
+                  cursor: "pointer",
+                  fontWeight: "600",
+                  transition: "all 0.2s",
+                  boxShadow: "0 4px 12px rgba(16, 185, 129, 0.2)",
                 }}
               >
                 Apply
@@ -558,13 +577,38 @@ export default function Membership() {
           </div>
 
           {couponError && (
-            <div style={{ marginTop: '12px', color: '#ef4444', fontSize: '14px', display: 'flex', alignItems: 'center', gap: '6px', backgroundColor: '#fef2f2', padding: '8px 12px', borderRadius: '8px' }}>
+            <div
+              style={{
+                marginTop: "12px",
+                color: "#ef4444",
+                fontSize: "14px",
+                display: "flex",
+                alignItems: "center",
+                gap: "6px",
+                backgroundColor: "#fef2f2",
+                padding: "8px 12px",
+                borderRadius: "8px",
+              }}
+            >
               <span>⚠️</span> {couponError}
             </div>
           )}
 
           {discountApplied && (
-            <div style={{ marginTop: '12px', color: '#059669', fontSize: '14px', display: 'flex', alignItems: 'center', gap: '6px', fontWeight: '500', backgroundColor: '#ecfdf5', padding: '8px 12px', borderRadius: '8px' }}>
+            <div
+              style={{
+                marginTop: "12px",
+                color: "#059669",
+                fontSize: "14px",
+                display: "flex",
+                alignItems: "center",
+                gap: "6px",
+                fontWeight: "500",
+                backgroundColor: "#ecfdf5",
+                padding: "8px 12px",
+                borderRadius: "8px",
+              }}
+            >
               <span>✅</span> Coupon Applied! Yearly plan is now ₹99.
             </div>
           )}
@@ -606,5 +650,6 @@ export default function Membership() {
           {!isDowngrade && <ArrowRight />}
         </button>
       </footer>
-    </div>);
+    </div>
+  );
 }
