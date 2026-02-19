@@ -4,10 +4,7 @@
   left: 0;
   bottom: 0;
   width: 260px;
-  background: rgba(255,
-      255,
-      255,
-      0.85);
+  background: rgba(255, 255, 255, 0.85);
   /* More opaque to hide underlying content */
   backdrop-filter: blur(30px);
   -webkit-backdrop-filter: blur(30px);
@@ -28,16 +25,21 @@
 }
 
 .sidebarHeader {
-  padding: 0 24px;
-  margin-bottom: 50px;
+  padding: 0;
+  margin-bottom: 40px;
   display: flex;
   justify-content: center;
+  align-items: center;
 }
 
 .sidebarLogo {
-  height: 48px;
-  width: auto;
-  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1));
+  width: 100%;
+  max-width: 250px;
+  height: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 6px #0000001a);
+  /* border: 5px solid red; */
+  /* DEBUG: Visual confirmation */
 }
 
 .sidebarNav {
@@ -82,7 +84,8 @@
   background: linear-gradient(135deg, #fff 0%, #f0f9ff 100%);
   color: var(--primary);
   border: 1px solid rgba(37, 99, 235, 0.1);
-  box-shadow: 0 10px 20px -5px rgba(37, 99, 235, 0.15),
+  box-shadow:
+    0 10px 20px -5px rgba(37, 99, 235, 0.15),
     inset 0 0 0 1px rgba(255, 255, 255, 0.8);
 }
 
@@ -152,8 +155,9 @@
   }
 
   .sidebarLogo {
-    height: 64px;
-    /* Increased from 48px for better visibility */
+    height: 5rem;
+    width: auto;
+    /* Adjusted for mobile */
   }
 
   .sidebarHeader {

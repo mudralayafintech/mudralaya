@@ -59,6 +59,24 @@
 }
 
 /* Golden Card */
+.cardChip {
+  width: 48px;
+  height: 36px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  padding: 0 4px;
+}
+
+.chipLine {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.3);
+  width: 100%;
+}
+
 .goldenCard {
   width: 400px;
   height: 250px;
@@ -66,7 +84,8 @@
   border-radius: 24px;
   padding: 30px;
   position: relative;
-  box-shadow: 0 20px 50px rgba(184, 134, 11, 0.3),
+  box-shadow:
+    0 20px 50px rgba(184, 134, 11, 0.3),
     0 10px 20px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
@@ -80,6 +99,108 @@
 
 .goldenCard:hover {
   transform: rotateY(10deg) rotateX(10deg);
+  transform: rotateY(10deg) rotateX(10deg);
+}
+
+/* Chip */
+.cardTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 30px;
+}
+
+.cardChip {
+  width: 48px;
+  height: 36px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  padding: 0 4px;
+}
+
+.chipLine {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.3);
+  width: 100%;
+}
+
+.cardLogo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #fff;
+  font-weight: 600;
+  font-size: 18px;
+}
+
+.cardBody {
+  margin-top: auto;
+  margin-bottom: 20px;
+}
+
+.membershipLabel {
+  font-size: 10px;
+  letter-spacing: 1px;
+  opacity: 0.8;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.cardNumber {
+  font-size: 22px;
+  letter-spacing: 2px;
+  font-family: monospace;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.cardBottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  padding-top: 16px;
+}
+
+.cardHolder,
+.cardExpiry {
+  display: flex;
+  flex-direction: column;
+}
+
+.label {
+  font-size: 10px;
+  text-transform: uppercase;
+  opacity: 0.7;
+  margin-bottom: 2px;
+}
+
+.value {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.stackedBadge {
+  margin-top: 16px;
+  background: rgba(218, 165, 32, 0.1);
+  padding: 8px 16px;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid rgba(218, 165, 32, 0.3);
+  width: fit-content;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.stackedText {
+  color: #b8860b;
+  font-size: 14px;
+  font-weight: 500;
 }
 
 /* Benefits */
@@ -138,7 +259,7 @@
   display: flex;
   align-items: center;
   gap: 32px;
-  z-index: 100;
+  z-index: 90;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
 }
 

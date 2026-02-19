@@ -251,7 +251,7 @@ export default function KYCPage() {
             <tr>
               <th>Status</th>
               <th>Date</th>
-              <th>User ID</th>
+              <th>User Details</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -279,8 +279,13 @@ export default function KYCPage() {
                       year: "numeric",
                     })}
                   </td>
-                  <td className="font-mono text-xs text-gray-500">
-                    {record.user_id}
+                  <td className="text-sm">
+                    <div className="font-medium text-gray-900">
+                      {record.users?.full_name || "Unknown User"}
+                    </div>
+                    <div className="text-gray-500 text-xs">
+                      {record.users?.email_id || record.users?.mobile_number || record.user_id}
+                    </div>
                   </td>
                   <td>
                     <button
@@ -388,33 +393,68 @@ export default function KYCPage() {
             <div className={styles.modalActions}>
               {selectedRecord.status === "pending" && (
                 <>
-                  <button
-                    className={`${styles.btn} ${styles.btnReject}`}
-                    onClick={() => {
-                      // Simple reject for now
-                      if (confirm("Reject this KYC?")) {
-                        updateStatus(selectedRecord.id, "rejected");
-                      }
-                    }}
-                    disabled={actionLoading}
-                  >
-                    Reject
-                  </button>
-                  <button
-                    className={`${styles.btn} ${styles.btnApprove}`}
-                    onClick={() => updateStatus(selectedRecord.id, "approved")}
-                    disabled={actionLoading}
-                  >
-                    Approve
-                  </button>
+                  {!showRejectInput ? (
+                    <>
+                      <button
+                        className={`${styles.btn} ${styles.btnReject}`}
+                        onClick={() => setShowRejectInput(true)}
+                        disabled={actionLoading}
+                      >
+                        Reject
+                      </button>
+                      <button
+                        className={`${styles.btn} ${styles.btnApprove}`}
+                        onClick={() => updateStatus(selectedRecord.id, "approved")}
+                        disabled={actionLoading}
+                      >
+                        Approve
+                      </button>
+                    </>
+                  ) : (
+                    <div className="flex flex-col gap-2 w-full">
+                      <textarea
+                        className="w-full p-2 border rounded-md text-sm"
+                        placeholder="Enter reason for rejection..."
+                        value={rejectReason}
+                        onChange={(e) => setRejectReason(e.target.value)}
+                        rows={3}
+                      />
+                      <div className="flex gap-2 justify-end">
+                        <button
+                          className={`${styles.btn} ${styles.btnClose}`}
+                          onClick={() => {
+                            setShowRejectInput(false);
+                            setRejectReason("");
+                          }}
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          className={`${styles.btn} ${styles.btnReject}`}
+                          onClick={() => {
+                            if (!rejectReason.trim()) {
+                              alert("Please enter a reason");
+                              return;
+                            }
+                            updateStatus(selectedRecord.id, "rejected", rejectReason);
+                          }}
+                          disabled={actionLoading}
+                        >
+                          Confirm Reject
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </>
               )}
-              <button
-                className={`${styles.btn} ${styles.btnClose}`}
-                onClick={() => setSelectedRecord(null)}
-              >
-                Close
-              </button>
+              {!showRejectInput && (
+                <button
+                  className={`${styles.btn} ${styles.btnClose}`}
+                  onClick={() => setSelectedRecord(null)}
+                >
+                  Close
+                </button>
+              )}
             </div>
           </div>
         </div>

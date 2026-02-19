@@ -13,15 +13,18 @@ DECLARE
     today_sum NUMERIC;
     monthly_sum NUMERIC;
 BEGIN
-    -- Approved Balance (completed rewards minus payouts)
+    -- Approved Balance (completed rewards - only positive amounts from reward type)
     SELECT COALESCE(SUM(amount), 0) INTO approved_sum 
     FROM public.transactions 
-    WHERE user_id = user_id_param AND status = 'completed';
+    WHERE user_id = user_id_param 
+      AND status = 'completed' 
+      AND type = 'reward'
+      AND amount > 0;
 
-    -- Pending Amount
+    -- Pending Amount (tasks that are ongoing or completed but not yet approved)
     SELECT COALESCE(SUM(reward_earned), 0) INTO pending_sum 
     FROM public.user_tasks 
-    WHERE user_id = user_id_param AND status IN ('pending', 'ongoing');
+    WHERE user_id = user_id_param AND status IN ('pending', 'ongoing', 'completed');
 
     -- Total Balance
     total_sum := approved_sum + pending_sum;
@@ -31,15 +34,21 @@ BEGIN
     FROM public.transactions 
     WHERE user_id = user_id_param AND type = 'payout' AND status = 'completed';
 
-    -- Today's Earning
+    -- Today's Earning (only rewards, positive amounts)
     SELECT COALESCE(SUM(amount), 0) INTO today_sum 
     FROM public.transactions 
-    WHERE user_id = user_id_param AND created_at >= CURRENT_DATE;
+    WHERE user_id = user_id_param 
+      AND created_at >= CURRENT_DATE
+      AND type = 'reward'
+      AND amount > 0;
 
-    -- Monthly Earning
+    -- Monthly Earning (only rewards, positive amounts)
     SELECT COALESCE(SUM(amount), 0) INTO monthly_sum 
     FROM public.transactions 
-    WHERE user_id = user_id_param AND created_at >= date_trunc('month', CURRENT_DATE);
+    WHERE user_id = user_id_param 
+      AND created_at >= date_trunc('month', CURRENT_DATE)
+      AND type = 'reward'
+      AND amount > 0;
 
     result := jsonb_build_object(
         'approved', approved_sum,

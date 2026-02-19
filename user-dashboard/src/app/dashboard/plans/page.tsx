@@ -30,6 +30,7 @@ export default function Plans() {
   const [user, setUser] = useState<any>(null);
 
   const [loading, setLoading] = useState(true);
+  const [paymentProcessing, setPaymentProcessing] = useState(false);
   const supabase = createClient();
 
   useEffect(() => {
@@ -94,6 +95,8 @@ export default function Plans() {
 
       try {
         // 1. Create Order
+        setPaymentProcessing(true); // Start loading
+
         const finalAmount =
           plan.id === 2 && hasLaptop
             ? 5000
@@ -101,17 +104,35 @@ export default function Plans() {
               ? plan.price
               : 0;
 
-        const { data: orderData, error: orderError } =
-          await supabase.functions.invoke("razorpay-api", {
-            body: {
+        // Get session for auth headers
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
+
+        const orderRes = await fetch(
+          `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/razorpay-api`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ""}`,
+              apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "",
+            },
+            body: JSON.stringify({
               action: "create-order",
               data: {
                 amount: finalAmount,
                 currency: "INR",
                 receipt: `plan_ind_${Date.now()}`,
+                userId: user?.id,
+                planType: "individual",
               },
-            },
-          });
+            }),
+          },
+        );
+
+        const orderData = await orderRes.json();
+        const orderError = !orderRes.ok ? orderData : null;
 
         if (orderError) throw orderError;
         if (!orderData) throw new Error("No order data returned");
@@ -128,10 +149,20 @@ export default function Plans() {
           handler: async function (response: any) {
             try {
               // 3. Verify Payment
-              const { error: verifyError } = await supabase.functions.invoke(
-                "razorpay-api",
+              const {
+                data: { session: verifySession },
+              } = await supabase.auth.getSession();
+
+              const verifyRes = await fetch(
+                `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/razorpay-api`,
                 {
-                  body: {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ""}`,
+                    apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "",
+                  },
+                  body: JSON.stringify({
                     action: "verify-payment",
                     data: {
                       razorpay_payment_id: response.razorpay_payment_id,
@@ -140,10 +171,14 @@ export default function Plans() {
                       type: "plan",
                       userId: user?.id,
                       plan: "individual",
+                      hasLaptop: hasLaptop,
                     },
-                  },
-                }
+                  }),
+                },
               );
+
+              const verifyData = await verifyRes.json();
+              const verifyError = !verifyRes.ok ? verifyData : null;
 
               if (verifyError) throw verifyError;
 
@@ -168,18 +203,20 @@ export default function Plans() {
         const rzp1 = new window.Razorpay(options);
         rzp1.on("payment.failed", function (response: any) {
           alert(response.error.description);
+          setPaymentProcessing(false);
         });
         rzp1.open();
       } catch (err: any) {
         console.error("Payment Error:", err);
         alert(
-          `Payment initialization failed: ${err.message || JSON.stringify(err)}`
+          `Payment initialization failed: ${err.message || JSON.stringify(err)}`,
         );
+        setPaymentProcessing(false);
       }
     } else {
       // Business / Startup -> Contact Support
       alert(
-        `For ${plan.name}, please contact our sales team at support@mudralaya.com for a customized quote.`
+        `For ${plan.name}, please contact our sales team at support@mudralaya.com for a customized quote.`,
       );
     }
   };
@@ -222,8 +259,9 @@ export default function Plans() {
       type: "black",
       badgeType: "wide",
       hasCheckbox: true,
-      buttonText: "CHOOSE PLAN",
-      buttonStyle: "cyan",
+      buttonText:
+        profile?.plan_type === "INDIVIDUAL" ? "CURRENT PLAN" : "CHOOSE PLAN",
+      buttonStyle: profile?.plan_type === "INDIVIDUAL" ? "outline" : "cyan",
     },
     {
       id: 3,
@@ -301,6 +339,45 @@ export default function Plans() {
 
   return (
     <div className={styles.plansPage}>
+      {paymentProcessing && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: "rgba(0,0,0,0.7)",
+            zIndex: 9999,
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            color: "white",
+          }}
+        >
+          <div
+            className="loader"
+            style={{
+              border: "4px solid #f3f3f3",
+              borderTop: "4px solid #3498db",
+              borderRadius: "50%",
+              width: "40px",
+              height: "40px",
+              animation: "spin 1s linear infinite",
+              marginBottom: "1rem",
+            }}
+          ></div>
+          <style>{`
+            @keyframes spin {
+              0% { transform: rotate(0deg); }
+              100% { transform: rotate(360deg); }
+            }
+          `}</style>
+          <h2>Processing Payment...</h2>
+          <p>Please do not close this window.</p>
+        </div>
+      )}
       <header className={styles.plansHeader}>
         <h1>Mudralaya Plans</h1>
         <p className={styles.subtitle}>
@@ -362,13 +439,17 @@ export default function Plans() {
 
             <button
               className={`${styles.planBtn} ${getButtonStyle(
-                plan.buttonStyle
+                plan.buttonStyle,
               )}`}
               onClick={() => handlePlanSelect(plan)}
               disabled={plan.id === 1}
               style={{
-                cursor: plan.id === 1 ? "not-allowed" : "pointer",
-                opacity: plan.id === 1 ? 0.7 : 1,
+                cursor:
+                  plan.id === 1 || plan.buttonText === "CURRENT PLAN"
+                    ? "not-allowed"
+                    : "pointer",
+                opacity:
+                  plan.id === 1 || plan.buttonText === "CURRENT PLAN" ? 0.7 : 1,
               }}
             >
               {plan.buttonText}

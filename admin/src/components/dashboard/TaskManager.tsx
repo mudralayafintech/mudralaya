@@ -14,10 +14,12 @@ interface Task {
   reward: number; // Fallback
   reward_info?: string;
   type: string;
-  category?: string;
+  task_type?: string; // Daily or Dedicated
 }
 
 interface Participant {
+  id: string;
+  user_id: string;
   users?: {
     full_name?: string;
     email_id?: string;
@@ -25,6 +27,7 @@ interface Participant {
   };
   status: string;
   reward_earned: number;
+  task_id: string;
 }
 
 export default function TaskManager() {
@@ -40,7 +43,8 @@ export default function TaskManager() {
     reward_min: "",
     reward_max: "",
     reward_info: "",
-    type: "Daily Task",
+    type: "Daily",
+    task_type: "Daily", // Explicitly added
     video_link: "",
     pdf_url: "",
     action_link: "",
@@ -73,11 +77,43 @@ export default function TaskManager() {
   const handleCreateTask = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await adminApiRequest("create-task", newTask);
+      // Convert empty strings to null for numeric fields
+      const taskData = {
+        ...newTask,
+        reward_free:
+          newTask.reward_free === "" ? 0 : Number(newTask.reward_free),
+        reward_member:
+          newTask.reward_member === "" ? null : Number(newTask.reward_member),
+        reward_premium:
+          newTask.reward_premium === "" ? null : Number(newTask.reward_premium),
+        reward_min:
+          newTask.reward_min === "" ? null : Number(newTask.reward_min),
+        reward_max:
+          newTask.reward_max === "" ? null : Number(newTask.reward_max),
+      };
+
+      await adminApiRequest("create-task", taskData);
       alert("Task Created Successfully");
       setShowCreateForm(false);
-      // Reset form (simplified for brevity, should reset all fields)
-      setNewTask({ ...newTask, title: "", description: "" });
+      // Reset form
+      setNewTask({
+        title: "",
+        description: "",
+        reward_free: "",
+        reward_premium: "",
+        reward_min: "",
+        reward_max: "",
+        reward_info: "",
+        type: "Daily",
+        task_type: "Daily",
+        video_link: "",
+        pdf_url: "",
+        action_link: "",
+        icon_type: "group",
+        target_audience: [],
+        steps: "",
+        reward_member: "",
+      });
       fetchTasks();
     } catch (err: any) {
       alert("Failed to create task: " + err.message);
@@ -97,6 +133,43 @@ export default function TaskManager() {
       console.error("Failed to fetch participants", err);
     } finally {
       setLoadingParticipants(false);
+    }
+  };
+
+  const handleApproveTask = async (userTaskId: string) => {
+    if (
+      !confirm(
+        "Are you sure you want to approve this task? The reward will be added to the user's wallet.",
+      )
+    ) {
+      return;
+    }
+    try {
+      await adminApiRequest("approve-task", { userTaskId });
+      alert("Task approved! Reward has been added to user's wallet.");
+      // Refresh participants list
+      if (selectedTask) {
+        handleViewProgress(selectedTask);
+      }
+    } catch (err: any) {
+      alert("Failed to approve task: " + err.message);
+    }
+  };
+
+  const handleRejectTask = async (userTaskId: string) => {
+    const reason = prompt("Please provide a reason for rejection (optional):");
+    try {
+      await adminApiRequest("reject-task", {
+        userTaskId,
+        reason: reason || null,
+      });
+      alert("Task rejected.");
+      // Refresh participants list
+      if (selectedTask) {
+        handleViewProgress(selectedTask);
+      }
+    } catch (err: any) {
+      alert("Failed to reject task: " + err.message);
     }
   };
 
@@ -147,25 +220,13 @@ export default function TaskManager() {
                 <div className={styles.col6}>
                   <label className={styles.label}>Task Title</label>
                   <input
+                    type="text"
                     className={styles.input}
                     value={newTask.title}
                     onChange={(e) =>
                       setNewTask({ ...newTask, title: e.target.value })
                     }
-                    placeholder="e.g., Daily Login Bonus"
-                    required
-                  />
-                </div>
-                <div className={styles.col3}>
-                  <label className={styles.label}>Free Reward (₹)</label>
-                  <input
-                    type="number"
-                    className={styles.input}
-                    value={newTask.reward_free}
-                    onChange={(e) =>
-                      setNewTask({ ...newTask, reward_free: e.target.value })
-                    }
-                    placeholder="0"
+                    placeholder="Enter task title"
                     required
                   />
                 </div>
@@ -173,15 +234,36 @@ export default function TaskManager() {
                   <label className={styles.label}>Type</label>
                   <select
                     className={styles.select}
-                    value={newTask.type}
+                    value={newTask.task_type}
                     onChange={(e) =>
-                      setNewTask({ ...newTask, type: e.target.value })
+                      setNewTask({
+                        ...newTask,
+                        task_type: e.target.value,
+                        type: e.target.value,
+                      })
                     }
                   >
-                    <option>Daily Task</option>
-                    <option>Weekly Task</option>
-                    <option>One-time</option>
-                    <option>Dedicated Task</option>
+                    <option value="Daily">Daily Task</option>
+                    <option value="Dedicated">Dedicated Task</option>
+                  </select>
+                </div>
+                <div className={styles.col3}>
+                  <label className={styles.label}>Icon Type</label>
+                  <select
+                    className={styles.select}
+                    value={newTask.icon_type}
+                    onChange={(e) =>
+                      setNewTask({ ...newTask, icon_type: e.target.value })
+                    }
+                  >
+                    <option value="group">Group</option>
+                    <option value="youtube">YouTube</option>
+                    <option value="facebook">Facebook</option>
+                    <option value="instagram">Instagram</option>
+                    <option value="twitter">Twitter</option>
+                    <option value="linkedin">LinkedIn</option>
+                    <option value="telegram">Telegram</option>
+                    <option value="whatsapp">WhatsApp</option>
                   </select>
                 </div>
 
@@ -194,9 +276,152 @@ export default function TaskManager() {
                     onChange={(e) =>
                       setNewTask({ ...newTask, description: e.target.value })
                     }
-                    placeholder="Describe the task steps..."
+                    placeholder="Describe the task..."
                   />
                 </div>
+
+                <div className={styles.col12}>
+                  <label className={styles.label}>Steps (Optional)</label>
+                  <textarea
+                    className={styles.textarea}
+                    rows={2}
+                    value={newTask.steps}
+                    onChange={(e) =>
+                      setNewTask({ ...newTask, steps: e.target.value })
+                    }
+                    placeholder="Step-by-step instructions..."
+                  />
+                </div>
+
+                <div className={styles.col3}>
+                  <label className={styles.label}>Free Reward (₹)</label>
+                  <input
+                    type="number"
+                    className={styles.input}
+                    value={newTask.reward_free}
+                    onChange={(e) =>
+                      setNewTask({ ...newTask, reward_free: e.target.value })
+                    }
+                    placeholder="0"
+                  />
+                </div>
+                <div className={styles.col3}>
+                  <label className={styles.label}>Member Reward (₹)</label>
+                  <input
+                    type="number"
+                    className={styles.input}
+                    value={newTask.reward_member}
+                    onChange={(e) =>
+                      setNewTask({ ...newTask, reward_member: e.target.value })
+                    }
+                    placeholder="0"
+                  />
+                </div>
+                <div className={styles.col3}>
+                  <label className={styles.label}>Premium Reward (₹)</label>
+                  <input
+                    type="number"
+                    className={styles.input}
+                    value={newTask.reward_premium}
+                    onChange={(e) =>
+                      setNewTask({ ...newTask, reward_premium: e.target.value })
+                    }
+                    placeholder="0"
+                  />
+                </div>
+                <div className={styles.col3}>
+                  <label className={styles.label}>Reward Info</label>
+                  <input
+                    type="text"
+                    className={styles.input}
+                    value={newTask.reward_info}
+                    onChange={(e) =>
+                      setNewTask({ ...newTask, reward_info: e.target.value })
+                    }
+                    placeholder="e.g., Up to ₹500"
+                  />
+                </div>
+
+                <div className={styles.col6}>
+                  <label className={styles.label}>Video Link (Optional)</label>
+                  <input
+                    type="url"
+                    className={styles.input}
+                    value={newTask.video_link}
+                    onChange={(e) =>
+                      setNewTask({ ...newTask, video_link: e.target.value })
+                    }
+                    placeholder="https://youtube.com/..."
+                  />
+                </div>
+                <div className={styles.col6}>
+                  <label className={styles.label}>PDF URL (Optional)</label>
+                  <input
+                    type="url"
+                    className={styles.input}
+                    value={newTask.pdf_url}
+                    onChange={(e) =>
+                      setNewTask({ ...newTask, pdf_url: e.target.value })
+                    }
+                    placeholder="https://..."
+                  />
+                </div>
+
+                <div className={styles.col12}>
+                  <label className={styles.label}>Action Link (Optional)</label>
+                  <input
+                    type="url"
+                    className={styles.input}
+                    value={newTask.action_link}
+                    onChange={(e) =>
+                      setNewTask({ ...newTask, action_link: e.target.value })
+                    }
+                    placeholder="https://..."
+                  />
+                </div>
+
+                <div className={styles.col12}>
+                  <label className={styles.label}>Target Audience</label>
+                  <div
+                    style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}
+                  >
+                    {["All", "Free", "Member", "Premium"].map((audience) => (
+                      <label
+                        key={audience}
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "6px",
+                        }}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={newTask.target_audience.includes(audience)}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setNewTask({
+                                ...newTask,
+                                target_audience: [
+                                  ...newTask.target_audience,
+                                  audience,
+                                ],
+                              });
+                            } else {
+                              setNewTask({
+                                ...newTask,
+                                target_audience: newTask.target_audience.filter(
+                                  (a) => a !== audience,
+                                ),
+                              });
+                            }
+                          }}
+                        />
+                        {audience}
+                      </label>
+                    ))}
+                  </div>
+                </div>
+
                 <div className={styles.col12} style={{ textAlign: "right" }}>
                   <button type="submit" className={styles.saveBtn}>
                     Save Task
@@ -255,18 +480,65 @@ export default function TaskManager() {
                       <span className={styles.userEmail}>
                         {p.users?.email_id}
                       </span>
+                      {p.reward_earned > 0 && (
+                        <span className={styles.rewardText}>
+                          Reward: ₹{p.reward_earned}
+                        </span>
+                      )}
                     </div>
-                    <div>
+                    <div
+                      style={{
+                        display: "flex",
+                        gap: "8px",
+                        alignItems: "center",
+                      }}
+                    >
                       <span
                         className={clsx(
                           styles.statusPill,
-                          p.status === "completed"
+                          p.status === "completed" || p.status === "approved"
                             ? styles.completed
-                            : styles.pending
+                            : p.status === "rejected"
+                              ? styles.rejected
+                              : styles.pending,
                         )}
                       >
                         {p.status}
                       </span>
+                      {p.status === "completed" && (
+                        <>
+                          <button
+                            className={styles.approveBtn}
+                            onClick={() => handleApproveTask(p.id)}
+                            style={{
+                              padding: "6px 12px",
+                              fontSize: "12px",
+                              background: "#10b981",
+                              color: "white",
+                              border: "none",
+                              borderRadius: "6px",
+                              cursor: "pointer",
+                            }}
+                          >
+                            Approve
+                          </button>
+                          <button
+                            className={styles.rejectBtn}
+                            onClick={() => handleRejectTask(p.id)}
+                            style={{
+                              padding: "6px 12px",
+                              fontSize: "12px",
+                              background: "#ef4444",
+                              color: "white",
+                              border: "none",
+                              borderRadius: "6px",
+                              cursor: "pointer",
+                            }}
+                          >
+                            Reject
+                          </button>
+                        </>
+                      )}
                     </div>
                   </li>
                 ))}

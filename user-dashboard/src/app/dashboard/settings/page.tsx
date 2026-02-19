@@ -1,7 +1,17 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { User, Lock, Bell, HelpCircle, FileText, Loader2 } from "lucide-react";
+import {
+  User,
+  Lock,
+  Bell,
+  HelpCircle,
+  FileText,
+  Loader2,
+  Check,
+  X,
+  AlertCircle,
+} from "lucide-react";
 import Skeleton from "@/components/ui/Skeleton";
 import { createClient } from "@/utils/supabase/client";
 import styles from "./settings.module.css";
@@ -11,6 +21,8 @@ export default function Settings() {
   const [profile, setProfile] = useState<any>(null);
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [notifications, setNotifications] = useState<any[]>([]);
+  const [notificationLoading, setNotificationLoading] = useState(false);
   const supabase = createClient();
 
   useEffect(() => {
@@ -31,7 +43,81 @@ export default function Settings() {
       setLoading(false);
     };
     fetchUser();
+    fetchNotifications();
   }, []);
+
+  const fetchNotifications = async () => {
+    try {
+      setNotificationLoading(true);
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data, error } = await supabase
+        .from("notifications")
+        .select("*")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false })
+        .limit(20);
+
+      if (error) throw error;
+      setNotifications(data || []);
+    } catch (error) {
+      console.error("Error fetching notifications:", error);
+    } finally {
+      setNotificationLoading(false);
+    }
+  };
+
+  const markAsRead = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from("notifications")
+        .update({ is_read: true })
+        .eq("id", id);
+
+      if (error) throw error;
+      setNotifications((prev) =>
+        prev.map((n) => (n.id === id ? { ...n, is_read: true } : n)),
+      );
+    } catch (error) {
+      console.error("Error marking notification as read:", error);
+    }
+  };
+
+  const markAllRead = async () => {
+    try {
+      if (!user) return;
+
+      const { error } = await supabase
+        .from("notifications")
+        .update({ is_read: true })
+        .eq("user_id", user.id)
+        .eq("is_read", false);
+
+      if (error) throw error;
+      setNotifications((prev) => prev.map((n) => ({ ...n, is_read: true })));
+    } catch (error) {
+      console.error("Error marking all read:", error);
+    }
+  };
+
+  const clearAllNotifications = async () => {
+    try {
+      if (!user) return;
+
+      const { error } = await supabase
+        .from("notifications")
+        .delete()
+        .eq("user_id", user.id);
+
+      if (error) throw error;
+      setNotifications([]);
+    } catch (error) {
+      console.error("Error clearing notifications:", error);
+    }
+  };
 
   const renderContent = () => {
     switch (activeTab) {
@@ -103,34 +189,203 @@ export default function Settings() {
       case "notifications":
         return (
           <div>
-            <h2 className={styles.settingsSectionTitle}>Notifications</h2>
-            <div className={styles.toggleRow}>
-              <div className={styles.toggleInfo}>
-                <h4>Email Notifications</h4>
-                <p>Receive emails about your account activity.</p>
-              </div>
-              <div className={`${styles.toggleSwitch} ${styles.on}`}>
-                <div className={styles.toggleHandle}></div>
-              </div>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                marginBottom: "24px",
+              }}
+            >
+              <h2 className={styles.settingsSectionTitle}>Notifications</h2>
+              {notifications.some((n) => !n.is_read) && (
+                <button
+                  onClick={markAllRead}
+                  style={{
+                    background: "none",
+                    border: "none",
+                    color: "#4F46E5",
+                    fontSize: "14px",
+                    fontWeight: "600",
+                    cursor: "pointer",
+                  }}
+                >
+                  Mark all as read
+                </button>
+              )}
             </div>
-            <div className={styles.toggleRow}>
-              <div className={styles.toggleInfo}>
-                <h4>Task Updates</h4>
-                <p>Get notified when a task is approved.</p>
+
+            {notificationLoading ? (
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  padding: "40px",
+                }}
+              >
+                <Loader2
+                  size={24}
+                  className="animate-spin"
+                  style={{ color: "#4F46E5" }}
+                />
               </div>
-              <div className={`${styles.toggleSwitch} ${styles.on}`}>
-                <div className={styles.toggleHandle}></div>
+            ) : notifications.length > 0 ? (
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "12px",
+                }}
+              >
+                {notifications.map((notif) => {
+                  const getIcon = () => {
+                    switch (notif.type) {
+                      case "success":
+                      case "task":
+                        return <Check size={18} />;
+                      case "error":
+                        return <X size={18} />;
+                      case "warning":
+                        return <AlertCircle size={18} />;
+                      default:
+                        return <Bell size={18} />;
+                    }
+                  };
+
+                  const getIconBg = () => {
+                    switch (notif.type) {
+                      case "success":
+                      case "task":
+                        return "#10b981";
+                      case "error":
+                        return "#ef4444";
+                      case "warning":
+                        return "#f59e0b";
+                      default:
+                        return "#6366f1";
+                    }
+                  };
+
+                  return (
+                    <div
+                      key={notif.id}
+                      onClick={() => !notif.is_read && markAsRead(notif.id)}
+                      style={{
+                        display: "flex",
+                        gap: "16px",
+                        padding: "16px",
+                        background: notif.is_read ? "#fff" : "#f0f9ff",
+                        border: "1px solid #e5e7eb",
+                        borderRadius: "12px",
+                        cursor: notif.is_read ? "default" : "pointer",
+                        transition: "all 0.2s",
+                        position: "relative",
+                      }}
+                    >
+                      <div
+                        style={{
+                          width: "40px",
+                          height: "40px",
+                          borderRadius: "50%",
+                          background: getIconBg(),
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          flexShrink: 0,
+                          color: "#fff",
+                        }}
+                      >
+                        {getIcon()}
+                      </div>
+                      <div style={{ flex: 1 }}>
+                        <h4
+                          style={{
+                            margin: "0 0 4px 0",
+                            fontSize: "14px",
+                            fontWeight: notif.is_read ? "500" : "700",
+                            color: "#1e293b",
+                          }}
+                        >
+                          {notif.title}
+                        </h4>
+                        <p
+                          style={{
+                            margin: "0 0 8px 0",
+                            fontSize: "13px",
+                            color: "#64748b",
+                            lineHeight: "1.5",
+                          }}
+                        >
+                          {notif.message}
+                        </p>
+                        <p
+                          style={{
+                            margin: 0,
+                            fontSize: "12px",
+                            color: "#94a3b8",
+                          }}
+                        >
+                          {new Date(notif.created_at).toLocaleDateString(
+                            "en-US",
+                            {
+                              day: "2-digit",
+                              month: "short",
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            },
+                          )}
+                        </p>
+                      </div>
+                      {!notif.is_read && (
+                        <div
+                          style={{
+                            width: "8px",
+                            height: "8px",
+                            borderRadius: "50%",
+                            background: "#4F46E5",
+                            position: "absolute",
+                            top: "20px",
+                            right: "20px",
+                          }}
+                        />
+                      )}
+                    </div>
+                  );
+                })}
+                <button
+                  onClick={clearAllNotifications}
+                  style={{
+                    marginTop: "16px",
+                    padding: "12px",
+                    background: "#fee2e2",
+                    border: "none",
+                    borderRadius: "8px",
+                    color: "#dc2626",
+                    fontSize: "14px",
+                    fontWeight: "600",
+                    cursor: "pointer",
+                  }}
+                >
+                  Clear All Notifications
+                </button>
               </div>
-            </div>
-            <div className={styles.toggleRow}>
-              <div className={styles.toggleInfo}>
-                <h4>Promotional Offers</h4>
-                <p>Receive updates about new plans and offers.</p>
+            ) : (
+              <div
+                style={{
+                  textAlign: "center",
+                  padding: "60px 20px",
+                  color: "#94a3b8",
+                }}
+              >
+                <Bell
+                  size={48}
+                  style={{ marginBottom: "16px", opacity: 0.3 }}
+                />
+                <p style={{ fontSize: "16px", margin: 0 }}>
+                  No new notifications
+                </p>
               </div>
-              <div className={styles.toggleSwitch}>
-                <div className={styles.toggleHandle}></div>
-              </div>
-            </div>
+            )}
           </div>
         );
       default:

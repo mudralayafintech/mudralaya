@@ -47,15 +47,15 @@ const MemberBenefits = () => {
         <div className={styles.box}>
           <div className={styles.header}>
             <h2 className={styles.title}>
-              Become our <span className={styles.accent}>early member</span> <br />
-              <span className={styles.priceHighlight}>
-                <span className={styles.strike}>₹999</span> ₹99/-
-              </span>
+              Become our early member <br />
+              <span className={styles.priceHighlight}>₹2499/-</span>
             </h2>
             <p className={styles.subtitle}>
+              Get our yearly membership at just{" "}
+              <span className={styles.highlight}>₹99</span> using code{" "}
+              <span className={styles.highlight}>MFONEYEAR</span> <br />
               Join the waitlist today and unlock exclusive founder member
               benefits. <br />
-              <span className={styles.highlight}>Limited time offer!</span>
             </p>
           </div>
 

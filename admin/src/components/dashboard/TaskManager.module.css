@@ -250,6 +250,29 @@
   letter-spacing: 0.05em;
 }
 
+.statusPill.completed {
+  background: #d1fae5;
+  color: #059669;
+}
+
+.statusPill.pending {
+  background: #fef3c7;
+  color: #d97706;
+}
+
+.statusPill.rejected {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.rewardText {
+  font-size: 0.75rem;
+  color: #059669;
+  font-weight: 600;
+  display: block;
+  margin-top: 4px;
+}
+
 /* ... previous styles ... */
 
 /* Task specific styles */

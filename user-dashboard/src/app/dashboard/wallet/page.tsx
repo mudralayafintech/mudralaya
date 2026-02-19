@@ -12,6 +12,8 @@ import {
   Rocket,
   MessageSquare,
   Megaphone,
+  CheckCircle,
+  AlertCircle,
 } from "lucide-react";
 import Skeleton from "@/components/ui/Skeleton";
 import { createClient } from "@/utils/supabase/client";
@@ -39,6 +41,47 @@ export default function Wallet() {
     account_number: "",
     ifsc_code: "",
   });
+  const [errors, setErrors] = useState({
+    holder_name: "",
+    bank_name: "",
+    account_number: "",
+    ifsc_code: "",
+  });
+
+  const validateForm = () => {
+    let isValid = true;
+    const newErrors = {
+      holder_name: "",
+      bank_name: "",
+      account_number: "",
+      ifsc_code: "",
+    };
+
+    if (!formData.holder_name.trim() || formData.holder_name.length < 3) {
+      newErrors.holder_name = "Name must be at least 3 characters";
+      isValid = false;
+    }
+
+    if (!formData.bank_name.trim() || formData.bank_name.length < 3) {
+      newErrors.bank_name = "Bank Name must be at least 3 characters";
+      isValid = false;
+    }
+
+    // Account number: 9-18 digits, numeric
+    if (!/^\d{9,18}$/.test(formData.account_number)) {
+      newErrors.account_number = "Account Number must be 9-18 digits";
+      isValid = false;
+    }
+
+    // IFSC: 4 letters, 0, 6 alphanumeric. strict check
+    if (!/^[A-Z]{4}0[A-Z0-9]{6}$/.test(formData.ifsc_code)) {
+      newErrors.ifsc_code = "Invalid IFSC Code (e.g., SBIN0001234)";
+      isValid = false;
+    }
+
+    setErrors(newErrors);
+    return isValid;
+  };
 
   // KYC State
   const [isKYCModalOpen, setIsKYCModalOpen] = useState(false);
@@ -57,11 +100,18 @@ export default function Wallet() {
       setUserId(session.user.id);
 
       // Fetch KYC Status
-      const { data: kycData } = await supabase
+      // Fetch KYC Status
+      const { data: kycData, error: kycError } = await supabase
         .from("user_kyc")
         .select("status")
         .eq("user_id", session.user.id)
-        .single();
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (kycError) {
+        console.error("Error fetching KYC status:", kycError);
+      }
 
       if (kycData) {
         setKycStatus(kycData.status);
@@ -85,7 +135,7 @@ export default function Wallet() {
         });
       }
 
-      // Fetch Wallet Summary
+      // Fetch Wallet Summary (for stats)
       const { data: summary } = await supabase.functions.invoke(
         "dashboard-api",
         {
@@ -93,16 +143,29 @@ export default function Wallet() {
         }
       );
 
+      // Fetch Full Transaction List (for "task_earning" filtering)
+      const { data: allTransactions } = await supabase.functions.invoke(
+        "dashboard-api",
+        {
+          body: { action: "get-wallet" },
+        }
+      );
+
+      // Filter for Task Earnings
+      const taskTransactions = allTransactions?.filter(
+        (t: any) => t.type === "task_earning"
+      ) || [];
+
       if (summary) {
         setWalletData({
-          transactions: summary.transactions || [],
+          transactions: taskTransactions, // Use filtered transactions
           stats: {
-            today: summary.stats?.today || 450,
-            monthly: summary.stats?.monthly || 250,
-            approved: summary.stats?.approved || 450,
-            pending: summary.stats?.pending || 450,
-            total: summary.stats?.total || 450,
-            payout: summary.stats?.payout || 450,
+            today: summary.stats?.today || 0,
+            monthly: summary.stats?.monthly || 0,
+            approved: summary.stats?.approved || 0,
+            pending: summary.stats?.pending || 0,
+            total: summary.stats?.total || 0,
+            payout: summary.stats?.payout || 0,
           },
         });
       }
@@ -118,6 +181,8 @@ export default function Wallet() {
   }, []);
 
   const handleSave = async () => {
+    if (!validateForm()) return;
+
     try {
       const { error } = await supabase.functions.invoke("bank-account", {
         method: "POST",
@@ -239,19 +304,26 @@ export default function Wallet() {
             Track your earnings and manage your bank account for payouts
           </p>
         </div>
-        {kycStatus === "verified" ? (
-          <div className={styles.kycBadgeSuccess}>✓ KYC Verified</div>
-        ) : kycStatus === "pending" ? (
-          <div className={styles.kycBadgePending}>
-            ⧗ KYC Submitted (Pending)
+        {kycStatus === "approved" || kycStatus === "verified" ? (
+          <div className={styles.kycBadgeSuccess}>
+            <CheckCircle size={16} /> KYC Verified
           </div>
-        ) : kycStatus === "fail" || kycStatus === "rejected" ? (
+        ) : kycStatus === "rejected" ? (
           <button
             className={styles.kycBtnError}
-            onClick={() => setIsKYCModalOpen(true)}
+            onClick={() => {
+              if (confirm("Your KYC was rejected. Do you want to try again?")) {
+                setIsKYCModalOpen(true);
+              }
+            }}
+            title="Click to retry"
           >
-            ⚠ KYC Failed - Retry
+            <AlertCircle size={16} /> Rejected - Retry
           </button>
+        ) : kycStatus === "pending" || kycStatus === "submitted" ? (
+          <div className={styles.kycBadgePending}>
+            ⧗ KYC Pending
+          </div>
         ) : (
           <button
             className={styles.kycBtn}
@@ -410,47 +482,56 @@ export default function Wallet() {
                   <input
                     type="text"
                     value={formData.holder_name}
-                    onChange={(e) =>
-                      setFormData({ ...formData, holder_name: e.target.value })
-                    }
+                    onChange={(e) => {
+                      setFormData({ ...formData, holder_name: e.target.value });
+                      if (errors.holder_name) setErrors({ ...errors, holder_name: "" });
+                    }}
                     placeholder="Enter name"
                   />
+                  {errors.holder_name && <span className={styles.errorText} style={{ color: 'red', fontSize: '12px' }}>{errors.holder_name}</span>}
                 </div>
                 <div className={styles.formGroup}>
                   <label>Bank Name</label>
                   <input
                     type="text"
                     value={formData.bank_name}
-                    onChange={(e) =>
-                      setFormData({ ...formData, bank_name: e.target.value })
-                    }
+                    onChange={(e) => {
+                      setFormData({ ...formData, bank_name: e.target.value });
+                      if (errors.bank_name) setErrors({ ...errors, bank_name: "" });
+                    }}
                     placeholder="Enter bank name"
                   />
+                  {errors.bank_name && <span className={styles.errorText} style={{ color: 'red', fontSize: '12px' }}>{errors.bank_name}</span>}
                 </div>
                 <div className={styles.formGroup}>
                   <label>Account Number</label>
                   <input
                     type="text"
                     value={formData.account_number}
-                    onChange={(e) =>
+                    onChange={(e) => {
+                      const val = e.target.value.replace(/\D/g, "");
                       setFormData({
                         ...formData,
-                        account_number: e.target.value,
-                      })
-                    }
+                        account_number: val,
+                      });
+                      if (errors.account_number) setErrors({ ...errors, account_number: "" });
+                    }}
                     placeholder="Enter account number"
                   />
+                  {errors.account_number && <span className={styles.errorText} style={{ color: 'red', fontSize: '12px' }}>{errors.account_number}</span>}
                 </div>
                 <div className={styles.formGroup}>
                   <label>IFSC Code</label>
                   <input
                     type="text"
                     value={formData.ifsc_code}
-                    onChange={(e) =>
-                      setFormData({ ...formData, ifsc_code: e.target.value })
-                    }
+                    onChange={(e) => {
+                      setFormData({ ...formData, ifsc_code: e.target.value.toUpperCase() });
+                      if (errors.ifsc_code) setErrors({ ...errors, ifsc_code: "" });
+                    }}
                     placeholder="Enter IFSC code"
                   />
+                  {errors.ifsc_code && <span className={styles.errorText} style={{ color: 'red', fontSize: '12px' }}>{errors.ifsc_code}</span>}
                 </div>
                 <div className={styles.formActions}>
                   <button

@@ -90,12 +90,12 @@ const Header = () => {
                   Dashboard
                 </Link>
               ) : (
-                <button
+                <Link
+                  href="https://user.mudralaya.com"
                   className={styles.loginBtn}
-                  onClick={() => openLoginModal()}
                 >
                   Login
-                </button>
+                </Link>
               )}
             </li>
           </ul>
@@ -170,12 +170,12 @@ const Header = () => {
                       Dashboard
                     </Link>
                   ) : (
-                    <button
+                    <Link
+                      href="https://user.mudralaya.com"
                       className={styles.mobileLoginBtn}
-                      onClick={() => openLoginModal()}
                     >
                       Login
-                    </button>
+                    </Link>
                   )}
                 </li>
               </ul>
@@ -183,7 +183,7 @@ const Header = () => {
           </>
         )}
       </AnimatePresence>
-    </header>
+    </header >
   );
 };
 

@@ -28,6 +28,33 @@ const JoinUsModal = () => {
     plan: "",
   });
 
+  const [couponCode, setCouponCode] = useState("");
+  const [discountApplied, setDiscountApplied] = useState(false);
+  const [couponError, setCouponError] = useState("");
+  const [finalPrice, setFinalPrice] = useState(2499);
+
+  const handleApplyCoupon = () => {
+    setCouponError("");
+    if (!couponCode) {
+      setCouponError("Please enter a coupon code");
+      return;
+    }
+
+    if (couponCode.toUpperCase() === "MFONEYEAR") {
+      setDiscountApplied(true);
+      setFinalPrice(99); // Discounted price
+    } else {
+      setCouponError("Invalid Coupon Code");
+    }
+  };
+
+  const handleRemoveCoupon = () => {
+    setCouponCode("");
+    setDiscountApplied(false);
+    setCouponError("");
+    setFinalPrice(2499);
+  };
+
   // Calculate price based on passed data
   const isIndividualWithLaptop =
     modalData?.hasLaptop && selectedPlan === "individual";
@@ -49,7 +76,7 @@ const JoinUsModal = () => {
   const [submissionId, setSubmissionId] = useState<string | null>(null);
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -69,6 +96,10 @@ const JoinUsModal = () => {
       profession: "",
       plan: "",
     });
+    setCouponCode("");
+    setDiscountApplied(false);
+    setCouponError("");
+    setFinalPrice(2499);
     closeJoinUsModal();
   };
 
@@ -188,7 +219,7 @@ const JoinUsModal = () => {
                 headers: {
                   Authorization: `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`,
                 },
-              }
+              },
             );
 
             if (verifyError) throw verifyError;
@@ -200,7 +231,7 @@ const JoinUsModal = () => {
           } catch (err: any) {
             console.error("Payment Verification Failed", err);
             setSubmitError(
-              "Payment verification failed. Please contact support."
+              "Payment verification failed. Please contact support.",
             );
           }
         },
@@ -314,10 +345,88 @@ const JoinUsModal = () => {
                   ✨ Special One-Time Offer
                 </span>
                 <h2 className={styles.upsellTitle}>Become an Early Member</h2>
-                <span className={styles.upsellPrice}>₹99</span>
+                <span className={styles.upsellPrice}>
+                  {formatPrice(finalPrice)}
+                </span>
                 <p className={styles.upsellDesc}>
                   Unlock premium task benefits instantly!
                 </p>
+
+                {/* Coupon Section */}
+                <div
+                  style={{
+                    width: "100%",
+                    marginTop: "1rem",
+                    marginBottom: "1rem",
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "8px",
+                  }}
+                >
+                  <div style={{ display: "flex", gap: "8px" }}>
+                    <input
+                      type="text"
+                      placeholder="Enter Coupon Code"
+                      value={couponCode}
+                      onChange={(e) => setCouponCode(e.target.value)}
+                      disabled={discountApplied}
+                      style={{
+                        flex: 1,
+                        padding: "10px",
+                        borderRadius: "8px",
+                        border: "1px solid #cbd5e1",
+                        fontSize: "14px",
+                      }}
+                    />
+                    {discountApplied ? (
+                      <button
+                        onClick={handleRemoveCoupon}
+                        style={{
+                          padding: "10px 16px",
+                          borderRadius: "8px",
+                          border: "none",
+                          backgroundColor: "#fee2e2",
+                          color: "#ef4444",
+                          fontWeight: "600",
+                          cursor: "pointer",
+                        }}
+                      >
+                        Remove
+                      </button>
+                    ) : (
+                      <button
+                        onClick={handleApplyCoupon}
+                        style={{
+                          padding: "10px 16px",
+                          borderRadius: "8px",
+                          border: "none",
+                          backgroundColor: "#2563eb",
+                          color: "white",
+                          fontWeight: "600",
+                          cursor: "pointer",
+                        }}
+                      >
+                        Apply
+                      </button>
+                    )}
+                  </div>
+                  {couponError && (
+                    <span style={{ color: "#ef4444", fontSize: "13px" }}>
+                      {couponError}
+                    </span>
+                  )}
+                  {discountApplied && (
+                    <span
+                      style={{
+                        color: "#059669",
+                        fontSize: "13px",
+                        fontWeight: "500",
+                      }}
+                    >
+                      Coupon Applied! Price reduced to ₹99.
+                    </span>
+                  )}
+                </div>
 
                 <div className={styles.upsellBenefits}>
                   <div className={styles.upsellItem}>
@@ -344,7 +453,9 @@ const JoinUsModal = () => {
                 )}
 
                 <button
-                  onClick={() => handlePayment(99, "Early Member Subscription")}
+                  onClick={() =>
+                    handlePayment(finalPrice, "Early Member Subscription")
+                  }
                   className={styles.payBtn}
                   disabled={submitting}
                 >
@@ -352,7 +463,7 @@ const JoinUsModal = () => {
                     <Loader2 className="animate-spin" />
                   ) : (
                     <>
-                      Get for ₹99 <ArrowRight size={20} />
+                      Get for {formatPrice(finalPrice)} <ArrowRight size={20} />
                     </>
                   )}
                 </button>
@@ -450,8 +561,8 @@ const JoinUsModal = () => {
                           max={
                             new Date(
                               new Date().setFullYear(
-                                new Date().getFullYear() - 16
-                              )
+                                new Date().getFullYear() - 16,
+                              ),
                             )
                               .toISOString()
                               .split("T")[0]

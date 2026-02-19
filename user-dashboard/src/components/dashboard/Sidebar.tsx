@@ -49,10 +49,10 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
       <aside className={`${styles.sidebar} ${isOpen ? styles.open : ""}`}>
         <div className={styles.sidebarHeader}>
           <Image
-            src="/mudralaya_logo.webp"
+            src="/mudralaya_logo_new.png"
             alt="Mudralaya"
-            width={200}
-            height={60}
+            width={500}
+            height={150}
             className={styles.sidebarLogo}
             priority
           />
@@ -66,8 +66,9 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
                 <Link
                   key={item.path}
                   href={item.path}
-                  className={`${styles.navItem} ${isActive ? styles.active : ""
-                    }`}
+                  className={`${styles.navItem} ${
+                    isActive ? styles.active : ""
+                  }`}
                   onClick={() => {
                     if (window.innerWidth <= 768) {
                       toggleSidebar();

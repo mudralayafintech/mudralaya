@@ -19,6 +19,17 @@ serve(async (req: Request): Promise<Response> => {
 
     switch (action) {
       case 'submit-join-request':
+        // Check for existing user with same mobile or email
+        const { data: existingUser, error: checkError } = await supabaseClient
+          .from('join_requests')
+          .select('id')
+          .or(`mobile_number.eq.${data.mobileNumber},email_id.eq.${data.emailId}`)
+          .single()
+
+        if (existingUser) {
+          throw new Error('A partner with this mobile number or email ID already exists.')
+        }
+
         const { data: joinData, error: joinError } = await supabaseClient
           .from('join_requests')
           .insert({
@@ -33,7 +44,7 @@ serve(async (req: Request): Promise<Response> => {
           })
           .select()
           .single()
-        
+
         if (joinError) throw joinError
         result = joinData
         break;
@@ -52,7 +63,7 @@ serve(async (req: Request): Promise<Response> => {
           })
           .select()
           .single()
-        
+
         if (advisorError) throw advisorError
         result = advisorData
         break;
@@ -71,7 +82,7 @@ serve(async (req: Request): Promise<Response> => {
           })
           .select()
           .single()
-        
+
         if (contactError) throw contactError
         result = contactData
         break;
@@ -82,7 +93,7 @@ serve(async (req: Request): Promise<Response> => {
           .upsert({ email: data.email })
           .select()
           .single()
-        
+
         if (newsError) throw newsError
         result = newsData
         break;

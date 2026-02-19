@@ -12,10 +12,10 @@ import {
   Info,
   ChevronDown,
   ChevronUp,
-  Youtube,
   FileText,
-  Gem,
   Loader2,
+  Gem,
+  Youtube,
 } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
 import styles from "./tasks.module.css";
@@ -25,6 +25,7 @@ interface Task {
   title: string;
   category?: string;
   type?: string;
+  task_type?: string;
   target_audience?: string[];
   icon_type: string;
   status?: string;
@@ -45,6 +46,9 @@ export default function TasksPage() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
   const supabase = createClient();
+
+  // Search and Filter States
+  const [searchQuery, setSearchQuery] = useState("");
 
   // Sidebar Filter States
   const [selectedProfessions, setSelectedProfessions] = useState<{
@@ -69,6 +73,9 @@ export default function TasksPage() {
 
   const [sortOption, setSortOption] = useState("newest");
   const [activeTab, setActiveTab] = useState("All Task");
+  const [activeTaskType, setActiveTaskType] = useState<"Daily" | "Dedicated">(
+    "Daily",
+  );
   const [expandedTaskId, setExpandedTaskId] = useState<string | null>(null);
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
 
@@ -79,7 +86,7 @@ export default function TasksPage() {
           "dashboard-api",
           {
             body: { action: "get-tasks" },
-          }
+          },
         );
 
         if (error) throw error;
@@ -113,8 +120,8 @@ export default function TasksPage() {
       } else {
         setTasks((prevTasks) =>
           prevTasks.map((t) =>
-            t.id === task.id ? { ...t, status: "ongoing" } : t
-          )
+            t.id === task.id ? { ...t, status: "ongoing" } : t,
+          ),
         );
       }
     } catch (err) {
@@ -123,21 +130,64 @@ export default function TasksPage() {
   };
 
   const getSmartButtonLabel = (task: Task) => {
+    if (task.status === "approved") return "Reward Claimed";
+    if (task.status === "completed") return "Pending Approval";
     if (task.status === "ongoing" || task.status === "in_progress")
-      return "Resume Task";
-    if (task.status === "completed") return "Claim Reward";
+      return "Complete Task";
+    if (task.status === "rejected") return "Task Rejected";
     return "Start Task";
+  };
+
+  const handleCompleteTask = async (task: Task) => {
+    try {
+      const { error } = await supabase.functions.invoke("dashboard-api", {
+        body: {
+          action: "complete-task",
+          taskId: task.id,
+          submissionData: {
+            completed_at: new Date().toISOString(),
+            action_link_visited: task.action_link ? true : false,
+          },
+        },
+      });
+
+      if (error) {
+        console.error("Error completing task:", error);
+        alert("Failed to complete task. Please try again.");
+        return;
+      }
+
+      // Update local state
+      setTasks((prevTasks) =>
+        prevTasks.map((t) =>
+          t.id === task.id ? { ...t, status: "completed" } : t,
+        ),
+      );
+      alert("Task completed! Waiting for admin approval.");
+    } catch (err) {
+      console.error("Failed to complete task:", err);
+      alert("Failed to complete task. Please try again.");
+    }
   };
 
   const handleSmartAction = (task: Task) => {
     const label = getSmartButtonLabel(task);
-    if (label === "Resume Task") {
+    if (label === "Complete Task") {
       if (task.action_link) window.open(task.action_link, "_blank");
-    } else if (label === "Claim Reward") {
-      console.log("Claiming", task.id);
-    } else {
+      // Small delay to let user see the action link open
+      setTimeout(() => {
+        if (
+          confirm(
+            "Have you completed the task? Click OK to submit for approval.",
+          )
+        ) {
+          handleCompleteTask(task);
+        }
+      }, 500);
+    } else if (label === "Start Task") {
       handleTakeTask(task);
     }
+    // "Reward Claimed", "Pending Approval", and "Task Rejected" are disabled states
   };
 
   const handleProfessionChange = (prof: string) => {
@@ -305,55 +355,85 @@ export default function TasksPage() {
   // Filtering Logic
   const filteredTasks = tasks
     .filter((task) => {
-      // 1. Tab Filter
-      if (activeTab === "Completed" && task.status !== "completed")
+      // Search filter
+      if (
+        searchQuery &&
+        !task.title.toLowerCase().includes(searchQuery.toLowerCase())
+      ) {
         return false;
+      }
+
+      // Profession filter
+      const selectedProfs = Object.keys(selectedProfessions).filter(
+        (k) => selectedProfessions[k],
+      );
+      if (
+        !selectedProfs.includes("All") &&
+        task.target_audience &&
+        !task.target_audience.some((prof) => selectedProfs.includes(prof))
+      ) {
+        return false;
+      }
+
+      // Type filter (sidebar checkboxes - keeping for backward compatibility)
+      const selectedTypesArray = Object.keys(selectedTypes).filter(
+        (k) => selectedTypes[k],
+      );
+      if (
+        !selectedTypesArray.includes("All") &&
+        task.type &&
+        !selectedTypesArray.includes(task.type)
+      ) {
+        return false;
+      }
+
+      // Task Type Filter (Daily/Dedicated buttons)
+      // Use task_type if available, otherwise fall back to checking title/category
+      const taskType = task.type || task.task_type || "Daily";
+
+      if (activeTaskType === "Daily") {
+        // Show Daily tasks (anything that's not Dedicated)
+        if (
+          taskType === "Dedicated" ||
+          taskType?.toLowerCase().includes("dedicated")
+        ) {
+          return false;
+        }
+      } else {
+        // Show Dedicated tasks only
+        if (
+          taskType !== "Dedicated" &&
+          !taskType?.toLowerCase().includes("dedicated")
+        ) {
+          return false;
+        }
+      }
+
+      // Tab filter (All Task, Completed, Ongoing)
+      if (activeTab === "Completed" && task.status !== "approved") {
+        return false;
+      }
       if (
         activeTab === "Ongoing" &&
         task.status !== "ongoing" &&
         task.status !== "in_progress"
-      )
+      ) {
         return false;
+      }
 
-      // 2. Profession Filter
-      const activeProfessions = Object.keys(selectedProfessions).filter(
-        (k) => k !== "All" && selectedProfessions[k]
-      );
-
-      // Only filter by profession IF specific professions are selected
-      const professionMatch =
-        selectedProfessions["All"] ||
-        (task.target_audience &&
-          task.target_audience.some((aud) =>
-            activeProfessions.includes(aud)
-          )) ||
-        !task.target_audience ||
-        activeProfessions.length === 0;
-
-      // 3. Type Filter
-      const activeTypes = Object.keys(selectedTypes).filter(
-        (k) => k !== "All" && selectedTypes[k]
-      );
-      const typeMatch =
-        selectedTypes["All"] ||
-        activeTypes.some(
-          (t) =>
-            task.category &&
-            task.category.toLowerCase().includes(t.toLowerCase())
-        ) ||
-        activeTypes.length === 0;
-
-      return professionMatch && typeMatch;
+      return true;
     })
     .sort((a, b) => {
-      if (sortOption === "reward_high")
-        return (b.reward_free || 0) - (a.reward_free || 0);
-      if (sortOption === "reward_low")
-        return (a.reward_free || 0) - (b.reward_free || 0);
-      // newest
-      return (
-        new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-      );
+      if (sortOption === "newest") {
+        return (
+          new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+        );
+      } else if (sortOption === "reward") {
+        return (
+          (b.reward_free || b.reward || 0) - (a.reward_free || a.reward || 0)
+        );
+      }
+      return 0;
     });
 
   return (
@@ -364,6 +444,8 @@ export default function TasksPage() {
           type="text"
           placeholder="Search tasks"
           className={styles.taskSearchInput}
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
         />
       </div>
 
@@ -475,19 +557,99 @@ export default function TasksPage() {
 
         {/* Task List */}
         <div className={styles.colLg9}>
-          <div className={styles.taskHeaderControls}>
-            <div className={styles.taskTabs}>
-              {["All Task", "Completed", "Ongoing"].map((tab) => (
-                <button
-                  key={tab}
-                  className={`${styles.taskTab} ${
-                    activeTab === tab ? styles.active : ""
-                  }`}
-                  onClick={() => setActiveTab(tab)}
-                >
-                  {tab}
-                </button>
-              ))}
+          {/* Main Content */}
+          <div className={styles.mainContent}>
+            {/* Task Type Tabs + Tabs Row */}
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "12px",
+                marginBottom: "20px",
+              }}
+            >
+              {/* Daily Task Button */}
+              <button
+                onClick={() => setActiveTaskType("Daily")}
+                style={{
+                  padding: "10px 24px",
+                  borderRadius: "8px",
+                  border:
+                    activeTaskType === "Daily" ? "none" : "1px solid #e2e8f0",
+                  backgroundColor:
+                    activeTaskType === "Daily" ? "#2563eb" : "#fff",
+                  color: activeTaskType === "Daily" ? "#fff" : "#64748b",
+                  fontWeight: "600",
+                  cursor: "pointer",
+                  transition: "all 0.2s",
+                  fontSize: "14px",
+                }}
+              >
+                Daily Task
+              </button>
+
+              {/* Dedicated Task Button */}
+              <button
+                onClick={() => setActiveTaskType("Dedicated")}
+                style={{
+                  padding: "10px 24px",
+                  borderRadius: "8px",
+                  border:
+                    activeTaskType === "Dedicated"
+                      ? "none"
+                      : "1px solid #e2e8f0",
+                  backgroundColor:
+                    activeTaskType === "Dedicated" ? "#db2777" : "#fff",
+                  color: activeTaskType === "Dedicated" ? "#fff" : "#64748b",
+                  fontWeight: "600",
+                  cursor: "pointer",
+                  transition: "all 0.2s",
+                  fontSize: "14px",
+                }}
+              >
+                Dedicated Task
+              </button>
+
+              {/* Spacer */}
+              <div style={{ flex: 1 }} />
+
+              {/* All Task / Completed / Ongoing Tabs */}
+              <div
+                style={{
+                  display: "flex",
+                  gap: "12px",
+                  background: "rgba(255, 255, 255, 0.7)",
+                  padding: "6px",
+                  borderRadius: "50px",
+                  border: "1px solid #fff",
+                  backdropFilter: "blur(10px)",
+                }}
+              >
+                {["All Task", "Completed", "Ongoing"].map((tab) => (
+                  <button
+                    key={tab}
+                    onClick={() => setActiveTab(tab)}
+                    style={{
+                      background: activeTab === tab ? "#fff" : "transparent",
+                      border: "none",
+                      color:
+                        activeTab === tab ? "#2563eb" : "rgb(148, 163, 184)",
+                      padding: "8px 20px",
+                      borderRadius: "40px",
+                      fontSize: "14px",
+                      fontWeight: "600",
+                      transition: "all 0.3s ease",
+                      cursor: "pointer",
+                      boxShadow:
+                        activeTab === tab
+                          ? "0 4px 12px rgba(0, 0, 0, 0.05)"
+                          : "none",
+                    }}
+                  >
+                    {tab}
+                  </button>
+                ))}
+              </div>
             </div>
             <div className={styles.taskActions}>
               <select
@@ -602,7 +764,7 @@ export default function TasksPage() {
                             onClick={() =>
                               window.open(
                                 task.video_url || task.video_link,
-                                "_blank"
+                                "_blank",
                               )
                             }
                           >
@@ -642,8 +804,29 @@ export default function TasksPage() {
 
                     <div className="mt-3" style={{ marginTop: "16px" }}>
                       <button
-                        className={styles.btnTakeTask}
+                        className={`${styles.btnTakeTask} ${
+                          task.status === "approved" ||
+                          task.status === "rejected"
+                            ? styles.btnDisabled
+                            : ""
+                        }`}
                         onClick={() => handleSmartAction(task)}
+                        disabled={
+                          task.status === "approved" ||
+                          task.status === "rejected"
+                        }
+                        style={{
+                          opacity:
+                            task.status === "approved" ||
+                            task.status === "rejected"
+                              ? 0.6
+                              : 1,
+                          cursor:
+                            task.status === "approved" ||
+                            task.status === "rejected"
+                              ? "not-allowed"
+                              : "pointer",
+                        }}
                       >
                         {getSmartButtonLabel(task)}
                       </button>

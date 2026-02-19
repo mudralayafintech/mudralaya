@@ -48,10 +48,10 @@ const navItems = [
     label: "Task Manager",
   },
   {
-    id: "clients",
-    path: "/dashboard/clients",
-    icon: Users,
-    label: "Clients",
+    id: "kyc",
+    path: "/dashboard/kyc",
+    icon: CheckSquare, // Using CheckSquare or similar, Sidebar.tsx imports CheckSquare (already used for tasks? Let's check imports)
+    label: "KYC Requests",
   },
 ];
 
