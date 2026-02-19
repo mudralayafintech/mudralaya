@@ -89,9 +89,7 @@ const Footer = () => {
                 <li>
                   <Link href="/career">Careers</Link>
                 </li>
-                <li>
-                  <Link href="/blog">Blog</Link>
-                </li>
+
               </ul>
             </div>
             <div className={styles.linkGroup}>
