@@ -19,30 +19,11 @@ serve(async (req: Request): Promise<Response> => {
     const adminUser = Deno.env.get('DASHBOARD_ADMIN_USER')
     const adminPass = Deno.env.get('DASHBOARD_ADMIN_PASS')
 
-    // Check if environment variables are configured
-    if (!adminUser || !adminPass) {
-      console.error('Admin credentials not configured. Please set DASHBOARD_ADMIN_USER and DASHBOARD_ADMIN_PASS environment variables.')
-      return new Response(JSON.stringify({
-        error: 'Server configuration error: Admin credentials not set. Please contact the administrator.'
-      }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 500,
-      })
-    }
-
     // Simple Admin Auth check
     const authHeader = req.headers.get('x-admin-password')
 
     if (action === 'login') {
-      // Log login attempt (without exposing passwords)
-      console.log('Login attempt:', {
-        username: data.username,
-        usernameMatch: data.username === adminUser,
-        passwordProvided: !!data.password
-      })
-
       if (data.username === adminUser && data.password === adminPass) {
-        console.log('Login successful')
         return new Response(JSON.stringify({
           message: 'Logged in',
           success: true,
@@ -52,7 +33,6 @@ serve(async (req: Request): Promise<Response> => {
           status: 200,
         })
       } else {
-        console.log('Login failed: Invalid credentials')
         return new Response(JSON.stringify({ error: 'Invalid credentials' }), {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
           status: 401,
@@ -114,7 +94,7 @@ serve(async (req: Request): Promise<Response> => {
         break;
 
       case 'create-task':
-        const { title, description, reward_free, reward_member, reward_premium, type, task_type, video_url, video_link, pdf_url, action_link, icon_type, target_audience, steps, reward_min, reward_max, reward_info } = data
+        const { title, description, reward_free, reward_member, reward_premium, type, video_url, video_link, pdf_url, action_link, icon_type, target_audience, steps, reward_min, reward_max, reward_info } = data
         const { data: createdTask, error: createTaskError } = await supabaseClient
           .from('tasks')
           .insert({
@@ -127,7 +107,7 @@ serve(async (req: Request): Promise<Response> => {
             reward_min: reward_min,
             reward_max: reward_max,
             reward_info: reward_info,
-            task_type: task_type || type || 'Daily',
+            category: type,
             icon_type: icon_type || 'group',
             pdf_url,
             action_link,
@@ -241,8 +221,8 @@ serve(async (req: Request): Promise<Response> => {
         if (clientsError) throw clientsError
 
         if (!clients || clients.length === 0) {
-          result = []
-          break
+            result = []
+            break
         }
 
         // 2. Fetch User Details manually using user_id (reliable) instead of join on account_id
@@ -262,7 +242,7 @@ serve(async (req: Request): Promise<Response> => {
           const user = clientUsersMap.get(c.user_id) || null
           // Polyfill mobile if needed
           if (user && !user.mobile_number && user.phone) {
-            user.mobile_number = user.phone
+              user.mobile_number = user.phone
           }
           return {
             ...c,
@@ -279,7 +259,7 @@ serve(async (req: Request): Promise<Response> => {
 
       case 'get-client-details':
         const { clientId } = data // This is actually the kyc_id from the URL
-
+        
         // 1. Fetch KYC record
         const { data: kycRecord, error: kycError } = await supabaseClient
           .from('user_kyc')
@@ -295,7 +275,7 @@ serve(async (req: Request): Promise<Response> => {
           .select('*')
           .eq('id', kycRecord.user_id)
           .single()
-
+          
         if (userDetailsError) throw userDetailsError
 
 
@@ -379,7 +359,6 @@ serve(async (req: Request): Promise<Response> => {
           throw new Error('Invalid reward amount. Cannot create transaction with zero or negative amount.')
         }
 
-        // 1. Create Transaction
         const { data: transaction, error: transactionError } = await supabaseClient
           .from('transactions')
           .insert({
@@ -387,7 +366,7 @@ serve(async (req: Request): Promise<Response> => {
             title: taskTitle,
             sub_title: 'Task reward',
             amount: rewardAmount,
-            type: 'task_earning', // Changed from 'reward' to 'task_earning'
+            type: 'reward',
             status: 'completed',
             icon_type: taskIcon
           })
@@ -395,68 +374,15 @@ serve(async (req: Request): Promise<Response> => {
           .single()
 
         if (transactionError) {
-          // Rollback
-          await supabaseClient.from('user_tasks').update({ status: 'completed' }).eq('id', userTaskId)
+          // Rollback the approval if transaction creation fails
+          await supabaseClient
+            .from('user_tasks')
+            .update({ status: 'completed' })
+            .eq('id', userTaskId)
           throw new Error(`Failed to create transaction: ${transactionError.message}`)
         }
 
-        // 2. Update Wallet Balance
-        // We use an RPC or direct update. Since there's no concurrency lock here, direct update might be race-condition prone if high volume, 
-        // but for admin approval it's likely fine. Ideally use an RPC 'increment_wallet' but direct update is faster to implement now.
-        const { data: wallet, error: walletError } = await supabaseClient
-          .from('wallets')
-          .select('balance, total_earnings')
-          .eq('user_id', userTask.user_id)
-          .single()
-
-        let newBalance = rewardAmount
-        let newTotal = rewardAmount
-
-        if (wallet) {
-          newBalance = Number(wallet.balance) + Number(rewardAmount)
-          newTotal = Number(wallet.total_earnings) + Number(rewardAmount)
-
-          await supabaseClient
-            .from('wallets')
-            .update({
-              balance: newBalance,
-              total_earnings: newTotal,
-              updated_at: new Date().toISOString()
-            })
-            .eq('user_id', userTask.user_id)
-        } else {
-          // Create wallet if not exists
-          await supabaseClient
-            .from('wallets')
-            .insert({
-              user_id: userTask.user_id,
-              balance: newBalance,
-              total_earnings: newTotal
-            })
-        }
-
-        // 3. Update Daily Earnings
-        // Upsert logic for (user_id, date)
-        const today = new Date().toISOString().split('T')[0]
-
-        const { data: daily, error: dailyFetchError } = await supabaseClient
-          .from('daily_earnings')
-          .select('amount')
-          .eq('user_id', userTask.user_id)
-          .eq('date', today)
-          .maybeSingle()
-
-        const newDailyAmount = daily ? Number(daily.amount) + Number(rewardAmount) : Number(rewardAmount)
-
-        await supabaseClient
-          .from('daily_earnings')
-          .upsert({
-            user_id: userTask.user_id,
-            date: today,
-            amount: newDailyAmount,
-            updated_at: new Date().toISOString()
-          }, { onConflict: 'user_id,date' })
-
+        if (!transaction) throw new Error('Transaction creation returned no data')
 
         result = { approvedTask, transaction }
         break;
@@ -480,7 +406,7 @@ serve(async (req: Request): Promise<Response> => {
           .from('user_tasks')
           .update({
             status: 'rejected',
-            submission_data: rejectReason
+            submission_data: rejectReason 
               ? { ...(taskToReject.submission_data || {}), rejection_reason: rejectReason }
               : taskToReject.submission_data,
             updated_at: new Date().toISOString()
@@ -506,10 +432,10 @@ serve(async (req: Request): Promise<Response> => {
 
   } catch (error: any) {
     console.error('Admin API Error:', error)
-    const statusCode = error.message?.includes('Unauthorized') ? 401
-      : error.message?.includes('not found') ? 404
-        : 400
-    return new Response(JSON.stringify({
+    const statusCode = error.message?.includes('Unauthorized') ? 401 
+      : error.message?.includes('not found') ? 404 
+      : 400
+    return new Response(JSON.stringify({ 
       error: error.message || 'An error occurred',
       stack: Deno.env.get('DENO_ENV') === 'development' ? error.stack : undefined
     }), {

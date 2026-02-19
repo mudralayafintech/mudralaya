@@ -32,7 +32,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${inter.variable} ${outfit.variable} antialiased`}
+        className={`${roboto.variable} ${montserrat.variable} antialiased`}
         suppressHydrationWarning={true}
       >
         <AuthProvider>
