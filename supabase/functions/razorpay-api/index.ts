@@ -305,8 +305,9 @@ serve(async (req: Request): Promise<Response> => {
         }
 
         // 3. Update User Membership
+        let userWasNewMember = false;
         try {
-          await supabaseClient
+          const { data: updatedUser } = await supabaseClient
             .from('users')
             .update({
               membership_type: isYearly ? 'yearly' : 'monthly',
@@ -314,9 +315,37 @@ serve(async (req: Request): Promise<Response> => {
               membership_start_date: istStartString, // Track when this specific purchase starts
               updated_at: new Date().toISOString()
             })
-            .eq('id', userId);
+            .eq('id', userId)
+            .select('id')
+            .single();
+
+          if (updatedUser) {
+            userWasNewMember = true;
+          }
         } catch (e) {
           console.error('User Membership Update Exception:', e);
+        }
+
+        // 4. Joining Bonus: ₹250 Wallet Credit (Only if it's not a stacked plan, meaning they are joining freshly)
+        if (!isStacked) {
+          try {
+            console.log(`Adding ₹250 membership joining bonus for user: ${userId}`);
+            await supabaseClient
+              .from('transactions')
+              .insert({
+                user_id: userId,
+                title: 'Membership Joining Bonus',
+                sub_title: 'Early member bonus',
+                amount: 250,
+                type: 'reward',
+                status: 'completed',
+                icon_type: 'gift',
+                updated_at: new Date().toISOString()
+              });
+          } catch (bonusError) {
+            console.error("Failed to add joining bonus:", bonusError);
+            // Do not throw here, as the main membership transaction already succeeded
+          }
         }
 
         console.log("Razorpay API Handler V19.1 - Time: 2026-02-02 14:30");
