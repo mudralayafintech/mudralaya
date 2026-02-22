@@ -160,9 +160,9 @@ export default function Membership() {
         console.error("Order Creation Failed:", orderRes.status, orderData);
         throw new Error(
           orderData.error ||
-            orderData.message ||
-            JSON.stringify(orderData) ||
-            "Failed to create order",
+          orderData.message ||
+          JSON.stringify(orderData) ||
+          "Failed to create order",
         );
       }
 
@@ -174,9 +174,8 @@ export default function Membership() {
         amount: orderData.amount,
         currency: orderData.currency,
         name: "Mudralaya Fintech Private Limited",
-        description: `${
-          billingCycle === "yearly" ? "Yearly" : "Monthly"
-        } Membership`,
+        description: `${billingCycle === "yearly" ? "Yearly" : "Monthly"
+          } Membership`,
         image: "/logo.png",
         order_id: orderData.id,
         handler: async function (response: any) {
@@ -254,10 +253,19 @@ export default function Membership() {
       return;
     }
 
-    if (couponCode.toUpperCase() === "MFONEYEAR") {
+    const code = couponCode.toUpperCase();
+    if (code === "MFONEYEAR") {
       setDiscountApplied(true);
-      setFinalPrice(99); // 95% off 2499
-      alert("Coupon Applied! You check price update at bottom.");
+      setFinalPrice(99);
+    } else if (code === "YEARLY499") {
+      setDiscountApplied(true);
+      setFinalPrice(499);
+    } else if (code === "YEARLY999") {
+      setDiscountApplied(true);
+      setFinalPrice(999);
+    } else if (code === "YEARLY1499") {
+      setDiscountApplied(true);
+      setFinalPrice(1499);
     } else {
       setCouponError("Invalid Coupon Code");
     }
@@ -278,7 +286,8 @@ export default function Membership() {
     setFinalPrice(billingCycle === "yearly" ? 2499 : 99);
   }, [billingCycle]);
 
-  const price = discountApplied ? 99 : billingCycle === "yearly" ? 2499 : 99;
+  // Using finalPrice state directly for amount since it tracks the applied coupon accurately
+  const price = finalPrice;
   const period = billingCycle === "yearly" ? "Year" : "30 Days";
 
   // Helper to parse expiry (handling potential formats)
@@ -377,17 +386,15 @@ export default function Membership() {
 
         <div className={styles.planToggle}>
           <button
-            className={`${styles.toggleOption} ${
-              billingCycle === "yearly" ? styles.active : ""
-            }`}
+            className={`${styles.toggleOption} ${billingCycle === "yearly" ? styles.active : ""
+              }`}
             onClick={() => setBillingCycle("yearly")}
           >
             Yearly
           </button>
           <button
-            className={`${styles.toggleOption} ${
-              billingCycle === "monthly" ? styles.active : ""
-            }`}
+            className={`${styles.toggleOption} ${billingCycle === "monthly" ? styles.active : ""
+              }`}
             onClick={() => setBillingCycle("monthly")}
           >
             Monthly
@@ -471,9 +478,9 @@ export default function Membership() {
                 <span className={styles.value}>
                   {expiryDate
                     ? expiryDate.toLocaleDateString("en-US", {
-                        month: "2-digit",
-                        year: "2-digit",
-                      })
+                      month: "2-digit",
+                      year: "2-digit",
+                    })
                     : "MM/YY"}
                 </span>
               </div>

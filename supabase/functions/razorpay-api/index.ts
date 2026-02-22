@@ -47,21 +47,29 @@ serve(async (req: Request): Promise<Response> => {
       let finalAmount = amount;
 
       // VALIDATE COUPON
-      if (couponCode?.toUpperCase() === 'MFONEYEAR') {
+      const code = couponCode?.toUpperCase();
+      if (code) {
         if (planType !== 'yearly') {
           return new Response(JSON.stringify({ error: "Coupon valid only for Yearly plan" }), {
             headers: { ...corsHeaders, 'Content-Type': 'application/json' },
             status: 400,
           });
         }
-        // Server-side price enforcement
-        // 90% discount on 999 = 99.9 -> 99
-        finalAmount = 99;
-      } else if (couponCode) {
-        return new Response(JSON.stringify({ error: "Invalid Coupon Code" }), {
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          status: 400,
-        });
+
+        if (code === 'MFONEYEAR') {
+          finalAmount = 99;
+        } else if (code === 'YEARLY499') {
+          finalAmount = 499;
+        } else if (code === 'YEARLY999') {
+          finalAmount = 999;
+        } else if (code === 'YEARLY1499') {
+          finalAmount = 1499;
+        } else {
+          return new Response(JSON.stringify({ error: "Invalid Coupon Code" }), {
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+            status: 400,
+          });
+        }
       } else {
         // Standard Price Validation
         // If no coupon, ensure amount matches standard prices (basic security)
