@@ -13,7 +13,10 @@ export async function adminApiRequest(action: string, data: any = {}) {
 
   const { data: res, error } = await supabase.functions.invoke("admin-api", {
     body: { action, data },
-    headers: adminToken ? { "x-admin-password": adminToken } : undefined,
+    headers: {
+      "Authorization": `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`,
+      ...(adminToken ? { "x-admin-password": adminToken } : {})
+    },
   });
 
   if (error) {
