@@ -9,10 +9,12 @@
 }
 
 .title {
-  font-size: 3.5rem;
+  font-size: var(--font-size-4xl);
   font-weight: 800;
   margin-bottom: 1rem;
   color: #0f172a;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
 }
 
 .accent {
@@ -228,7 +230,7 @@
   }
 
   .title {
-    font-size: 2.5rem;
+    font-size: var(--font-size-3xl);
   }
 
   .card {

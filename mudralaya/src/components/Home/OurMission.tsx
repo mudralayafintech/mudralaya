@@ -7,16 +7,15 @@ import {
     MapPin,
     ShieldAlert,
     TrendingUp,
-    AlertTriangle,
     CheckCircle2,
     XCircle,
-    Users,
     ChevronLeft,
     ChevronRight,
     GraduationCap,
     Home,
     Briefcase
 } from "lucide-react";
+import Link from "next/link";
 import styles from "./OurMission.module.css";
 
 const focusItems = [
@@ -47,19 +46,22 @@ const partners = [
         icon: <GraduationCap size={40} />,
         title: "Students",
         text: "We train students based on their skills and real company requirements, giving them practical work exposure from early college life. Graduate with experience, skills, and a strong resume — not just a degree.",
-        highlight: "Practical Work Exposure"
+        highlight: "Read More",
+        link: "/financial-courses-for-students"
     },
     {
         icon: <Home size={40} />,
         title: "Educated Housewives",
         text: "Flexible work-from-home or location-based opportunities that enable financial independence while managing personal responsibilities.",
-        highlight: "Financial Independence"
+        highlight: "Read More",
+        link: "/financial-independence-for-women"
     },
     {
         icon: <Briefcase size={40} />,
         title: "Educated Unemployed Youth",
         text: "Structured earning and career growth without the need to migrate to metro cities. Build a career from your hometown, with flexible work earning platform India.",
-        highlight: "Career From Hometown"
+        highlight: "Read More",
+        link: "/financial-entrepreneurship-platform"
     }
 ];
 
@@ -206,9 +208,15 @@ const OurMission = () => {
                                         <div className={styles.partnerContent}>
                                             <h3>{partners[currentIndex].title}</h3>
                                             <p className={styles.partnerText}>{partners[currentIndex].text}</p>
-                                            <span className={styles.partnerHighlight}>
-                                                {partners[currentIndex].highlight}
-                                            </span>
+                                            {partners[currentIndex].link ? (
+                                                <Link href={partners[currentIndex].link!} className={styles.partnerHighlight}>
+                                                    {partners[currentIndex].highlight}
+                                                </Link>
+                                            ) : (
+                                                <span className={styles.partnerHighlight}>
+                                                    {partners[currentIndex].highlight}
+                                                </span>
+                                            )}
                                         </div>
                                     </motion.div>
                                 </AnimatePresence>

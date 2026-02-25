@@ -16,9 +16,11 @@
 }
 
 .heroTitle {
-  font-size: 4rem;
+  font-size: var(--font-size-4xl);
   font-weight: 800;
   margin-bottom: 1.5rem;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
 }
 
 .accent {
@@ -75,8 +77,9 @@
 }
 
 .sectionHeader h2 {
-  font-size: 3rem;
+  font-size: var(--font-size-3xl);
   margin-bottom: 1.5rem;
+  letter-spacing: -0.02em;
 }
 
 .sectionHeader p {
@@ -132,8 +135,10 @@
 }
 
 .sideTitle {
-  font-size: 3rem;
+  font-size: var(--font-size-3xl);
   margin-bottom: 1.5rem;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
 }
 
 .sideDesc {

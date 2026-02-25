@@ -9,7 +9,6 @@ import { Menu, X } from "lucide-react";
 import { useUI } from "@/context/UIContext";
 import { useAuth } from "@/context/AuthContext";
 import styles from "./Header.module.css";
-import FAQ from "../FAQ/FAQ";
 
 const Header = () => {
   const [scrolled, setScrolled] = useState(false);
@@ -34,7 +33,16 @@ const Header = () => {
   const navLinks = [
     { name: "Home", href: "/" },
     { name: "About Us", href: "/about" },
-    { name: "What We Do", href: "/what-we-do" },
+    {
+      name: "What We Do",
+      href: "/what-we-do",
+      dropdown: [
+        { name: "Financial Courses for Students", href: "/financial-courses-for-students" },
+        { name: "Financial Independence for Women", href: "/financial-independence-for-women" },
+        { name: "Financial Entrepreneurship Platform", href: "/financial-entrepreneurship-platform" },
+        { name: "Fintech Financial Services in India", href: "/fintech-financial-services-in-India" },
+      ],
+    },
     { name: "Career", href: "/career" },
     { name: "FAQ", href: "/faq" },
     { name: "Contact Us", href: "/contact" },
@@ -51,8 +59,8 @@ const Header = () => {
             <Image
               src="/images/mudralya_logo.webp"
               alt="Mudralaya"
-              width={160}
-              height={40}
+              width={280}
+              height={68}
               className={styles.logoImg}
               priority
             />
@@ -61,7 +69,7 @@ const Header = () => {
           {/* Desktop Nav */}
           <ul className={styles.navLinks}>
             {navLinks.map((link) => (
-              <li key={link.href}>
+              <li key={link.href} className={link.dropdown ? styles.navItemDropdown : ""}>
                 <Link
                   href={link.href}
                   className={`${styles.navLink} ${pathname === link.href ? styles.active : ""
@@ -75,6 +83,21 @@ const Header = () => {
                     />
                   )}
                 </Link>
+                {link.dropdown && (
+                  <div className={styles.dropdown}>
+                    <div className={styles.dropdownInner}>
+                      {link.dropdown.map((item) => (
+                        <Link
+                          key={item.href}
+                          href={item.href}
+                          className={`${styles.dropdownLink} ${pathname === item.href ? styles.dropdownLinkActive : ""}`}
+                        >
+                          {item.name}
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </li>
             ))}
             <li className={styles.authItem}>

@@ -53,8 +53,9 @@
 }
 
 .header h2 {
-  font-size: 1.75rem;
+  font-size: var(--font-size-2xl);
   margin-bottom: 0.5rem;
+  letter-spacing: -0.01em;
 }
 
 .header p {
@@ -142,8 +143,9 @@
 }
 
 .successView h2 {
-  font-size: 1.75rem;
+  font-size: var(--font-size-2xl);
   margin-bottom: 1rem;
+  letter-spacing: -0.01em;
 }
 
 .successView p {
@@ -199,18 +201,20 @@
 }
 
 .upsellTitle {
-  font-size: 2rem;
+  font-size: var(--font-size-2xl);
   font-weight: 800;
   margin-bottom: 1rem;
   line-height: 1.2;
+  letter-spacing: -0.02em;
 }
 
 .upsellPrice {
-  font-size: 3.5rem;
+  font-size: var(--font-size-4xl);
   font-weight: 800;
   color: var(--primary);
   margin-bottom: 1.5rem;
   display: block;
+  letter-spacing: -0.03em;
 }
 
 .upsellDesc {

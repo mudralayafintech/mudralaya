@@ -66,11 +66,12 @@
 }
 
 .headline {
-  font-size: clamp(2.5rem, 5vw, 4.5rem);
+  font-size: var(--font-size-4xl);
   font-weight: 800;
-  line-height: 1.1;
+  line-height: 1.05;
   margin-bottom: 2rem;
   color: white;
+  letter-spacing: -0.03em;
 }
 
 .gradientText {

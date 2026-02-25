@@ -34,11 +34,11 @@
 }
 
 .title {
-  font-size: 3.5rem;
+  font-size: var(--font-size-3xl);
   font-weight: 800;
   color: #0f172a;
-  /* Slate-900 */
   line-height: 1.1;
+  letter-spacing: -0.03em;
 }
 
 .highlight {

@@ -1,15 +1,18 @@
 import type { Metadata } from "next";
-import { Montserrat, Roboto } from "next/font/google"; // Optimized fonts
+import { Inter, Plus_Jakarta_Sans } from "next/font/google"; // Optimized fonts
 import "./globals.css";
 
-const roboto = Roboto({
+const inter = Inter({
   subsets: ["latin"],
-  weight: ["300", "400", "500", "700"],
-  variable: "--font-roboto"
+  weight: ["300", "400", "500", "600", "700"],
+  variable: "--font-inter",
+  display: "swap",
 });
-const montserrat = Montserrat({
+const plusJakartaSans = Plus_Jakarta_Sans({
   subsets: ["latin"],
-  variable: "--font-montserrat"
+  weight: ["400", "500", "600", "700", "800"],
+  variable: "--font-jakarta",
+  display: "swap",
 });
 import { AuthProvider } from "@/context/AuthContext";
 import { UIProvider } from "@/context/UIContext";
@@ -30,9 +33,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className={`${inter.variable} ${plusJakartaSans.variable}`}>
       <body
-        className={`${roboto.variable} ${montserrat.variable} antialiased`}
+        className="antialiased"
         suppressHydrationWarning={true}
       >
         <AuthProvider>

@@ -16,13 +16,14 @@
 }
 
 .title {
-    font-size: 3.5rem;
+    font-size: var(--font-size-4xl);
     font-weight: 800;
     margin-bottom: 1.5rem;
     background: var(--gradient-text);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    line-height: 1.2;
+    line-height: 1.1;
+    letter-spacing: -0.03em;
 }
 
 .lastUpdated {
@@ -46,13 +47,14 @@
 }
 
 .sectionTitle {
-    font-size: 1.75rem;
+    font-size: var(--font-size-2xl);
     font-weight: 700;
     margin-bottom: 1.5rem;
     color: var(--foreground);
     display: flex;
     align-items: baseline;
     gap: 1rem;
+    letter-spacing: -0.01em;
 }
 
 .sectionNumber {

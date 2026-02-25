@@ -13,10 +13,12 @@
 }
 
 .title {
-    font-size: 3rem;
+    font-size: var(--font-size-3xl);
     font-weight: 800;
     margin-bottom: 1rem;
     color: var(--foreground);
+    letter-spacing: -0.02em;
+    line-height: 1.2;
 }
 
 .accent {

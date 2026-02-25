@@ -1,0 +1,573 @@
+/* =========================================================
+   Financial Independence for Women – CSS Module
+   ========================================================= */
+
+.page {
+  background: var(--background);
+}
+
+/* ─── Hero ─── */
+.hero {
+  position: relative;
+  padding: 9rem 0 6rem;
+  background-color: #0f172a;
+  color: white;
+  overflow: hidden;
+}
+
+.orb1 {
+  position: absolute;
+  top: -10%;
+  right: -5%;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(219, 39, 119, 0.15) 0%, transparent 70%);
+  filter: blur(80px);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.orb2 {
+  position: absolute;
+  bottom: -5%;
+  left: -10%;
+  width: 700px;
+  height: 700px;
+  background: radial-gradient(circle, rgba(37, 99, 235, 0.12) 0%, transparent 70%);
+  filter: blur(100px);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.heroGrid {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 4rem;
+  align-items: center;
+  position: relative;
+  z-index: 2;
+}
+
+.heroContent {
+  display: flex;
+  flex-direction: column;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.55rem 1.2rem;
+  background: rgba(255, 255, 255, 0.06);
+  color: #f9a8d4;
+  border-radius: var(--radius-full);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  margin-bottom: 2rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  width: fit-content;
+}
+
+.badgeIcon {
+  flex-shrink: 0;
+}
+
+.heroTitle {
+  font-size: clamp(2.2rem, 4.5vw, 3.8rem);
+  font-weight: 800;
+  line-height: 1.15;
+  color: white;
+  margin-bottom: 1.5rem;
+}
+
+.gradientText {
+  background: linear-gradient(135deg, #f472b6 0%, #ec4899 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: inline-block;
+  position: relative;
+}
+
+.gradientText::after {
+  content: "";
+  position: absolute;
+  bottom: 0.12em;
+  left: 0;
+  width: 100%;
+  height: 0.22em;
+  background: #ec4899;
+  opacity: 0.15;
+  z-index: -1;
+  border-radius: var(--radius-sm);
+}
+
+.heroDesc {
+  font-size: 1.05rem;
+  color: rgba(255, 255, 255, 0.65);
+  line-height: 1.75;
+  margin-bottom: 2.5rem;
+}
+
+.heroDesc strong {
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 600;
+}
+
+.heroActions {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.primaryBtn {
+  background: linear-gradient(135deg, #db2777 0%, #be185d 100%);
+  color: white;
+  padding: 1rem 2.2rem;
+  border-radius: var(--radius-lg);
+  font-weight: 700;
+  font-size: 1rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 20px rgba(219, 39, 119, 0.4);
+}
+
+.primaryBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(219, 39, 119, 0.5);
+}
+
+.heroImageWrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.heroImg {
+  width: 100%;
+  height: auto;
+  border-radius: var(--radius-2xl);
+  box-shadow: var(--shadow-2xl);
+  object-fit: cover;
+}
+
+/* ─── Shared Section Helpers ─── */
+.sectionTitle {
+  font-size: clamp(1.8rem, 3vw, 2.8rem);
+  font-weight: 800;
+  line-height: 1.2;
+  color: var(--foreground);
+  margin-bottom: 1rem;
+}
+
+.accent {
+  background: linear-gradient(135deg, #db2777 0%, #9333ea 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: inline-block;
+  position: relative;
+}
+
+.accent::after {
+  content: "";
+  position: absolute;
+  bottom: 0.1em;
+  left: 0;
+  width: 100%;
+  height: 0.2em;
+  background: #db2777;
+  opacity: 0.12;
+  z-index: -1;
+  border-radius: var(--radius-sm);
+}
+
+.sectionSub {
+  font-size: 1.05rem;
+  color: var(--secondary);
+  line-height: 1.7;
+  margin-bottom: 2.5rem;
+}
+
+.sectionHeader {
+  text-align: center;
+  max-width: 720px;
+  margin: 0 auto 3.5rem;
+}
+
+/* ─── Why It Matters ─── */
+.whySection {
+  padding: 5.5rem 0;
+  background: var(--gradient-surface);
+}
+
+.twoCol {
+  display: grid;
+  grid-template-columns: 1fr 1.1fr;
+  gap: 5rem;
+  align-items: center;
+}
+
+.whyImageWrapper {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.whyImg {
+  width: 100%;
+  height: auto;
+  border-radius: var(--radius-2xl);
+  box-shadow: var(--shadow-xl);
+  object-fit: cover;
+}
+
+.impactCard {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.9rem 1.4rem;
+  background: white;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  font-size: 0.875rem;
+  color: var(--foreground);
+  border: 1px solid rgba(219, 39, 119, 0.1);
+}
+
+.impactIcon {
+  color: #db2777;
+  flex-shrink: 0;
+}
+
+.whyContent {
+  display: flex;
+  flex-direction: column;
+}
+
+.challengeList {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.challengeItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.9rem;
+  background: white;
+  padding: 1rem 1.3rem;
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  box-shadow: var(--shadow-sm);
+  font-size: 0.975rem;
+  font-weight: 500;
+  color: var(--foreground);
+  line-height: 1.5;
+  transition: all 0.25s ease;
+}
+
+.challengeItem:hover {
+  transform: translateX(4px);
+  box-shadow: var(--shadow);
+  border-color: rgba(219, 39, 119, 0.12);
+}
+
+.challengeIcon {
+  flex-shrink: 0;
+  color: #e11d48;
+  margin-top: 2px;
+}
+
+/* ─── Building Blocks ─── */
+.blocksSection {
+  padding: 5.5rem 0;
+  background: #f8fafc;
+}
+
+.blocksGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1.5rem;
+}
+
+.blockCard {
+  background: white;
+  padding: 1.6rem;
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  box-shadow: var(--shadow);
+  display: flex;
+  align-items: flex-start;
+  gap: 1.1rem;
+  transition: all 0.3s ease;
+}
+
+.blockCard:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+  border-color: rgba(219, 39, 119, 0.12);
+}
+
+.blockIconBox {
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  background: rgba(219, 39, 119, 0.07);
+  color: #db2777;
+  border-radius: 0.875rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.blockTitle {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--foreground);
+  margin-bottom: 0.3rem;
+}
+
+.blockDesc {
+  font-size: 0.875rem;
+  color: var(--secondary);
+  line-height: 1.55;
+}
+
+/* ─── Myths Section ─── */
+.mythsSection {
+  padding: 5.5rem 0;
+  background: var(--gradient-surface);
+}
+
+.mythsLayout {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 5rem;
+  align-items: start;
+}
+
+.mythsContent {
+  display: flex;
+  flex-direction: column;
+}
+
+.mythCards {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.mythCard {
+  background: white;
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  transition: all 0.25s ease;
+}
+
+.mythCard:hover {
+  box-shadow: var(--shadow);
+  border-color: rgba(219, 39, 119, 0.1);
+}
+
+.mythTop {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 1rem 1.3rem;
+  background: #fff1f2;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.mythX {
+  flex-shrink: 0;
+  color: #e11d48;
+  margin-top: 2px;
+}
+
+.mythText {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #be123c;
+  font-style: italic;
+  line-height: 1.4;
+}
+
+.mythBottom {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 1rem 1.3rem;
+}
+
+.mythCheck {
+  flex-shrink: 0;
+  color: #16a34a;
+  margin-top: 2px;
+}
+
+.realityText {
+  font-size: 0.9rem;
+  color: var(--foreground);
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+.mythsImageWrapper {
+  display: flex;
+  justify-content: center;
+  position: sticky;
+  top: 5rem;
+}
+
+.mythsImg {
+  width: 100%;
+  height: auto;
+  border-radius: var(--radius-2xl);
+  box-shadow: var(--shadow-xl);
+  object-fit: cover;
+}
+
+/* ─── CTA ─── */
+.cta {
+  position: relative;
+  padding: 6rem 0;
+  background: linear-gradient(135deg, #0f172a 0%, #4a044e 60%, #0f172a 100%);
+  color: white;
+  overflow: hidden;
+  text-align: center;
+}
+
+.ctaOrb {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 800px;
+  height: 500px;
+  background: radial-gradient(ellipse, rgba(219, 39, 119, 0.2) 0%, transparent 70%);
+  filter: blur(60px);
+  pointer-events: none;
+}
+
+.ctaInner {
+  position: relative;
+  z-index: 2;
+  max-width: 680px;
+  margin: 0 auto;
+}
+
+.ctaIconRow {
+  margin-bottom: 1.5rem;
+}
+
+.ctaIcon {
+  color: #f9a8d4;
+}
+
+.ctaTitle {
+  font-size: clamp(1.8rem, 3.5vw, 3rem);
+  font-weight: 800;
+  line-height: 1.2;
+  margin-bottom: 1.5rem;
+  color: white;
+}
+
+.ctaAccent {
+  background: linear-gradient(135deg, #f472b6 0%, #c084fc 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: inline-block;
+}
+
+.ctaDesc {
+  font-size: 1.1rem;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.7;
+  margin-bottom: 1rem;
+}
+
+.ctaTagline {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #f9a8d4;
+  margin-bottom: 2.5rem;
+  font-style: italic;
+}
+
+.ctaActions {
+  display: flex;
+  justify-content: center;
+}
+
+.ctaBtn {
+  background: linear-gradient(135deg, #db2777 0%, #9333ea 100%);
+  color: white;
+  padding: 1.1rem 2.6rem;
+  border-radius: var(--radius-lg);
+  font-weight: 700;
+  font-size: 1.05rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 20px rgba(219, 39, 119, 0.45);
+}
+
+.ctaBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(219, 39, 119, 0.55);
+}
+
+/* ─── Responsive ─── */
+@media (max-width: 1024px) {
+  .heroGrid {
+    grid-template-columns: 1fr;
+    gap: 3rem;
+  }
+
+  .twoCol {
+    grid-template-columns: 1fr;
+    gap: 3rem;
+  }
+
+  .mythsLayout {
+    grid-template-columns: 1fr;
+    gap: 3rem;
+  }
+
+  .whyImageWrapper {
+    order: -1;
+  }
+
+  .mythsImageWrapper {
+    position: static;
+    order: -1;
+  }
+}
+
+@media (max-width: 768px) {
+  .hero {
+    padding: 7rem 0 4rem;
+  }
+
+  .blocksGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .sectionTitle {
+    font-size: var(--font-size-2xl);
+  }
+
+  .ctaTitle {
+    font-size: var(--font-size-2xl);
+  }
+}

@@ -16,10 +16,11 @@
 }
 
 .heroTitle {
-  font-size: 4rem;
+  font-size: var(--font-size-4xl);
   font-weight: 800;
   line-height: 1.1;
   margin-bottom: 1.5rem;
+  letter-spacing: -0.03em;
 }
 
 .accent {
@@ -93,8 +94,9 @@
 }
 
 .sectionTitle {
-  font-size: 3rem;
+  font-size: var(--font-size-3xl);
   margin-bottom: 1rem;
+  letter-spacing: -0.02em;
 }
 
 .sectionSubtitle {
@@ -216,8 +218,10 @@
 }
 
 .sideTitle {
-  font-size: 3rem;
+  font-size: var(--font-size-3xl);
   margin-bottom: 1.5rem;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
 }
 
 .sideDesc {
@@ -267,7 +271,7 @@
   }
 
   .heroTitle {
-    font-size: 3rem;
+    font-size: var(--font-size-3xl);
   }
   .heroActions,
   .heroDesc {
