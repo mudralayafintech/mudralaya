@@ -284,9 +284,8 @@ export default function Profile() {
       <div className={styles.glassCard}>
         {message.text && (
           <div
-            className={`${styles.messageBanner} ${
-              styles[message.type as keyof typeof styles]
-            }`}
+            className={`${styles.messageBanner} ${styles[message.type as keyof typeof styles]
+              }`}
           >
             {message.text}
           </div>
@@ -341,9 +340,14 @@ export default function Profile() {
                   <button
                     className={styles.btnSave}
                     onClick={handleSave}
-                    disabled={otpSent}
+                    disabled={loading || otpSent}
                   >
-                    <Save size={18} /> Save
+                    {loading ? (
+                      <Loader2 size={18} className="animate-spin" />
+                    ) : (
+                      <Save size={18} />
+                    )}{" "}
+                    Save
                   </button>
                   <button
                     className={styles.btnCancel}

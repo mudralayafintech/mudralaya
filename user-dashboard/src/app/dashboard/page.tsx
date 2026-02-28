@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { createClient } from "@/utils/supabase/client";
 import Skeleton from "@/components/ui/Skeleton";
 import {
@@ -53,6 +54,7 @@ export default function DashboardHome() {
   const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
 
   const supabase = createClient();
+  const router = useRouter();
 
   const fetchDashboardData = async () => {
     const {
@@ -362,8 +364,16 @@ export default function DashboardHome() {
                   </div>
                 </div>
                 <div className={styles.taskActionsRow}>
-                  <button className={styles.btnViewDetails}>Resume Task</button>
-                  <button className={styles.btnCopyCode}>
+                  <button
+                    className={styles.btnViewDetails}
+                    onClick={() => router.push("/dashboard/tasks")}
+                  >
+                    Resume Task
+                  </button>
+                  <button
+                    className={styles.btnCopyCode}
+                    onClick={() => router.push("/dashboard/tasks")}
+                  >
                     <span>Claim Reward</span>
                     <HandCoins size={14} />
                   </button>
@@ -399,8 +409,8 @@ export default function DashboardHome() {
                   <div className={styles.taskItemLeft}>
                     <div
                       className={`${styles.taskIconCircle} ${index % 2 === 0
-                          ? styles.blueGradient
-                          : styles.purpleGradient
+                        ? styles.blueGradient
+                        : styles.purpleGradient
                         }`}
                     >
                       {getIcon(task.icon_type)}

@@ -458,6 +458,11 @@ export default function Wallet() {
             <button
               className={styles.payoutBtn}
               disabled={walletData.stats.approved < 500}
+              onClick={() =>
+                alert(
+                  "Payout requests are processed manually by our team. Please contact support with your request and bank details."
+                )
+              }
             >
               Proceed to Payout
             </button>

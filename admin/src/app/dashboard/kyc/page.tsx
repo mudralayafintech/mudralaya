@@ -136,15 +136,7 @@ export default function KYCPage() {
       setActionLoading(true);
       const { error } = await supabase
         .from("user_kyc")
-        .update({
-          status,
-          rejection_reason: reason || null, // Ensure column name matches schema if added, schema didn't show it but plan did.
-          // Wait, migration 20260110_create_kyc_schema.sql DID NOT have rejection_reason.
-          // I should probably check if column exists or add it.
-          // For now, let's assume valid fields only: `status`.
-          // If status is rejected, maybe we just set status.
-          // I will stick to status only if I can't modify schema right now.
-        })
+        .update({ status })
         .eq("id", id);
 
       if (error) throw error;

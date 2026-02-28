@@ -616,7 +616,7 @@ export default function Membership() {
                 borderRadius: "8px",
               }}
             >
-              <span>✅</span> Coupon Applied! Yearly plan is now ₹99.
+              <span>✅</span> Coupon Applied! Yearly plan is now ₹{finalPrice}.
             </div>
           )}
         </div>

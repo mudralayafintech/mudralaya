@@ -428,9 +428,13 @@ export default function TasksPage() {
         return (
           new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
         );
-      } else if (sortOption === "reward") {
+      } else if (sortOption === "reward_high") {
         return (
           (b.reward_free || b.reward || 0) - (a.reward_free || a.reward || 0)
+        );
+      } else if (sortOption === "reward_low") {
+        return (
+          (a.reward_free || a.reward || 0) - (b.reward_free || b.reward || 0)
         );
       }
       return 0;
@@ -461,9 +465,8 @@ export default function TasksPage() {
           </button>
 
           <div
-            className={`${styles.filtersSidebar} ${
-              isFiltersOpen ? styles.mobileVisible : styles.mobileHidden
-            }`}
+            className={`${styles.filtersSidebar} ${isFiltersOpen ? styles.mobileVisible : styles.mobileHidden
+              }`}
           >
             <div
               className="d-flex justify-content-between align-items-center mb-4"
@@ -570,7 +573,7 @@ export default function TasksPage() {
             >
               {/* Daily Task Button */}
               <button
-                onClick={() => setActiveTaskType("Daily")}
+                onClick={() => { setActiveTaskType("Daily"); setActiveTab("All Task"); }}
                 style={{
                   padding: "10px 24px",
                   borderRadius: "8px",
@@ -590,7 +593,7 @@ export default function TasksPage() {
 
               {/* Dedicated Task Button */}
               <button
-                onClick={() => setActiveTaskType("Dedicated")}
+                onClick={() => { setActiveTaskType("Dedicated"); setActiveTab("All Task"); }}
                 style={{
                   padding: "10px 24px",
                   borderRadius: "8px",
@@ -804,12 +807,11 @@ export default function TasksPage() {
 
                     <div className="mt-3" style={{ marginTop: "16px" }}>
                       <button
-                        className={`${styles.btnTakeTask} ${
-                          task.status === "approved" ||
-                          task.status === "rejected"
+                        className={`${styles.btnTakeTask} ${task.status === "approved" ||
+                            task.status === "rejected"
                             ? styles.btnDisabled
                             : ""
-                        }`}
+                          }`}
                         onClick={() => handleSmartAction(task)}
                         disabled={
                           task.status === "approved" ||
@@ -818,12 +820,12 @@ export default function TasksPage() {
                         style={{
                           opacity:
                             task.status === "approved" ||
-                            task.status === "rejected"
+                              task.status === "rejected"
                               ? 0.6
                               : 1,
                           cursor:
                             task.status === "approved" ||
-                            task.status === "rejected"
+                              task.status === "rejected"
                               ? "not-allowed"
                               : "pointer",
                         }}
