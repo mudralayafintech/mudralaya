@@ -11,6 +11,16 @@ import Link from "next/link";
 
 export default function DashboardPage() {
   const { data, loading, refresh } = useAdminData();
+  const router = import("next/navigation").then(m => m.useRouter);
+
+  React.useEffect(() => {
+    if (typeof window !== "undefined") {
+      const role = localStorage.getItem("adminRole");
+      if (role === "blogger") {
+        window.location.href = "/dashboard/blogs";
+      }
+    }
+  }, []);
 
   const formatDate = (value: string) => {
     if (!value) return "-";
@@ -41,8 +51,8 @@ export default function DashboardPage() {
       format: (val: string) => (
         <span
           className={`px-2 py-1 rounded-md text-xs font-bold uppercase tracking-wider ${val === "Paid"
-              ? "bg-emerald-100 text-emerald-700"
-              : "bg-amber-100 text-amber-700"
+            ? "bg-emerald-100 text-emerald-700"
+            : "bg-amber-100 text-amber-700"
             }`}
         >
           {val || "Pending"}

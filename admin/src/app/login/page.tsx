@@ -32,10 +32,15 @@ export default function LoginPage() {
       // If the API returns { token: "..." }, use res.token.
       // If the API returns the token string directly, use res.
       const token = res?.token || res;
+      const role = res?.role || 'super_admin';
+      const returnedUsername = res?.username || 'Super Admin';
 
       if (token && typeof token === "string") {
         localStorage.setItem("adminToken", token);
-        console.log("Logged in successfully");
+        localStorage.setItem("adminRole", role);
+        localStorage.setItem("adminUsername", returnedUsername);
+
+        console.log("Logged in successfully as", role);
         router.push("/dashboard");
       } else {
         throw new Error("Invalid response from server");

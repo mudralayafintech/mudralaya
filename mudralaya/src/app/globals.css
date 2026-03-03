@@ -9,8 +9,8 @@ body {
 }
 
 :root {
-  --font-primary: var(--font-roboto), system-ui, -apple-system, sans-serif;
-  --font-heading: var(--font-montserrat), sans-serif;
+  --font-primary: var(--font-inter), system-ui, -apple-system, sans-serif;
+  --font-heading: var(--font-playfair), serif;
 
   /* Heading Effect Variables */
   --heading-accent-color: var(--primary);

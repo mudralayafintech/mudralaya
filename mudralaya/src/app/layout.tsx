@@ -1,15 +1,17 @@
 import type { Metadata } from "next";
-import { Montserrat, Roboto } from "next/font/google"; // Optimized fonts
+import { Inter, Playfair_Display } from "next/font/google"; // Optimized fonts
 import "./globals.css";
 
-const roboto = Roboto({
+const inter = Inter({
   subsets: ["latin"],
-  weight: ["300", "400", "500", "700"],
-  variable: "--font-roboto"
+  variable: "--font-inter",
+  display: "swap",
 });
-const montserrat = Montserrat({
+
+const playfair = Playfair_Display({
   subsets: ["latin"],
-  variable: "--font-montserrat"
+  variable: "--font-playfair",
+  display: "swap",
 });
 import { AuthProvider } from "@/context/AuthContext";
 import { UIProvider } from "@/context/UIContext";
@@ -32,7 +34,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${roboto.variable} ${montserrat.variable} antialiased`}
+        className={`${inter.variable} ${playfair.variable} antialiased`}
         suppressHydrationWarning={true}
       >
         <AuthProvider>
