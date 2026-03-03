@@ -45,14 +45,27 @@ export default function Login() {
     }
 
     try {
-      const { error } = await supabase.auth.signInWithOtp({
-        phone: formattedPhone,
+      // Add a 10 second timeout
+      const timeoutPromise = new Promise<{ error: Error }>((_, reject) => {
+        setTimeout(() => reject(new Error("Connection to server timed out. Please check your internet or VPN.")), 10000);
       });
+
+      const { error } = await Promise.race([
+        supabase.auth.signInWithOtp({
+          phone: formattedPhone,
+        }),
+        timeoutPromise
+      ]);
+
       if (error) throw error;
       setPhone(formattedPhone); // Update state to correct format for verification
       setStep("otp");
-    } catch (err) {
-      setError((err as Error).message);
+    } catch (err: any) {
+      if (err.message.includes("fetch") || err.message.includes("timed out")) {
+        setError("Network error: Unable to connect to the server. Please check your internet connection.");
+      } else {
+        setError(err.message || "An unexpected error occurred.");
+      }
     } finally {
       setLoading(false);
     }
@@ -63,11 +76,20 @@ export default function Login() {
     setLoading(true);
     setError(null);
     try {
-      const { error } = await supabase.auth.verifyOtp({
-        phone: phone,
-        token: otp,
-        type: "sms",
+      // Add a 10 second timeout
+      const timeoutPromise = new Promise<{ error: Error }>((_, reject) => {
+        setTimeout(() => reject(new Error("Connection to server timed out. Please check your internet or VPN.")), 10000);
       });
+
+      const { error } = await Promise.race([
+        supabase.auth.verifyOtp({
+          phone: phone,
+          token: otp,
+          type: "sms",
+        }),
+        timeoutPromise
+      ]);
+
       if (error) throw error;
 
       // Verification Successful
@@ -78,8 +100,12 @@ export default function Login() {
         router.push("/dashboard");
         router.refresh();
       }, 1500);
-    } catch (err) {
-      setError((err as Error).message);
+    } catch (err: any) {
+      if (err.message.includes("fetch") || err.message.includes("timed out")) {
+        setError("Network error: Unable to connect to the server. Please check your internet connection.");
+      } else {
+        setError(err.message || "An unexpected error occurred.");
+      }
       setLoading(false); // Only stop loading if error, otherwise keep it loading/verified state
     }
   };
@@ -100,14 +126,27 @@ export default function Login() {
     setLoading(true);
     setError(null);
     try {
-      const { error } = await supabase.auth.signInWithOtp({
-        phone: phone,
+      // Add a 10 second timeout
+      const timeoutPromise = new Promise<{ error: Error }>((_, reject) => {
+        setTimeout(() => reject(new Error("Connection to server timed out. Please check your internet or VPN.")), 10000);
       });
+
+      const { error } = await Promise.race([
+        supabase.auth.signInWithOtp({
+          phone: phone,
+        }),
+        timeoutPromise
+      ]);
+
       if (error) throw error;
       setTimer(60);
       setResendAttempts((prev) => prev + 1);
-    } catch (err) {
-      setError((err as Error).message);
+    } catch (err: any) {
+      if (err.message.includes("fetch") || err.message.includes("timed out")) {
+        setError("Network error: Unable to connect to the server. Please check your internet connection.");
+      } else {
+        setError(err.message || "An unexpected error occurred.");
+      }
     } finally {
       setLoading(false);
     }

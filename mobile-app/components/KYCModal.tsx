@@ -21,6 +21,7 @@ import {
 } from "lucide-react-native";
 import * as DocumentPicker from "expo-document-picker";
 import * as ImagePicker from "expo-image-picker";
+import { useRouter } from "expo-router";
 import { supabase } from "@/lib/supabase";
 import { useTheme } from "@/lib/ThemeContext";
 
@@ -40,6 +41,7 @@ export default function KYCModal({
   status,
 }: KYCModalProps) {
   const { theme } = useTheme();
+  const router = useRouter();
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [documents, setDocuments] = useState<{
@@ -391,6 +393,23 @@ export default function KYCModal({
           {renderContent()}
 
           {(!status || status === "rejected") && (
+            <View style={{ paddingHorizontal: 20, paddingTop: 10 }}>
+              <Text style={{ fontSize: 11, color: subTextColor, textAlign: 'center' }}>
+                Your documents are securely processed and used solely for identity verification in accordance with our{" "}
+                <Text
+                  style={{ color: "#3b82f6", fontWeight: '600' }}
+                  onPress={() => {
+                    onClose();
+                    router.push("/(drawer)/privacy-policy");
+                  }}
+                >
+                  Privacy Policy
+                </Text>.
+              </Text>
+            </View>
+          )}
+
+          {(!status || status === "rejected") && (
             <View style={[styles.footer, { borderTopColor: borderColor }]}>
               {step === 2 && (
                 <TouchableOpacity
@@ -407,7 +426,7 @@ export default function KYCModal({
                   style={[
                     styles.nextBtn,
                     (!documents.pan || !documents.adhaar || !documents.bank) &&
-                      styles.disabledBtn,
+                    styles.disabledBtn,
                   ]}
                   onPress={() => setStep(2)}
                   disabled={

@@ -30,6 +30,7 @@ import {
   Sun,
   Monitor,
   Palette,
+  ShieldCheck,
 } from "lucide-react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { DrawerActions } from "@react-navigation/native";
@@ -715,6 +716,56 @@ export default function Settings() {
           </View>
         );
 
+      case "legal":
+        return (
+          <View style={styles.sectionContainer}>
+            <Text style={[styles.sectionTitle, { color: textColor }]}>Legal & Support</Text>
+            <Text style={[styles.toggleDesc, { marginBottom: 20 }]}>
+              Important documents and company information.
+            </Text>
+
+            <View style={styles.legalLinks}>
+              <TouchableOpacity
+                style={[styles.legalItem, { backgroundColor: cardBg, borderColor }]}
+                onPress={() => router.push("/(drawer)/privacy-policy")}
+              >
+                <View style={styles.legalIconWrapper}>
+                  <ShieldCheck size={20} color="#4F46E5" />
+                  <Text style={[styles.legalLabel, { color: textColor }]}>Privacy Policy</Text>
+                </View>
+                <ChevronRight size={20} color={subTextColor} />
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[styles.legalItem, { backgroundColor: cardBg, borderColor }]}
+                onPress={() => router.push("/(drawer)/terms-conditions")}
+              >
+                <View style={styles.legalIconWrapper}>
+                  <FileText size={20} color="#4F46E5" />
+                  <Text style={[styles.legalLabel, { color: textColor }]}>Terms & Conditions</Text>
+                </View>
+                <ChevronRight size={20} color={subTextColor} />
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[styles.legalItem, { backgroundColor: cardBg, borderColor }]}
+                onPress={() => router.push("/(drawer)/about-us")}
+              >
+                <View style={styles.legalIconWrapper}>
+                  <HelpCircle size={20} color="#4F46E5" />
+                  <Text style={[styles.legalLabel, { color: textColor }]}>About & Contact Us</Text>
+                </View>
+                <ChevronRight size={20} color={subTextColor} />
+              </TouchableOpacity>
+            </View>
+
+            <View style={[styles.versionInfo, { marginTop: 30, alignItems: 'center' }]}>
+              <Text style={{ color: subTextColor, fontSize: 12 }}>Mudralaya v1.0.0</Text>
+              <Text style={{ color: subTextColor, fontSize: 10, marginTop: 4 }}>© 2026 Mudralaya Fintech Private Limited</Text>
+            </View>
+          </View>
+        );
+
       default:
         return <View />;
     }
@@ -814,7 +865,9 @@ export default function Settings() {
             >
               {[
                 { id: "account", label: "Account", icon: User },
+                { id: "notifications", label: "Notifications", icon: Bell },
                 { id: "appearance", label: "Appearance", icon: Palette },
+                { id: "legal", label: "Legal", icon: FileText },
               ].map((tab: any) => (
                 <TouchableOpacity
                   key={tab.id}
@@ -823,16 +876,16 @@ export default function Settings() {
                     activeTab === tab.id && styles.activeTab,
                     activeTab === tab.id
                       ? {
-                          backgroundColor: isDark ? "#4F46E5" : "#1e293b",
-                        }
+                        backgroundColor: isDark ? "#4F46E5" : "#1e293b",
+                      }
                       : {
-                          backgroundColor: isDark
-                            ? "rgba(30, 41, 59, 0.5)"
-                            : "#f1f5f9",
-                          borderColor: isDark
-                            ? "rgba(255,255,255,0.1)"
-                            : "#e2e8f0",
-                        },
+                        backgroundColor: isDark
+                          ? "rgba(30, 41, 59, 0.5)"
+                          : "#f1f5f9",
+                        borderColor: isDark
+                          ? "rgba(255,255,255,0.1)"
+                          : "#e2e8f0",
+                      },
                   ]}
                   onPress={() => setActiveTab(tab.id)}
                 >
@@ -1264,6 +1317,31 @@ const styles = StyleSheet.create({
     width: 6,
     height: 6,
     borderRadius: 3,
+  },
+  legalLinks: {
+    gap: 12,
+  },
+  legalItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    padding: 16,
+    borderRadius: 16,
+    borderWidth: 1,
+  },
+  legalIconWrapper: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+  },
+  legalLabel: {
+    fontSize: 15,
+    fontWeight: "600",
+  },
+  versionInfo: {
+    marginTop: 30,
+    alignItems: 'center',
+    marginBottom: 20,
   },
   scrollContent: {
     paddingBottom: 40,
