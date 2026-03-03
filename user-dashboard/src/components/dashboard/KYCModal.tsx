@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useCallback } from "react";
 import Webcam from "react-webcam";
-import { X, Upload, Camera, CheckCircle, AlertCircle } from "lucide-react";
+import { X, Upload, Camera, CheckCircle } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
 import styles from "./kyc-modal.module.css";
 
@@ -97,7 +97,7 @@ const KYCModal: React.FC<KYCModalProps> = ({
 
       // 2. Call Edge Function (or direct insert if easier, but plan said Edge Function)
       // Since we established the edge function logic, let's call it.
-      const { data: funcData, error: funcError } =
+      const { error: funcError } =
         await supabase.functions.invoke("kyc-api", {
           body: {
             action: "submit-kyc",
@@ -116,9 +116,9 @@ const KYCModal: React.FC<KYCModalProps> = ({
       alert("KYC Submitted Successfully!");
       onSuccess();
       onClose();
-    } catch (error: any) {
+    } catch (error) {
       console.error("KYC Submit Error:", error);
-      alert(`Submission failed: ${error.message}`);
+      alert(`Submission failed: ${(error as Error).message}`);
     } finally {
       setLoading(false);
     }
@@ -228,6 +228,7 @@ const KYCModal: React.FC<KYCModalProps> = ({
               <label className={styles.stepLabel}>4. Live Selfie</label>
               <div className={styles.cameraBox}>
                 {documents.selfie ? (
+                  /* eslint-disable-next-line @next/next/no-img-element */
                   <img
                     src={documents.selfie}
                     alt="Selfie"

@@ -49,6 +49,7 @@ export default function DashboardHome() {
     stats: { approved: 0, pending: 0, total: 0, today: 0, monthly: 0 },
   });
   const [loading, setLoading] = useState(true);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [profile, setProfile] = useState<any>(null);
   const [joiningTaskId, setJoiningTaskId] = useState<string | null>(null);
   const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
@@ -101,6 +102,7 @@ export default function DashboardHome() {
       setData({
         tasks,
         ongoingTask,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         stats: stats as any,
       });
     } catch (err) {
@@ -112,6 +114,7 @@ export default function DashboardHome() {
 
   useEffect(() => {
     fetchDashboardData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleStartTask = async (task: Task) => {
@@ -134,6 +137,7 @@ export default function DashboardHome() {
         let errorMessage = error.message;
         try {
           if (error && typeof error === "object" && "context" in error) {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const json = await (error as any).context.json();
             if (json.error) errorMessage = json.error;
           }
@@ -144,9 +148,9 @@ export default function DashboardHome() {
       }
 
       await fetchDashboardData();
-    } catch (err: any) {
+    } catch (err) {
       console.error("Failed to start task:", err);
-      alert(`Failed to join task: ${err.message}`);
+      alert(`Failed to join task: ${(err as Error).message}`);
     } finally {
       setJoiningTaskId(null);
     }
@@ -264,7 +268,7 @@ export default function DashboardHome() {
       <div className={styles.statsGrid}>
         <div className={styles.statCard}>
           <div className={styles.statHeader}>
-            <h3>Today's Earning</h3>
+            <h3>Today&apos;s Earning</h3>
             <span>:</span>
           </div>
           <div className={styles.statContent}>

@@ -38,8 +38,8 @@ const LoginModal = () => {
 
       setStep(2);
       setSuccessMessage(`OTP sent to +91 ${mobileNumber}`);
-    } catch (err: any) {
-      setError(err.message || "Failed to send OTP. Please try again.");
+    } catch (err) {
+      setError((err as Error).message || "Failed to send OTP. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -52,7 +52,6 @@ const LoginModal = () => {
 
     try {
       const {
-        data: { session },
         error: verifyError,
       } = await supabase.auth.verifyOtp({
         phone: `+91${mobileNumber}`,
@@ -69,8 +68,8 @@ const LoginModal = () => {
           process.env.NEXT_PUBLIC_DASHBOARD_URL || "https://user.mudralaya.com";
         window.location.href = dashboardUrl;
       }, 1500);
-    } catch (err: any) {
-      setError(err.message || "Invalid OTP. Please try again.");
+    } catch (err) {
+      setError((err as Error).message || "Invalid OTP. Please try again.");
     } finally {
       setLoading(false);
     }

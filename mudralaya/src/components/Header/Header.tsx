@@ -6,15 +6,13 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X } from "lucide-react";
-import { useUI } from "@/context/UIContext";
 import { useAuth } from "@/context/AuthContext";
 import styles from "./Header.module.css";
-import FAQ from "../FAQ/FAQ";
 
 const Header = () => {
   const [scrolled, setScrolled] = useState(false);
   const [isNavOpen, setIsNavOpen] = useState(false);
-  const { openLoginModal } = useUI();
+
   const { user } = useAuth();
   const pathname = usePathname();
 
@@ -28,7 +26,10 @@ const Header = () => {
   }, []);
 
   useEffect(() => {
-    setIsNavOpen(false);
+    if (isNavOpen) {
+      setIsNavOpen(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname]);
 
   const navLinks = [

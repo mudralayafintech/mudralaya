@@ -47,12 +47,15 @@ const Blog = () => {
             {/* Hero Grid */}
             <div className={styles.heroGrid}>
                 <div className={styles.heroImageBox}>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src="https://img.freepik.com/free-photo/portrait-businesswoman-sitting-office-with-money-working-making-profit-income-posing-happy_1258-87600.jpg" alt="Hero 1" className={styles.heroImg} />
                 </div>
                 <div className={styles.heroImageBox}>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src="https://img.freepik.com/free-photo/portrait-businesswoman-sitting-office-with-money-working-making-profit-income-posing-happy_1258-87600.jpg" alt="Hero 2" className={styles.heroImg} />
                 </div>
                 <div className={styles.heroImageBox}>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src="https://img.freepik.com/free-photo/portrait-businesswoman-sitting-office-with-money-working-making-profit-income-posing-happy_1258-87600.jpg" alt="Hero 3" className={styles.heroImg} />
                 </div>
             </div>
@@ -74,6 +77,7 @@ const Blog = () => {
                             className={styles.blogCard}
                         >
                             <div className={styles.blogCardImgBox}>
+                                {/* eslint-disable-next-line @next/next/no-img-element */}
                                 <img src={post.image} alt={post.title} className={styles.blogCardImg} />
                             </div>
                             <div className={styles.blogCardContent}>
@@ -102,6 +106,7 @@ const Blog = () => {
                         <h3 className={styles.sidebarTitle}>Find me on Instagram</h3>
                         <div className={styles.instaGrid}>
                             {instaImages.map((img, i) => (
+                                /* eslint-disable-next-line @next/next/no-img-element */
                                 <img key={i} src={img} alt={`instagram-${i}`} className={styles.instaImg} />
                             ))}
                         </div>

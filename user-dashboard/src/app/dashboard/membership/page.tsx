@@ -1,13 +1,14 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { ArrowRight, Crown, Loader2, Sparkles } from "lucide-react";
+import { ArrowRight, Crown, Sparkles } from "lucide-react";
 import Skeleton from "@/components/ui/Skeleton";
 import { createClient } from "@/utils/supabase/client";
 import styles from "./membership.module.css";
 
 declare global {
   interface Window {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     Razorpay: any;
   }
 }
@@ -39,7 +40,9 @@ export default function Membership() {
   const [billingCycle, setBillingCycle] = useState<"yearly" | "monthly">(
     "yearly",
   );
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [profile, setProfile] = useState<any>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const supabase = createClient();
@@ -50,6 +53,7 @@ export default function Membership() {
 
   useEffect(() => {
     fetchProfile();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchProfile = async () => {
@@ -178,6 +182,7 @@ export default function Membership() {
           } Membership`,
         image: "/logo.png",
         order_id: orderData.id,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         handler: async function (response: any) {
           // 3. Verify Payment
           try {
@@ -229,14 +234,15 @@ export default function Membership() {
       };
 
       const rzp1 = new window.Razorpay(options);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       rzp1.on("payment.failed", function (response: any) {
         alert(response.error.description);
       });
       rzp1.open();
-    } catch (err: any) {
+    } catch (err) {
       console.error("Payment Error:", err);
       alert(
-        `Payment initialization failed: ${err.message || JSON.stringify(err)}`,
+        `Payment initialization failed: ${(err as Error).message || JSON.stringify(err)}`,
       );
     }
   };

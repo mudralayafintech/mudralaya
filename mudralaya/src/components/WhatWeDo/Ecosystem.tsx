@@ -38,6 +38,7 @@ const Ecosystem = () => {
     useEffect(() => {
         const timer = setInterval(next, 6000);
         return () => clearInterval(timer);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [index]);
 
     return (

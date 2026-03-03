@@ -18,12 +18,14 @@ import clsx from "clsx";
 interface Column {
   key: string;
   label: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   format?: (value: any, row: any) => React.ReactNode;
 }
 
 interface DataTableProps {
   title: string;
   columns: Column[];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   data: any[];
   onSearch?: (term: string) => void;
   onDelete?: (id: string | number) => void;
@@ -105,16 +107,16 @@ export default function DataTable({
       {/* Detached Header */}
       <div className={styles.header}>
         {title &&
-        ![
-          "Join Partnership Requests",
-          "Contact Inquiries",
-          "Advisor Applications",
-        ].includes(title) ? (
+          ![
+            "Join Partnership Requests",
+            "Contact Inquiries",
+            "Advisor Applications",
+          ].includes(title) ? (
           <h5 className={styles.title}>{title}</h5>
         ) : // Show at least controls if no title is present, but keep alignment
-        title ? (
-          <div />
-        ) : null}
+          title ? (
+            <div />
+          ) : null}
 
         <div className={styles.controls}>
           <div className={styles.searchWrapper}>

@@ -13,7 +13,6 @@ import {
   ChevronDown,
   ChevronUp,
   FileText,
-  Loader2,
   Gem,
   Youtube,
 } from "lucide-react";
@@ -99,6 +98,7 @@ export default function TasksPage() {
     };
 
     fetchTasks();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const toggleExpand = (id: string) => {
@@ -808,9 +808,9 @@ export default function TasksPage() {
                     <div className="mt-3" style={{ marginTop: "16px" }}>
                       <button
                         className={`${styles.btnTakeTask} ${task.status === "approved" ||
-                            task.status === "rejected"
-                            ? styles.btnDisabled
-                            : ""
+                          task.status === "rejected"
+                          ? styles.btnDisabled
+                          : ""
                           }`}
                         onClick={() => handleSmartAction(task)}
                         disabled={

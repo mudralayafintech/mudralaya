@@ -7,10 +7,8 @@ import {
     MapPin,
     ShieldAlert,
     TrendingUp,
-    AlertTriangle,
     CheckCircle2,
     XCircle,
-    Users,
     ChevronLeft,
     ChevronRight,
     GraduationCap,
@@ -77,6 +75,7 @@ const OurMission = () => {
     useEffect(() => {
         const timer = setInterval(nextSlide, 5000);
         return () => clearInterval(timer);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     return (

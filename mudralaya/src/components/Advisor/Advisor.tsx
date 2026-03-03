@@ -1,9 +1,9 @@
 "use client";
 
 import React, { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
-import { X, CheckCircle2, Loader2, Sparkles, ChevronRight } from "lucide-react";
+import { X, CheckCircle2, Loader2, ChevronRight } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import styles from "./Advisor.module.css";
 
@@ -71,6 +71,7 @@ const Advisor = () => {
         <div className={styles.grid}>
           <div className={styles.imageCol}>
             <div className={styles.logo}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src="/images/mudralya_logo.webp" alt="Mudralaya" />
               <span>Mudralaya Fintech</span>
             </div>

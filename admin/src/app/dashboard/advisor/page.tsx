@@ -32,7 +32,7 @@ export default function AdvisorPage() {
     try {
       await adminApiRequest("delete-entry", { type: "advisor", id });
       refresh();
-    } catch (err) {
+    } catch {
       alert("Failed to delete");
     }
   };

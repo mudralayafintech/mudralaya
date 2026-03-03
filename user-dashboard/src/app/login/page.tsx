@@ -51,8 +51,8 @@ export default function Login() {
       if (error) throw error;
       setPhone(formattedPhone); // Update state to correct format for verification
       setStep("otp");
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err) {
+      setError((err as Error).message);
     } finally {
       setLoading(false);
     }
@@ -78,8 +78,8 @@ export default function Login() {
         router.push("/dashboard");
         router.refresh();
       }, 1500);
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err) {
+      setError((err as Error).message);
       setLoading(false); // Only stop loading if error, otherwise keep it loading/verified state
     }
   };
@@ -106,8 +106,8 @@ export default function Login() {
       if (error) throw error;
       setTimer(60);
       setResendAttempts((prev) => prev + 1);
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err) {
+      setError((err as Error).message);
     } finally {
       setLoading(false);
     }

@@ -33,7 +33,7 @@ export default function ContactsPage() {
     try {
       await adminApiRequest("delete-entry", { type: "contact", id });
       refresh();
-    } catch (err) {
+    } catch {
       alert("Failed to delete");
     }
   };

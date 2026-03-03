@@ -5,12 +5,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   X,
   UserPlus,
-  Send,
   Loader2,
   CheckCircle,
   ArrowRight,
-  Briefcase,
-  GraduationCap,
 } from "lucide-react";
 import { useUI } from "@/context/UIContext";
 import { supabase } from "@/lib/supabase";
@@ -138,8 +135,8 @@ const JoinUsModal = () => {
       else {
         setShowUpsell(true);
       }
-    } catch (err: any) {
-      setSubmitError(err.message || "Failed to submit. Please try again.");
+    } catch (err) {
+      setSubmitError((err as Error).message || "Failed to submit. Please try again.");
     } finally {
       setSubmitting(false);
     }
@@ -153,6 +150,7 @@ const JoinUsModal = () => {
   // Helper to load Razorpay dynamically
   const loadRazorpay = (): Promise<boolean> => {
     return new Promise((resolve) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       if ((window as any).Razorpay) {
         resolve(true);
         return;
@@ -203,6 +201,7 @@ const JoinUsModal = () => {
         description: description,
         image: "/images/mudralya_logo.webp", // Ensure logo is passed
         order_id: orderData.id,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         handler: async function (response: any) {
           // 3. Verify Payment
           try {
@@ -228,7 +227,7 @@ const JoinUsModal = () => {
             setShowUpsell(false);
             setShowPaymentScreen(false);
             setSubmitted(true);
-          } catch (err: any) {
+          } catch (err) {
             console.error("Payment Verification Failed", err);
             setSubmitError(
               "Payment verification failed. Please contact support.",
@@ -245,21 +244,25 @@ const JoinUsModal = () => {
         },
       };
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const rzp1 = new (window as any).Razorpay(options);
       rzp1.open();
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       rzp1.on("payment.failed", function (response: any) {
         setSubmitError(`Payment failed: ${response.error.description}`);
       });
-    } catch (err: any) {
+    } catch (err) {
       console.error("Payment Init Failed", err);
       // Try to extract more info if available
-      let errorMsg = err.message || "Failed to initiate payment.";
-      if (err.context && err.context.json) {
+      let errorMsg = (err as Error).message || "Failed to initiate payment.";
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      if ((err as any).context && (err as any).context.json) {
         try {
-          const json = await err.context.json();
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const json = await (err as any).context.json();
           if (json.error) errorMsg = json.error;
-        } catch (e) {
+        } catch {
           /* ignore */
         }
       }

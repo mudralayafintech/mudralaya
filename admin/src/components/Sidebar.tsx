@@ -10,7 +10,6 @@ import {
   Briefcase,
   CheckSquare,
   LogOut,
-  Users,
 } from "lucide-react";
 import styles from "./Sidebar.module.css";
 import clsx from "clsx";

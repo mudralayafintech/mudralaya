@@ -2,7 +2,7 @@
 
 import React from "react";
 import { usePathname } from "next/navigation";
-import { Bell, Search, Settings } from "lucide-react";
+import { Bell, Search } from "lucide-react";
 import styles from "./TopHeader.module.css";
 
 const getPageTitle = (pathname: string) => {

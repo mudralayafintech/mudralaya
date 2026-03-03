@@ -17,7 +17,9 @@ import { createClient } from "@/utils/supabase/client";
 import styles from "./profile.module.css";
 
 export default function Profile() {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [profile, setProfile] = useState<any>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
@@ -42,6 +44,7 @@ export default function Profile() {
 
   useEffect(() => {
     fetchProfile();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchProfile = async () => {
@@ -92,7 +95,7 @@ export default function Profile() {
       const fileName = `${user.id}-${Date.now()}.${fileExt}`;
       const filePath = `${fileName}`;
 
-      let { error: uploadError } = await supabase.storage
+      const { error: uploadError } = await supabase.storage
         .from("profile-images")
         .upload(filePath, file, {
           cacheControl: "3600",
@@ -114,13 +117,14 @@ export default function Profile() {
 
       if (updateError) throw updateError;
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       setProfile((prev: any) => ({ ...prev, avatar_url: publicUrl }));
       setMessage({ type: "success", text: "Profile image updated!" });
-    } catch (error: any) {
+    } catch (error) {
       console.error("Error uploading image:", error);
       setMessage({
         type: "error",
-        text: `Error uploading image: ${error.message || "Unknown error"}`,
+        text: `Error uploading image: ${(error as Error).message || "Unknown error"}`,
       });
     } finally {
       setLoading(false);
@@ -153,8 +157,8 @@ export default function Profile() {
           text: "OTP sent to new phone number. Please verify.",
         });
         return;
-      } catch (err: any) {
-        setMessage({ type: "error", text: err.message });
+      } catch (err) {
+        setMessage({ type: "error", text: (err as Error).message });
         return;
       }
     }
@@ -187,8 +191,8 @@ export default function Profile() {
       });
       setOtpSent(false);
       await updateProfileData();
-    } catch (err: any) {
-      setMessage({ type: "error", text: err.message });
+    } catch (err) {
+      setMessage({ type: "error", text: (err as Error).message });
     } finally {
       setVerifyingOtp(false);
     }
@@ -213,6 +217,7 @@ export default function Profile() {
 
       if (error) throw error;
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       setProfile((prev: any) => ({
         ...prev,
         ...data,
@@ -295,6 +300,7 @@ export default function Profile() {
           {/* Left Column: Avatar & Actions */}
           <div className={styles.profileHeader}>
             <div className={styles.avatarContainer}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={profile?.avatar_url || "https://placehold.co/150"}
                 alt="Profile"

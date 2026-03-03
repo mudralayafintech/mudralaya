@@ -7,6 +7,7 @@ import { Eye, CheckCircle, XCircle, Clock } from "lucide-react";
 import styles from "./clients.module.css";
 
 export default function ClientsPage() {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [data, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -96,7 +97,7 @@ export default function ClientsPage() {
 
         {/* Data Rows */}
         <div>
-          {data.map((row: any) => (
+          {data.map((row) => (
             <div key={row.id} className={styles.gridRow}>
               {/* Client Info */}
               <div className={styles.cellClient}>

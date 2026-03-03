@@ -40,9 +40,9 @@ export default function LoginPage() {
       } else {
         throw new Error("Invalid response from server");
       }
-    } catch (err: any) {
+    } catch (err) {
       console.error("Login failed:", err);
-      setError(err.message || "Login failed. Please check your credentials.");
+      setError((err as Error).message || "Login failed. Please check your credentials.");
     } finally {
       setLoading(false);
     }

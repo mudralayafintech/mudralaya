@@ -6,7 +6,6 @@ import Link from "next/link";
 import {
   Target,
   Eye,
-  Rocket,
   Users,
   HandHelping,
   GraduationCap,
@@ -14,7 +13,7 @@ import {
   Briefcase,
   Zap,
   Laptop,
-  Building2, 
+  Building2,
   Settings,
 } from "lucide-react";
 import { useUI } from "@/context/UIContext";
@@ -41,13 +40,13 @@ const AboutUs = () => {
                 Empowering Financial Simplicity Through AI.
               </h2>
               <p className={styles.heroText}>
-               Mudralaya is a partner-based earning ecosystem that bridges the gap between B2B companies and verified local partners (workers).
-               Mudralaya Fintech creates safe, transparent, and structured earning opportunities for individuals—especially in Tier 2 & Tier 3 cities—where genuine income options are limited.
-               We are not a task app.
-               <br />
-               We are not cheap labour.
-               <br />
-               We are a trusted growth platform for earning + skill development + career building.
+                Mudralaya is a partner-based earning ecosystem that bridges the gap between B2B companies and verified local partners (workers).
+                Mudralaya Fintech creates safe, transparent, and structured earning opportunities for individuals—especially in Tier 2 & Tier 3 cities—where genuine income options are limited.
+                We are not a task app.
+                <br />
+                We are not cheap labour.
+                <br />
+                We are a trusted growth platform for earning + skill development + career building.
 
               </p>
               <div className={styles.heroActions}>
@@ -67,6 +66,7 @@ const AboutUs = () => {
               animate={{ opacity: 1, scale: 1 }}
               className={styles.heroImageWrapper}
             >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src="/images/about-us.png"
                 alt="About Mudralaya"
@@ -117,6 +117,7 @@ const AboutUs = () => {
         <div className="container">
           <div className={styles.grid2}>
             <div className={styles.illustrationCol}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src="/images/what-we-do.png"
                 alt="What We Do"
@@ -148,14 +149,14 @@ const AboutUs = () => {
                   <Store className={styles.benefitIcon} />
                   <span>Dedicated Salaried Partners</span>
                 </div>
-                 <div className={styles.benefitItem}>
-                   <Building2 className={styles.benefitIcon} />
+                <div className={styles.benefitItem}>
+                  <Building2 className={styles.benefitIcon} />
                   <span>Kiosk / Franchise Business Partners</span>
-                 </div>
-                    <div className={styles.benefitItem}>
-                      <Settings className={styles.benefitIcon} />
-                      <span>Resource & Operational Partners</span>
-                    </div>
+                </div>
+                <div className={styles.benefitItem}>
+                  <Settings className={styles.benefitIcon} />
+                  <span>Resource & Operational Partners</span>
+                </div>
               </div>
             </div>
           </div>
@@ -178,6 +179,7 @@ const AboutUs = () => {
               </p>
             </div>
             <div className={styles.illustrationCol}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src="/images/vision.png"
                 alt="Our Vision"

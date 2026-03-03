@@ -7,6 +7,7 @@ import styles from "./plans.module.css";
 
 declare global {
   interface Window {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     Razorpay: any;
   }
 }
@@ -25,8 +26,10 @@ interface Plan {
 }
 
 export default function Plans() {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [profile, setProfile] = useState<any>(null);
   const [hasLaptop, setHasLaptop] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [user, setUser] = useState<any>(null);
 
   const [loading, setLoading] = useState(true);
@@ -35,6 +38,7 @@ export default function Plans() {
 
   useEffect(() => {
     fetchProfile();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchProfile = async () => {
@@ -105,9 +109,7 @@ export default function Plans() {
               : 0;
 
         // Get session for auth headers
-        const {
-          data: { session },
-        } = await supabase.auth.getSession();
+        await supabase.auth.getSession();
 
         const orderRes = await fetch(
           `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/razorpay-api`,
@@ -146,12 +148,11 @@ export default function Plans() {
           description: `Purchase ${plan.name} Plan`,
           image: "/logo.png",
           order_id: orderData.id,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           handler: async function (response: any) {
             try {
               // 3. Verify Payment
-              const {
-                data: { session: verifySession },
-              } = await supabase.auth.getSession();
+              await supabase.auth.getSession();
 
               const verifyRes = await fetch(
                 `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/razorpay-api`,
@@ -185,9 +186,9 @@ export default function Plans() {
               alert("Plan purchased successfully! Welcome to Individual Plan.");
               // reload to refresh profile
               window.location.reload();
-            } catch (err: any) {
+            } catch (err) {
               console.error("Verification Error:", err);
-              alert(`Verification failed: ${err.message}`);
+              alert(`Verification failed: ${(err as Error).message}`);
             }
           },
           prefill: {
@@ -201,15 +202,16 @@ export default function Plans() {
         };
 
         const rzp1 = new window.Razorpay(options);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         rzp1.on("payment.failed", function (response: any) {
           alert(response.error.description);
           setPaymentProcessing(false);
         });
         rzp1.open();
-      } catch (err: any) {
+      } catch (err) {
         console.error("Payment Error:", err);
         alert(
-          `Payment initialization failed: ${err.message || JSON.stringify(err)}`,
+          `Payment initialization failed: ${(err as Error).message || JSON.stringify(err)}`,
         );
         setPaymentProcessing(false);
       }

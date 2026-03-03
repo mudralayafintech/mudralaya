@@ -2,6 +2,7 @@ import { createClient } from "@/utils/supabase/client";
 
 const supabase = createClient();
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function adminApiRequest(action: string, data: any = {}) {
   const adminToken = typeof window !== "undefined" ? localStorage.getItem("adminToken") : null;
 
@@ -28,6 +29,7 @@ export async function adminApiRequest(action: string, data: any = {}) {
 
     // Check if error has context with response body
     if (error instanceof Error) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const errorAny = error as any;
 
       // Check context property (Supabase FunctionsHttpError format)
@@ -43,6 +45,7 @@ export async function adminApiRequest(action: string, data: any = {}) {
         } else if (context && typeof context === 'object') {
           // Check if it has Response-like properties (status, ok, etc.)
           // Response objects have status as a property but it might not be enumerable
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           if (context instanceof Response || ('status' in context && typeof (context as any).status === 'number')) {
             response = context as Response;
             statusCode = response.status || statusCode;
@@ -73,7 +76,7 @@ export async function adminApiRequest(action: string, data: any = {}) {
                   if (body && typeof body === 'object' && body.error) {
                     errorMessage = body.error;
                   }
-                } catch (e) {
+                } catch {
                   // If not JSON, use the text as error message
                   errorMessage = text || errorMessage;
                 }
@@ -89,7 +92,7 @@ export async function adminApiRequest(action: string, data: any = {}) {
                     if (body && typeof body === 'object' && body.error) {
                       errorMessage = body.error;
                     }
-                  } catch (e) {
+                  } catch {
                     errorMessage = text || errorMessage;
                   }
                 }
@@ -122,7 +125,7 @@ export async function adminApiRequest(action: string, data: any = {}) {
             if (body && typeof body === 'object' && body.error) {
               errorMessage = body.error;
             }
-          } catch (e) {
+          } catch {
             // If parsing fails, use the raw body
             if (typeof context.body === 'string') {
               errorMessage = context.body;
@@ -183,6 +186,7 @@ export async function adminApiRequest(action: string, data: any = {}) {
       errorMessage = `${errorMessage}. (Hint: Check DASHBOARD_ADMIN_USER and DASHBOARD_ADMIN_PASS in your Supabase Edge Function Secrets)`;
     }
     const enhancedError = new Error(errorMessage);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (enhancedError as any).status = statusCode;
     throw enhancedError;
   }
