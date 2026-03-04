@@ -244,6 +244,7 @@ serve(async (req: Request): Promise<Response> => {
         if (delType === 'contact') table = 'contact_requests'
         if (delType === 'advisor') table = 'advisor_applications'
         if (delType === 'client') table = 'users'
+        if (delType === 'blog') table = 'blogs'
 
         if (!table) throw new Error('Invalid type')
 

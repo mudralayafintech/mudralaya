@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { Plus, Edit2, Trash2 } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
+import { adminApiRequest } from "@/lib/adminApi";
 import styles from "./blogs.module.css";
 
 interface Blog {
@@ -40,11 +41,11 @@ export default function BlogsPage() {
     const handleDelete = async (id: string) => {
         if (!confirm("Are you sure you want to delete this blog?")) return;
 
-        const { error } = await supabase.from("blogs").delete().eq("id", id);
-        if (error) {
-            alert("Error deleting blog: " + error.message);
-        } else {
+        try {
+            await adminApiRequest("delete-entry", { type: "blog", id });
             setBlogs(blogs.filter((b) => b.id !== id));
+        } catch (error: any) {
+            alert("Error deleting blog: " + error.message);
         }
     };
 
