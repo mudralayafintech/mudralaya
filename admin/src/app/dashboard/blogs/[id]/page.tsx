@@ -1,12 +1,15 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { ArrowLeft, Save, Image as ImageIcon, Loader2 } from "lucide-react";
 import Link from "next/link";
-import { Editor } from "@tinymce/tinymce-react";
+import dynamic from "next/dynamic";
 import { createClient } from "@/utils/supabase/client";
 import styles from "./editor.module.css";
+import "react-quill-new/dist/quill.snow.css";
+
+const ReactQuill = dynamic(() => import("react-quill-new"), { ssr: false });
 
 export default function BlogEditor() {
     const { id } = useParams();
@@ -14,8 +17,22 @@ export default function BlogEditor() {
     const isNew = id === "new";
     const supabase = createClient();
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const editorRef = useRef<any>(null);
+    const quillModules = {
+        toolbar: [
+            [{ header: [1, 2, 3, 4, 5, 6, false] }],
+            ["bold", "italic", "underline", "strike"],
+            [{ color: [] }, { background: [] }],
+            [{ align: [] }],
+            [{ list: "ordered" }, { list: "bullet" }],
+            ["blockquote", "code-block"],
+            ["link", "image", "video"],
+            ["clean"],
+        ],
+    };
+
+    const handleContentChange = useCallback((value: string) => {
+        setFormData((prev) => ({ ...prev, content: value }));
+    }, []);
 
     const [formData, setFormData] = useState({
         title: "",
@@ -128,8 +145,7 @@ export default function BlogEditor() {
         setSaving(true);
         setError("");
 
-        // Get latest content from TinyMCE
-        const finalContent = editorRef.current?.getContent() || formData.content;
+        const finalContent = formData.content;
 
         try {
             const payload = {
@@ -213,42 +229,12 @@ export default function BlogEditor() {
 
                         <div className={styles.formGroup}>
                             <label>Content</label>
-                            <Editor
-                                id="blog-content-editor"
-                                apiKey={process.env.NEXT_PUBLIC_TINYMCE_API_KEY || "tutupwpufkcdiiv20mjt8lfsrq50etopp23qz2prsbchfh3h"}
-                                onInit={(evt, editor) => (editorRef.current = editor)}
-                                initialValue={formData.content}
-                                init={{
-                                    height: 500,
-                                    menubar: true,
-                                    plugins: [
-                                        "advlist",
-                                        "autolink",
-                                        "lists",
-                                        "link",
-                                        "image",
-                                        "charmap",
-                                        "preview",
-                                        "anchor",
-                                        "searchreplace",
-                                        "visualblocks",
-                                        "code",
-                                        "fullscreen",
-                                        "insertdatetime",
-                                        "media",
-                                        "table",
-                                        "code",
-                                        "help",
-                                        "wordcount",
-                                    ],
-                                    toolbar:
-                                        "undo redo | blocks | " +
-                                        "bold italic forecolor | alignleft aligncenter " +
-                                        "alignright alignjustify | bullist numlist outdent indent | " +
-                                        "removeformat | help",
-                                    content_style:
-                                        "body { font-family:Helvetica,Arial,sans-serif; font-size:14px }",
-                                }}
+                            <ReactQuill
+                                theme="snow"
+                                value={formData.content}
+                                onChange={handleContentChange}
+                                modules={quillModules}
+                                style={{ height: "400px", marginBottom: "3rem" }}
                             />
                         </div>
                     </div>
