@@ -47,6 +47,9 @@ export default function BlogEditor() {
         primary_keywords: "",
         secondary_keywords: "",
         tags: "",
+        hashtags: "",
+        category: "",
+        author: "",
     });
 
     const [loading, setLoading] = useState(!isNew);
@@ -77,6 +80,9 @@ export default function BlogEditor() {
                     primary_keywords: data.primary_keywords || "",
                     secondary_keywords: data.secondary_keywords || "",
                     tags: data.tags || "",
+                    hashtags: data.hashtags || "",
+                    category: data.category || "",
+                    author: data.author || "",
                 });
             }
         } catch (err: any) {
@@ -162,6 +168,9 @@ export default function BlogEditor() {
                 primary_keywords: formData.primary_keywords,
                 secondary_keywords: formData.secondary_keywords,
                 tags: formData.tags,
+                hashtags: formData.hashtags,
+                category: formData.category,
+                author: formData.author,
             };
 
             if (isNew) {
@@ -330,6 +339,44 @@ export default function BlogEditor() {
                             )}
                             {saving ? "Saving..." : "Save Blog"}
                         </button>
+                    </div>
+
+                    <div className={styles.card}>
+                        <h3 className={styles.cardTitle}>Author & Category</h3>
+                        <div className={styles.formGroup}>
+                            <label>Author</label>
+                            <input
+                                type="text"
+                                name="author"
+                                value={formData.author}
+                                onChange={handleChange}
+                                placeholder="Author name"
+                                className={styles.input}
+                            />
+                        </div>
+                        <div className={styles.formGroup}>
+                            <label>Category</label>
+                            <input
+                                type="text"
+                                name="category"
+                                value={formData.category}
+                                onChange={handleChange}
+                                placeholder="e.g. Finance, Technology, Education"
+                                className={styles.input}
+                            />
+                        </div>
+                        <div className={styles.formGroup}>
+                            <label>Hashtags</label>
+                            <input
+                                type="text"
+                                name="hashtags"
+                                value={formData.hashtags}
+                                onChange={handleChange}
+                                placeholder="e.g. #fintech #investing #savings"
+                                className={styles.input}
+                            />
+                            <p className={styles.helpText}>Space-separated hashtags for social sharing.</p>
+                        </div>
                     </div>
 
                     <div className={styles.card}>

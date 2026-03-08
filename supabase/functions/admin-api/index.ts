@@ -509,6 +509,9 @@ serve(async (req: Request): Promise<Response> => {
             primary_keywords: data.primary_keywords,
             secondary_keywords: data.secondary_keywords,
             tags: data.tags,
+            hashtags: data.hashtags,
+            category: data.category,
+            author: data.author,
           }])
           .select()
           .single()
@@ -536,6 +539,9 @@ serve(async (req: Request): Promise<Response> => {
             primary_keywords: blogPayload.primary_keywords,
             secondary_keywords: blogPayload.secondary_keywords,
             tags: blogPayload.tags,
+            hashtags: blogPayload.hashtags,
+            category: blogPayload.category,
+            author: blogPayload.author,
             updated_at: new Date().toISOString(),
           })
           .eq('id', updateBlogId)

@@ -276,3 +276,61 @@
     color: white;
     transform: translateY(-2px);
 }
+
+.socialBtn {
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+}
+
+.whatsappBtn {
+    background-color: #25D366 !important;
+    color: white !important;
+}
+
+.whatsappBtn:hover {
+    background-color: #128C7E !important;
+}
+
+/* Category Badge */
+.categoryBadge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255, 255, 255, 0.15);
+    color: rgba(255, 255, 255, 0.9);
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 20px;
+    backdrop-filter: blur(4px);
+}
+
+/* Hashtags Section */
+.hashtagsSection {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 40px;
+    padding-top: 24px;
+    border-top: 1px solid #e2e8f0;
+}
+
+.hashtag {
+    display: inline-block;
+    background: linear-gradient(135deg, #eff6ff, #e0e7ff);
+    color: #3b82f6;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+
+.hashtag:hover {
+    background: linear-gradient(135deg, #dbeafe, #c7d2fe);
+    transform: translateY(-1px);
+}
