@@ -506,6 +506,9 @@ serve(async (req: Request): Promise<Response> => {
             status: data.status,
             seo_title: data.seo_title,
             seo_description: data.seo_description,
+            primary_keywords: data.primary_keywords,
+            secondary_keywords: data.secondary_keywords,
+            tags: data.tags,
           }])
           .select()
           .single()
@@ -530,6 +533,9 @@ serve(async (req: Request): Promise<Response> => {
             status: blogPayload.status,
             seo_title: blogPayload.seo_title,
             seo_description: blogPayload.seo_description,
+            primary_keywords: blogPayload.primary_keywords,
+            secondary_keywords: blogPayload.secondary_keywords,
+            tags: blogPayload.tags,
             updated_at: new Date().toISOString(),
           })
           .eq('id', updateBlogId)

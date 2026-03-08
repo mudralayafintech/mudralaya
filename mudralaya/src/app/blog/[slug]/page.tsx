@@ -19,7 +19,7 @@ export async function generateMetadata(
 
     const { data: blog } = await supabase
         .from("blogs")
-        .select("title, excerpt, cover_image, seo_title, seo_description")
+        .select("title, excerpt, cover_image, seo_title, seo_description, primary_keywords, secondary_keywords")
         .eq("slug", slug)
         .single();
 
@@ -31,9 +31,14 @@ export async function generateMetadata(
 
     const previousImages = (await parent).openGraph?.images || [];
 
+    const allKeywords = [blog.primary_keywords, blog.secondary_keywords]
+        .filter(Boolean)
+        .join(", ");
+
     return {
         title: blog.seo_title || `${blog.title} | Mudralaya Blog`,
         description: blog.seo_description || blog.excerpt,
+        ...(allKeywords ? { keywords: allKeywords } : {}),
         openGraph: {
             title: blog.seo_title || blog.title,
             description: blog.seo_description || blog.excerpt,

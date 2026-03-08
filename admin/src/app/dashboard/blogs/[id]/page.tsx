@@ -44,6 +44,9 @@ export default function BlogEditor() {
         status: "draft",
         seo_title: "",
         seo_description: "",
+        primary_keywords: "",
+        secondary_keywords: "",
+        tags: "",
     });
 
     const [loading, setLoading] = useState(!isNew);
@@ -71,6 +74,9 @@ export default function BlogEditor() {
                     status: data.status || "draft",
                     seo_title: data.seo_title || "",
                     seo_description: data.seo_description || "",
+                    primary_keywords: data.primary_keywords || "",
+                    secondary_keywords: data.secondary_keywords || "",
+                    tags: data.tags || "",
                 });
             }
         } catch (err: any) {
@@ -153,6 +159,9 @@ export default function BlogEditor() {
                 status: formData.status,
                 seo_title: formData.seo_title,
                 seo_description: formData.seo_description,
+                primary_keywords: formData.primary_keywords,
+                secondary_keywords: formData.secondary_keywords,
+                tags: formData.tags,
             };
 
             if (isNew) {
@@ -251,6 +260,42 @@ export default function BlogEditor() {
                                 className={styles.textarea}
                                 rows={3}
                             />
+                        </div>
+                        <div className={styles.formGroup}>
+                            <label>Primary Keywords</label>
+                            <input
+                                type="text"
+                                name="primary_keywords"
+                                value={formData.primary_keywords}
+                                onChange={handleChange}
+                                placeholder="e.g. fintech, investment, mutual funds"
+                                className={styles.input}
+                            />
+                            <p className={styles.helpText}>Comma-separated main keywords for this post.</p>
+                        </div>
+                        <div className={styles.formGroup}>
+                            <label>Secondary Keywords</label>
+                            <input
+                                type="text"
+                                name="secondary_keywords"
+                                value={formData.secondary_keywords}
+                                onChange={handleChange}
+                                placeholder="e.g. money management, financial literacy"
+                                className={styles.input}
+                            />
+                            <p className={styles.helpText}>Comma-separated supporting keywords.</p>
+                        </div>
+                        <div className={styles.formGroup}>
+                            <label>Tags</label>
+                            <input
+                                type="text"
+                                name="tags"
+                                value={formData.tags}
+                                onChange={handleChange}
+                                placeholder="e.g. finance, tips, beginner"
+                                className={styles.input}
+                            />
+                            <p className={styles.helpText}>Comma-separated tags for categorization.</p>
                         </div>
                     </div>
                 </div>
