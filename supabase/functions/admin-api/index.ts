@@ -468,6 +468,79 @@ serve(async (req: Request): Promise<Response> => {
         result = rejectedTask
         break;
 
+      case 'get-blogs': {
+        const { data: allBlogs, error: blogsError } = await supabaseClient
+          .from('blogs')
+          .select('id, title, status, created_at')
+          .order('created_at', { ascending: false })
+
+        if (blogsError) throw blogsError
+        result = allBlogs || []
+        break
+      }
+
+      case 'get-blog': {
+        const { blogId } = data
+        if (!blogId) throw new Error('Blog ID is required')
+
+        const { data: blogData, error: blogError } = await supabaseClient
+          .from('blogs')
+          .select('*')
+          .eq('id', blogId)
+          .single()
+
+        if (blogError) throw blogError
+        result = blogData
+        break
+      }
+
+      case 'create-blog': {
+        const { data: newBlog, error: createBlogError } = await supabaseClient
+          .from('blogs')
+          .insert([{
+            title: data.title,
+            slug: data.slug,
+            excerpt: data.excerpt,
+            content: data.content,
+            cover_image: data.cover_image,
+            status: data.status,
+            seo_title: data.seo_title,
+            seo_description: data.seo_description,
+          }])
+          .select()
+          .single()
+
+        if (createBlogError) throw createBlogError
+        result = newBlog
+        break
+      }
+
+      case 'update-blog': {
+        const { blogId: updateBlogId, ...blogPayload } = data
+        if (!updateBlogId) throw new Error('Blog ID is required')
+
+        const { data: updatedBlog, error: updateBlogError } = await supabaseClient
+          .from('blogs')
+          .update({
+            title: blogPayload.title,
+            slug: blogPayload.slug,
+            excerpt: blogPayload.excerpt,
+            content: blogPayload.content,
+            cover_image: blogPayload.cover_image,
+            status: blogPayload.status,
+            seo_title: blogPayload.seo_title,
+            seo_description: blogPayload.seo_description,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', updateBlogId)
+          .select()
+          .single()
+
+        if (updateBlogError) throw updateBlogError
+        result = updatedBlog
+        break
+      }
+
       default:
         throw new Error('Invalid action')
     }

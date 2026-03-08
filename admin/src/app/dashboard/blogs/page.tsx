@@ -3,7 +3,6 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { Plus, Edit2, Trash2 } from "lucide-react";
-import { createClient } from "@/utils/supabase/client";
 import { adminApiRequest } from "@/lib/adminApi";
 import styles from "./blogs.module.css";
 
@@ -17,7 +16,6 @@ interface Blog {
 export default function BlogsPage() {
     const [blogs, setBlogs] = useState<Blog[]>([]);
     const [loading, setLoading] = useState(true);
-    const supabase = createClient();
 
     useEffect(() => {
         fetchBlogs();
@@ -25,15 +23,11 @@ export default function BlogsPage() {
 
     const fetchBlogs = async () => {
         setLoading(true);
-        const { data, error } = await supabase
-            .from("blogs")
-            .select("id, title, status, created_at")
-            .order("created_at", { ascending: false });
-
-        if (error) {
-            console.error("Error fetching blogs:", error);
-        } else {
+        try {
+            const data = await adminApiRequest("get-blogs");
             setBlogs(data || []);
+        } catch (error) {
+            console.error("Error fetching blogs:", error);
         }
         setLoading(false);
     };

@@ -6,6 +6,7 @@ import { ArrowLeft, Save, Image as ImageIcon, Loader2 } from "lucide-react";
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import { createClient } from "@/utils/supabase/client";
+import { adminApiRequest } from "@/lib/adminApi";
 import styles from "./editor.module.css";
 import "react-quill-new/dist/quill.snow.css";
 
@@ -58,26 +59,23 @@ export default function BlogEditor() {
 
     const fetchBlog = async () => {
         setError("");
-        const { data, error } = await supabase
-            .from("blogs")
-            .select("*")
-            .eq("id", id)
-            .single();
-
-        if (error) {
-            console.error("Error fetching blog:", error);
+        try {
+            const data = await adminApiRequest("get-blog", { blogId: id });
+            if (data) {
+                setFormData({
+                    title: data.title || "",
+                    slug: data.slug || "",
+                    excerpt: data.excerpt || "",
+                    content: data.content || "",
+                    cover_image: data.cover_image || "",
+                    status: data.status || "draft",
+                    seo_title: data.seo_title || "",
+                    seo_description: data.seo_description || "",
+                });
+            }
+        } catch (err: any) {
+            console.error("Error fetching blog:", err);
             setError("Failed to load blog post.");
-        } else if (data) {
-            setFormData({
-                title: data.title || "",
-                slug: data.slug || "",
-                excerpt: data.excerpt || "",
-                content: data.content || "",
-                cover_image: data.cover_image || "",
-                status: data.status || "draft",
-                seo_title: data.seo_title || "",
-                seo_description: data.seo_description || "",
-            });
         }
         setLoading(false);
     };
@@ -145,33 +143,24 @@ export default function BlogEditor() {
         setSaving(true);
         setError("");
 
-        const finalContent = formData.content;
-
         try {
             const payload = {
                 title: formData.title,
                 slug: formData.slug,
                 excerpt: formData.excerpt,
-                content: finalContent,
+                content: formData.content,
                 cover_image: formData.cover_image,
                 status: formData.status,
                 seo_title: formData.seo_title,
                 seo_description: formData.seo_description,
-                updated_at: new Date().toISOString(),
             };
 
             if (isNew) {
-                const { error } = await supabase.from("blogs").insert([payload]);
-                if (error) throw error;
-                router.push("/dashboard/blogs");
+                await adminApiRequest("create-blog", payload);
             } else {
-                const { error } = await supabase
-                    .from("blogs")
-                    .update(payload)
-                    .eq("id", id);
-                if (error) throw error;
-                router.push("/dashboard/blogs");
+                await adminApiRequest("update-blog", { blogId: id, ...payload });
             }
+            router.push("/dashboard/blogs");
         } catch (err: any) {
             console.error("Error saving blog:", err);
             setError(err.message || "Failed to save blog post.");
