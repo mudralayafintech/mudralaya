@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import FinancialEntrepreneurship from "@/components/FinancialEntrepreneurship/FinancialEntrepreneurship";
 
 export const metadata: Metadata = {
-  title: "Financial Entrepreneurship Platform | Launch & Grow with a Financial Entrepreneurship Platform – Mudralaya",
+  title: "Financial Entrepreneurship Platform | Launch & Grow with a Financial Entrepreneurship Platform",
   description:
-    "Turn your ideas into profitable ventures with smart finance at the core. Mudralaya's financial entrepreneurship platform provides integrated tools, funding guidance, growth analytics, and mentorship for Indian entrepreneurs.",
+    "Discover a powerful financial entrepreneurship platform designed to help aspiring entrepreneurs build, manage, and scale finance-driven ventures. Join a trusted financial entrepreneurship platform and accelerate your business growth today.",
   keywords: [
     "financial entrepreneurship platform",
     "entrepreneurship platform India",

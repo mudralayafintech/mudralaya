@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import FinancialCourses from "@/components/FinancialCourses/FinancialCourses";
 
 export const metadata: Metadata = {
-  title: "Financial Courses for Students | Best Financial Courses for Students Online – Mudralaya",
+  title: "Financial Courses for Students | Best Financial Courses for Students Online",
   description:
-    "Master money skills before life throws real bills at you. Practical, beginner-friendly financial courses for students in India. 100% online, self-paced, affordable. Start free today.",
+    "Explore top financial courses for students designed to build strong money management, investment, and career-ready skills. Discover beginner to advanced financial courses for students and start learning today.",
   keywords: [
     "financial courses for students",
     "best financial courses for students online",

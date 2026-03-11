@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import FintechServices from "@/components/FintechServices/FintechServices";
 
 export const metadata: Metadata = {
-  title: "Fintech Financial Services in India | Fintech Investment in India Opportunities – Mudralaya",
+  title: "Fintech Financial Services in India | Fintech Investment in India Opportunities",
   description:
-    "Explore India's fintech revolution – digital payments, lending, insurtech, wealthtech, and investment opportunities. Discover how fintech financial services in India are transforming financial access for crores.",
+    "Explore the growth of fintech financial services in India and discover emerging opportunities in fintech investment in india. Learn how innovation, digital payments, and smart funding models are transforming the Indian financial ecosystem.",
   keywords: [
     "fintech financial services in India",
     "fintech investment in India",

@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import FinancialWomen from "@/components/FinancialWomen/FinancialWomen";
 
 export const metadata: Metadata = {
-  title: "Financial Independence for Women | Women and Financial Independence Guide – Mudralaya",
+  title: "Financial Independence for Women | Women and Financial Independence Guide",
   description:
-    "Your Money, Your Power. Build the financial freedom you deserve. A complete guide on financial independence for women in India – investing, income streams, myth-busting, and more.",
+    "Financial independence for women begins with informed decisions, confident investing, and sustainable income strategies. Explore how women and financial independence create lasting security, leadership, and generational wealth.",
   keywords: [
     "financial independence for women",
     "women and financial independence",

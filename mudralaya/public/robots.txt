@@ -1,14 +1,4 @@
 User-agent: *
-Disallow: /
-
-User-agent: Googlebot
-Disallow: /
-User-agent: Bingbot
-Disallow: /
-User-agent: Mediapartners-Google
-Disallow: /
-User-agent: facebookexternalhit
-Disallow: /
 
 # Important User Agents
 User-agent: Googlebot
@@ -55,3 +45,5 @@ Disallow: */categoryid*
 Disallow: */?mode*
 Disallow: /embedded-form-thank-you-page/
 Disallow: /traderoom-account-registration/
+
+Sitemap: https://www.mudralaya.com/sitemap.xml

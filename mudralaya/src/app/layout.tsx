@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import { Inter, Plus_Jakarta_Sans } from "next/font/google"; // Optimized fonts
 import "./globals.css";
+import LocalBusinessSchema from "@/components/LocalBusinessSchema";
+import OrganizationSchema from "@/components/OrganizationSchema";
+import WebsiteSchema from "@/components/WebsiteSchema";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -22,9 +25,9 @@ import LayoutWrapper from "@/components/LayoutWrapper";
 import { Preconnect } from "@/components/Preconnect";
 
 export const metadata: Metadata = {
-  title: "Mudralaya - Your Financial Gateway",
+  title: "Grow Big with Mudralaya | Mudralaya Financial Services | Start Your Career in Mudralaya",
   description:
-    "Experience premium financial services with Mudralaya. Modern, secure, and user-friendly.",
+    "Grow big with Mudralaya and explore rewarding opportunities at Mudralaya Financial Services. Start your career in Mudralaya today and build a strong future with professional growth and success.",
 };
 
 export default function RootLayout({
@@ -34,6 +37,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${inter.variable} ${plusJakartaSans.variable}`}>
+      <head>
+        <LocalBusinessSchema />
+        <OrganizationSchema />
+        <WebsiteSchema />
+      </head>
       <body
         className="antialiased"
         suppressHydrationWarning={true}
