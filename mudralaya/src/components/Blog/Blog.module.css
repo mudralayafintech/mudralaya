@@ -5,6 +5,7 @@
     color: #1e293b;
     padding-bottom: 0;
     font-family: 'Inter', sans-serif;
+    overflow-x: hidden;
 }
 
 .container {
@@ -355,6 +356,7 @@
 
 .inputField {
     width: 100%;
+    box-sizing: border-box;
     padding: 16px;
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.1);
@@ -403,6 +405,11 @@
 @media (max-width: 1024px) {
     .mainLayout {
         grid-template-columns: 1fr;
+        gap: 32px;
+    }
+
+    .blogContent {
+        gap: 40px;
     }
 
     .featuredPost {
@@ -420,7 +427,7 @@
     }
 
     .pageHeader {
-        padding: 120px 0 20px;
+        padding: 100px 20px 20px;
     }
 
     .featuredContent {
