@@ -95,17 +95,26 @@ export default async function BlogPage({ params }: Props) {
 
     return (
         <article className={styles.articlePage}>
-            {/* Dark Premium Hero Header */}
-            <header className={styles.heroHeader}>
+            {/* Dynamic Full-Bleed Hero Header */}
+            <header
+                className={styles.heroHeader}
+                style={{
+                    backgroundImage: blog.cover_image ? `url(${blog.cover_image})` : "linear-gradient(135deg, #0f172a 0%, #1e293b 100%)"
+                }}
+            >
+                <div className={styles.glassOverlay}></div>
+                
                 <div className={styles.headerContainer}>
                     <Link href="/blog" className={styles.backLink}>
                         <ArrowLeft size={16} /> Back to Journal
                     </Link>
 
                     {blog.category && (
-                        <span className={styles.categoryBadge}>
-                            <FolderOpen size={14} /> {blog.category}
-                        </span>
+                        <div style={{ display: 'flex', justifyContent: 'center' }}>
+                            <span className={styles.categoryBadge}>
+                                <FolderOpen size={14} /> {blog.category}
+                            </span>
+                        </div>
                     )}
 
                     <div className={styles.meta}>
@@ -132,23 +141,15 @@ export default async function BlogPage({ params }: Props) {
                             </>
                         )}
                     </div>
+                    
                     <h1 className={styles.title}>{blog.title}</h1>
+                    
                     {blog.excerpt && <p className={styles.excerpt}>{blog.excerpt}</p>}
                 </div>
             </header>
 
-            {/* Content Wrapper pulled up over the header */}
+            {/* Content Wrapper pulled up over the header like white floating paper */}
             <div className={styles.contentWrapper}>
-                {blog.cover_image && (
-                    <div className={styles.heroImageContainer}>
-                        <img
-                            src={blog.cover_image}
-                            alt={blog.title}
-                            className={styles.heroImage}
-                        />
-                    </div>
-                )}
-
                 <div className={styles.articleBody}>
                     <div
                         className={styles.content}
