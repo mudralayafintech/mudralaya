@@ -8,7 +8,6 @@ import {
   LayoutGrid,
   CreditCard,
   Rocket,
-  CircleDollarSign,
 } from "lucide-react";
 import styles from "./Timeline.module.css";
 
@@ -57,6 +56,32 @@ const timelineItems = [
 
 const pathD =
   "M 0,100 C 125,100 125,180 250,180 S 375,20 500,20 S 625,180 750,180 S 875,20 1000,20";
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const TimelineNode = ({ item, index, progress }: { item: typeof timelineItems[0]; index: number; progress: any }) => {
+  const start = index * 0.25;
+  const activationRange = [start - 0.1, start, start + 0.1];
+  const opacity = useTransform(progress, activationRange, [0.3, 1, 0.3]);
+  const scale = useTransform(progress, activationRange, [0.9, 1.05, 0.9]);
+
+  return (
+    <motion.div
+      className={`${styles.cardNode} ${styles[item.position]}`}
+      style={{
+        opacity,
+        scale,
+        left: item.align,
+      }}
+    >
+      <div className={styles.cardIcon}>{item.icon}</div>
+      <div className={styles.cardContent}>
+        <span className={styles.step}>Step {item.step}</span>
+        <h4>{item.title}</h4>
+        <p>{item.description}</p>
+      </div>
+    </motion.div>
+  );
+};
 
 const Timeline = () => {
   const containerRef = useRef(null);
@@ -113,39 +138,9 @@ const Timeline = () => {
 
           {/* Timeline Cards */}
           <div className={styles.cardsLayout}>
-            {timelineItems.map((item, index) => {
-              const start = index * 0.25;
-              const activationRange = [start - 0.1, start, start + 0.1];
-              const opacity = useTransform(
-                smoothProgress,
-                activationRange,
-                [0.3, 1, 0.3]
-              );
-              const scale = useTransform(
-                smoothProgress,
-                activationRange,
-                [0.9, 1.05, 0.9]
-              );
-
-              return (
-                <motion.div
-                  key={index}
-                  className={`${styles.cardNode} ${styles[item.position]}`}
-                  style={{
-                    opacity,
-                    scale,
-                    left: item.align,
-                  }}
-                >
-                  <div className={styles.cardIcon}>{item.icon}</div>
-                  <div className={styles.cardContent}>
-                    <span className={styles.step}>Step {item.step}</span>
-                    <h4>{item.title}</h4>
-                    <p>{item.description}</p>
-                  </div>
-                </motion.div>
-              );
-            })}
+            {timelineItems.map((item, index) => (
+              <TimelineNode key={index} item={item} index={index} progress={smoothProgress} />
+            ))}
           </div>
         </div>
       </div>

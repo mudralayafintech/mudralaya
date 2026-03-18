@@ -1,12 +1,11 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import { adminApiRequest } from "@/lib/adminApi";
 import {
   ArrowLeft,
   Check,
-  X,
   ExternalLink,
   CheckCircle,
   XCircle,
@@ -17,9 +16,9 @@ import styles from "./client-details.module.css";
 
 export default function ClientDetailsPage() {
   const params = useParams();
-  const router = useRouter();
   const clientId = params.id as string;
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [client, setClient] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [processing, setProcessing] = useState(false);
@@ -38,6 +37,7 @@ export default function ClientDetailsPage() {
 
   useEffect(() => {
     if (clientId) fetchClient();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [clientId]);
 
   const handleKYCUpdate = async (status: "verified" | "rejected") => {
@@ -60,8 +60,8 @@ export default function ClientDetailsPage() {
         `KYC ${status === "verified" ? "Approved" : "Rejected"} Successfully`,
       );
       fetchClient(); // Refresh data
-    } catch (error: any) {
-      alert(`Failed: ${error.message}`);
+    } catch (error) {
+      alert(`Failed: ${(error as Error).message}`);
     } finally {
       setProcessing(false);
     }

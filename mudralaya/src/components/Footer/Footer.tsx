@@ -37,6 +37,7 @@ const Footer = () => {
           {/* Brand Section */}
           <div className={styles.brand}>
             <Link href="/" className={styles.logo}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src="/images/mudralya_logo.webp"
                 alt="Mudralaya"

@@ -6,7 +6,9 @@ interface UIContextType {
   isJoinUsModalOpen: boolean;
   isLoginModalOpen: boolean;
   selectedPlan: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   modalData: any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   openJoinUsModal: (plan?: string, data?: any) => void;
   closeJoinUsModal: () => void;
   openLoginModal: () => void;
@@ -19,8 +21,10 @@ export const UIProvider = ({ children }: { children: React.ReactNode }) => {
   const [isJoinUsModalOpen, setIsJoinUsModalOpen] = useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState("");
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [modalData, setModalData] = useState<any>(null);
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const openJoinUsModal = (plan = "", data: any = null) => {
     setSelectedPlan(plan);
     setModalData(data);

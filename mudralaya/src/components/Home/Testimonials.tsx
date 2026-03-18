@@ -50,6 +50,7 @@ const Testimonials = () => {
     useEffect(() => {
         const timer = setInterval(nextSlide, 6000);
         return () => clearInterval(timer);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     return (

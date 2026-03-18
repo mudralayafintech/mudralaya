@@ -18,12 +18,21 @@ import styles from "./settings.module.css";
 
 export default function Settings() {
   const [activeTab, setActiveTab] = useState("account");
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [profile, setProfile] = useState<any>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [notifications, setNotifications] = useState<any[]>([]);
   const [notificationLoading, setNotificationLoading] = useState(false);
   const supabase = createClient();
+
+  // Account form state
+  const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
+  const [saveLoading, setSaveLoading] = useState(false);
+  const [saveStatus, setSaveStatus] = useState<"success" | "error" | null>(null);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -39,11 +48,16 @@ export default function Settings() {
           .eq("id", user.id)
           .single();
         setProfile(profile);
+        if (profile) {
+          setFullName(profile.full_name || "");
+          setEmail(profile.email_id || "");
+        }
       }
       setLoading(false);
     };
     fetchUser();
     fetchNotifications();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchNotifications = async () => {
@@ -119,21 +133,41 @@ export default function Settings() {
     }
   };
 
+  const handleSaveAccount = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!user) return;
+    setSaveLoading(true);
+    setSaveStatus(null);
+    try {
+      const { error } = await supabase
+        .from("users")
+        .update({ full_name: fullName.trim(), email_id: email.trim() })
+        .eq("id", user.id);
+      if (error) throw error;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      setProfile((prev: any) => ({ ...prev, full_name: fullName.trim(), email_id: email.trim() }));
+      setSaveStatus("success");
+    } catch {
+      setSaveStatus("error");
+    } finally {
+      setSaveLoading(false);
+      setTimeout(() => setSaveStatus(null), 3000);
+    }
+  };
+
   const renderContent = () => {
     switch (activeTab) {
       case "account":
         return (
           <div>
             <h2 className={styles.settingsSectionTitle}>Account Settings</h2>
-            <form
-              className={styles.settingsForm}
-              onSubmit={(e) => e.preventDefault()}
-            >
+            <form className={styles.settingsForm} onSubmit={handleSaveAccount}>
               <div className={styles.formGroup}>
                 <label>Full Name</label>
                 <input
                   type="text"
-                  defaultValue={profile?.full_name || ""}
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
                   placeholder="Your Name"
                 />
               </div>
@@ -141,7 +175,8 @@ export default function Settings() {
                 <label>Email Address</label>
                 <input
                   type="email"
-                  defaultValue={profile?.email_id || ""}
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   placeholder="email@example.com"
                 />
               </div>
@@ -158,7 +193,19 @@ export default function Settings() {
                   Phone number cannot be changed here.
                 </small>
               </div>
-              <button className={styles.saveBtn}>Save Changes</button>
+              {saveStatus === "success" && (
+                <div style={{ color: "#059669", fontSize: "14px", display: "flex", alignItems: "center", gap: "6px", background: "#ecfdf5", padding: "10px 14px", borderRadius: "8px" }}>
+                  <Check size={16} /> Profile updated successfully!
+                </div>
+              )}
+              {saveStatus === "error" && (
+                <div style={{ color: "#dc2626", fontSize: "14px", display: "flex", alignItems: "center", gap: "6px", background: "#fef2f2", padding: "10px 14px", borderRadius: "8px" }}>
+                  <X size={16} /> Failed to save. Please try again.
+                </div>
+              )}
+              <button className={styles.saveBtn} disabled={saveLoading}>
+                {saveLoading ? <Loader2 size={16} className="animate-spin" /> : "Save Changes"}
+              </button>
             </form>
           </div>
         );
@@ -166,24 +213,29 @@ export default function Settings() {
         return (
           <div>
             <h2 className={styles.settingsSectionTitle}>Security</h2>
-            <form
-              className={styles.settingsForm}
-              onSubmit={(e) => e.preventDefault()}
+            <div
+              style={{
+                background: "#f0f9ff",
+                border: "1px solid #bae6fd",
+                borderRadius: "12px",
+                padding: "24px",
+                display: "flex",
+                flexDirection: "column",
+                gap: "12px",
+              }}
             >
-              <div className={styles.formGroup}>
-                <label>Current Password</label>
-                <input type="password" />
+              <div style={{ display: "flex", alignItems: "center", gap: "10px", color: "#0369a1" }}>
+                <Lock size={20} />
+                <span style={{ fontWeight: 600, fontSize: "15px" }}>OTP-Based Authentication</span>
               </div>
-              <div className={styles.formGroup}>
-                <label>New Password</label>
-                <input type="password" />
-              </div>
-              <div className={styles.formGroup}>
-                <label>Confirm New Password</label>
-                <input type="password" />
-              </div>
-              <button className={styles.saveBtn}>Update Password</button>
-            </form>
+              <p style={{ fontSize: "14px", color: "#475569", margin: 0, lineHeight: 1.6 }}>
+                Your account is secured using phone-based OTP login. No password is
+                required — your phone number serves as your identity.
+              </p>
+              <p style={{ fontSize: "13px", color: "#64748b", margin: 0 }}>
+                To change your phone number, please contact support.
+              </p>
+            </div>
           </div>
         );
       case "notifications":
@@ -445,25 +497,22 @@ export default function Settings() {
       <div className={styles.settingsContainer}>
         <div className={styles.settingsSidebar}>
           <button
-            className={`${styles.settingsTab} ${
-              activeTab === "account" ? styles.active : ""
-            }`}
+            className={`${styles.settingsTab} ${activeTab === "account" ? styles.active : ""
+              }`}
             onClick={() => setActiveTab("account")}
           >
             <User size={18} /> Account
           </button>
           <button
-            className={`${styles.settingsTab} ${
-              activeTab === "security" ? styles.active : ""
-            }`}
+            className={`${styles.settingsTab} ${activeTab === "security" ? styles.active : ""
+              }`}
             onClick={() => setActiveTab("security")}
           >
             <Lock size={18} /> Security
           </button>
           <button
-            className={`${styles.settingsTab} ${
-              activeTab === "notifications" ? styles.active : ""
-            }`}
+            className={`${styles.settingsTab} ${activeTab === "notifications" ? styles.active : ""
+              }`}
             onClick={() => setActiveTab("notifications")}
           >
             <Bell size={18} /> Notifications

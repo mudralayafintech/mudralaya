@@ -10,7 +10,6 @@ import {
   Briefcase,
   CheckSquare,
   LogOut,
-  Users,
 } from "lucide-react";
 import styles from "./Sidebar.module.css";
 import clsx from "clsx";
@@ -53,6 +52,12 @@ const navItems = [
     icon: CheckSquare, // Using CheckSquare or similar, Sidebar.tsx imports CheckSquare (already used for tasks? Let's check imports)
     label: "KYC Requests",
   },
+  {
+    id: "blogs",
+    path: "/dashboard/blogs",
+    icon: BarChart3, // Will import a proper icon, let's use BarChart3 for now or add FileText
+    label: "Blogs",
+  },
 ];
 
 export default function Sidebar({
@@ -61,6 +66,24 @@ export default function Sidebar({
   onLogout,
 }: SidebarProps) {
   const pathname = usePathname();
+  const [role, setRole] = React.useState<string>("super_admin");
+  const [username, setUsername] = React.useState<string>("Super Admin");
+
+  React.useEffect(() => {
+    if (typeof window !== "undefined") {
+      setRole(localStorage.getItem("adminRole") || "super_admin");
+      setUsername(localStorage.getItem("adminUsername") || "Super Admin");
+    }
+  }, []);
+
+  // Filter nav items based on RBAC
+  const visibleNavItems = navItems.filter((item) => {
+    if (role === 'blogger') {
+      return item.id === 'blogs';
+    }
+    // Super admins see everything
+    return true;
+  });
 
   return (
     <>
@@ -84,7 +107,7 @@ export default function Sidebar({
 
         <nav className={styles.nav}>
           <ul className={styles.navList}>
-            {navItems.map((item) => {
+            {visibleNavItems.map((item) => {
               const isActive = pathname === item.path;
               return (
                 <li key={item.id}>
@@ -113,10 +136,12 @@ export default function Sidebar({
             <span>Logout</span>
           </button>
           <div className={styles.profile}>
-            <div className={styles.avatar}>A</div>
+            <div className={styles.avatar}>{username.charAt(0).toUpperCase()}</div>
             <div className={styles.info}>
-              <span className={styles.name}>Admin User</span>
-              <span className={styles.role}>Super Admin</span>
+              <span className={styles.name}>{username}</span>
+              <span className={styles.role}>
+                {role === 'blogger' ? 'Blogger' : 'Super Admin'}
+              </span>
             </div>
           </div>
         </div>

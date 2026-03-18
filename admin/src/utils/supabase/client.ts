@@ -13,12 +13,13 @@ export function createClient() {
         autoRefreshToken: true,
         detectSessionInUrl: true,
         // Workaround for "Runtime AbortError" in Next.js 15 Dev (HMR).
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         lock: (name: string, ...args: any[]) => {
-            const callback = args[args.length - 1];
-            if (typeof callback === 'function') {
-                return callback({ name });
-            }
-            return Promise.resolve();
+          const callback = args[args.length - 1];
+          if (typeof callback === 'function') {
+            return callback({ name });
+          }
+          return Promise.resolve();
         },
       }
     }

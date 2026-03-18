@@ -23,6 +23,9 @@ const DrawerLayout = () => {
       <Drawer.Screen name="plans" options={{ headerShown: false }} />
       <Drawer.Screen name="membership" options={{ headerShown: false }} />
       <Drawer.Screen name="settings" options={{ headerShown: false }} />
+      <Drawer.Screen name="privacy-policy" options={{ headerShown: false }} />
+      <Drawer.Screen name="terms-conditions" options={{ headerShown: false }} />
+      <Drawer.Screen name="about-us" options={{ headerShown: false }} />
     </Drawer>
   );
 };

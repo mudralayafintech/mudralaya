@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Menu, Bell, HelpCircle, Search, User, Loader2 } from "lucide-react";
+import { Menu, Bell, HelpCircle, Search } from "lucide-react";
 import Link from "next/link";
 import { createClient } from "@/utils/supabase/client";
 import styles from "./header.module.css";
@@ -11,6 +11,7 @@ interface HeaderProps {
 }
 
 const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const supabase = createClient();
@@ -22,7 +23,7 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
       } = await supabase.auth.getUser();
       if (user) {
         try {
-          const { data, error } = await supabase
+          const { data } = await supabase
             .from("users")
             .select("*")
             .eq("id", user.id)
@@ -38,6 +39,7 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
       setLoading(false);
     };
     fetchProfile();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const displayName = profile?.full_name || "User";

@@ -21,6 +21,7 @@ import styles from "./wallet.module.css";
 import KYCModal from "@/components/dashboard/KYCModal";
 
 export default function Wallet() {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [bankDetails, setBankDetails] = useState<any>(null);
   const [walletData, setWalletData] = useState({
     transactions: [],
@@ -153,6 +154,7 @@ export default function Wallet() {
 
       // Filter for Task Earnings
       const taskTransactions = allTransactions?.filter(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (t: any) => t.type === "task_earning"
       ) || [];
 
@@ -178,6 +180,7 @@ export default function Wallet() {
 
   useEffect(() => {
     fetchInitialData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleSave = async () => {
@@ -342,7 +345,7 @@ export default function Wallet() {
                 <ArrowUpRight />
               </div>
               <div className={styles.statInfo}>
-                <span>Today's Pending Earning</span>
+                <span>Today&apos;s Pending Earning</span>
                 <h3>₹ {walletData.stats.today}</h3>
               </div>
             </div>
@@ -400,6 +403,7 @@ export default function Wallet() {
             <h2>Latest Transactions</h2>
             <div className={styles.transactionList}>
               {walletData.transactions.length > 0 ? (
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 walletData.transactions.map((t: any) => (
                   <div className={styles.transactionItem} key={t.id}>
                     <div className={styles.transLeft}>
@@ -458,6 +462,11 @@ export default function Wallet() {
             <button
               className={styles.payoutBtn}
               disabled={walletData.stats.approved < 500}
+              onClick={() =>
+                alert(
+                  "Payout requests are processed manually by our team. Please contact support with your request and bank details."
+                )
+              }
             >
               Proceed to Payout
             </button>

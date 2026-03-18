@@ -72,6 +72,7 @@ const Career = () => {
               className={styles.heroImages}
             >
               <div className={styles.imageBox}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src="/images/carrier.jpg"
                   alt="Team"
@@ -195,6 +196,7 @@ const Career = () => {
         <div className="container">
           <div className={styles.valuesGrid}>
             <div className={styles.valuesImgCol}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src="/images/about-us.png"
                 alt="Working"

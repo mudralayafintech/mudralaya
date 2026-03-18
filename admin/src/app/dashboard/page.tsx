@@ -11,6 +11,16 @@ import Link from "next/link";
 
 export default function DashboardPage() {
   const { data, loading, refresh } = useAdminData();
+  const router = import("next/navigation").then(m => m.useRouter);
+
+  React.useEffect(() => {
+    if (typeof window !== "undefined") {
+      const role = localStorage.getItem("adminRole");
+      if (role === "blogger") {
+        window.location.href = "/dashboard/blogs";
+      }
+    }
+  }, []);
 
   const formatDate = (value: string) => {
     if (!value) return "-";
@@ -32,6 +42,7 @@ export default function DashboardPage() {
     {
       key: "amount",
       label: "Amount (₹)",
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       format: (val: any) => (val ? val.toLocaleString() : "-"),
     },
     {
@@ -39,11 +50,10 @@ export default function DashboardPage() {
       label: "Status",
       format: (val: string) => (
         <span
-          className={`px-2 py-1 rounded-md text-xs font-bold uppercase tracking-wider ${
-            val === "Paid"
-              ? "bg-emerald-100 text-emerald-700"
-              : "bg-amber-100 text-amber-700"
-          }`}
+          className={`px-2 py-1 rounded-md text-xs font-bold uppercase tracking-wider ${val === "Paid"
+            ? "bg-emerald-100 text-emerald-700"
+            : "bg-amber-100 text-amber-700"
+            }`}
         >
           {val || "Pending"}
         </span>
@@ -60,7 +70,7 @@ export default function DashboardPage() {
     try {
       await adminApiRequest("delete-entry", { type: "join", id });
       refresh();
-    } catch (err) {
+    } catch {
       alert("Failed to delete");
     }
   };
@@ -94,6 +104,7 @@ export default function DashboardPage() {
             </Link>
           </div>
           <div className={styles.messageList}>
+            {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
             {data?.contacts?.slice(0, 5).map((msg: any, i: number) => (
               <div key={i} className={styles.messageItem}>
                 <div className={styles.msgHeader}>

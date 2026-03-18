@@ -72,6 +72,7 @@ const EmpoweringWomen = () => {
               transition={{ duration: 0.8 }}
               className={styles.mainImageWrapper}
             >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src="/images/women.png"
                 alt="Women Power"
@@ -84,6 +85,7 @@ const EmpoweringWomen = () => {
               transition={{ delay: 0.4, duration: 0.8 }}
               className={styles.floatingCard}
             >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src="/images/women-img.png"
                 alt="Community"

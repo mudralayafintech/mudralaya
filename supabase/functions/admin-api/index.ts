@@ -19,29 +19,75 @@ serve(async (req: Request): Promise<Response> => {
     const adminUser = Deno.env.get('DASHBOARD_ADMIN_USER')
     const adminPass = Deno.env.get('DASHBOARD_ADMIN_PASS')
 
-    // Simple Admin Auth check
+    // Auth verification
     const authHeader = req.headers.get('x-admin-password')
 
     if (action === 'login') {
+      // 1. Check Super Admin (Environment Variables)
       if (data.username === adminUser && data.password === adminPass) {
         return new Response(JSON.stringify({
           message: 'Logged in',
           success: true,
-          token: adminPass // Using password as a simple token to mirror current behavior
+          token: adminPass,
+          role: 'super_admin',
+          username: adminUser
         }), {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
           status: 200,
         })
-      } else {
-        return new Response(JSON.stringify({ error: 'Invalid credentials' }), {
+      }
+
+      // 2. Check Database Roles (e.g., Bloggers)
+      const { data: dbUser, error: dbErr } = await supabaseClient
+        .from('admin_users')
+        .select('*')
+        .eq('username', data.username)
+        .eq('password', data.password) // Basic plain-text check for simplicity (match existing pattern)
+        .single()
+
+      if (dbUser && !dbErr) {
+        return new Response(JSON.stringify({
+          message: 'Logged in',
+          success: true,
+          token: dbUser.id,   // Use their UUID as token
+          role: dbUser.role,
+          username: dbUser.username
+        }), {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          status: 401,
+          status: 200,
         })
       }
+
+      // 3. Failed Login
+      return new Response(JSON.stringify({ error: 'Invalid credentials' }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 401,
+      })
     }
 
     // Verify token for all other actions
-    if (authHeader !== adminPass) {
+    let isAuthenticated = false
+    let currentRole = null
+
+    // Check if token matches Super Admin
+    if (authHeader === adminPass) {
+      isAuthenticated = true
+      currentRole = 'super_admin'
+    } else if (authHeader) {
+      // Check if token matches a Database User (their UUID)
+      const { data: validUser, error: verifyErr } = await supabaseClient
+        .from('admin_users')
+        .select('id, role')
+        .eq('id', authHeader)
+        .maybeSingle()
+
+      if (validUser && !verifyErr) {
+        isAuthenticated = true
+        currentRole = validUser.role
+      }
+    }
+
+    if (!isAuthenticated) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 401,
@@ -198,6 +244,7 @@ serve(async (req: Request): Promise<Response> => {
         if (delType === 'contact') table = 'contact_requests'
         if (delType === 'advisor') table = 'advisor_applications'
         if (delType === 'client') table = 'users'
+        if (delType === 'blog') table = 'blogs'
 
         if (!table) throw new Error('Invalid type')
 
@@ -221,8 +268,8 @@ serve(async (req: Request): Promise<Response> => {
         if (clientsError) throw clientsError
 
         if (!clients || clients.length === 0) {
-            result = []
-            break
+          result = []
+          break
         }
 
         // 2. Fetch User Details manually using user_id (reliable) instead of join on account_id
@@ -242,7 +289,7 @@ serve(async (req: Request): Promise<Response> => {
           const user = clientUsersMap.get(c.user_id) || null
           // Polyfill mobile if needed
           if (user && !user.mobile_number && user.phone) {
-              user.mobile_number = user.phone
+            user.mobile_number = user.phone
           }
           return {
             ...c,
@@ -259,7 +306,7 @@ serve(async (req: Request): Promise<Response> => {
 
       case 'get-client-details':
         const { clientId } = data // This is actually the kyc_id from the URL
-        
+
         // 1. Fetch KYC record
         const { data: kycRecord, error: kycError } = await supabaseClient
           .from('user_kyc')
@@ -275,7 +322,7 @@ serve(async (req: Request): Promise<Response> => {
           .select('*')
           .eq('id', kycRecord.user_id)
           .single()
-          
+
         if (userDetailsError) throw userDetailsError
 
 
@@ -406,7 +453,7 @@ serve(async (req: Request): Promise<Response> => {
           .from('user_tasks')
           .update({
             status: 'rejected',
-            submission_data: rejectReason 
+            submission_data: rejectReason
               ? { ...(taskToReject.submission_data || {}), rejection_reason: rejectReason }
               : taskToReject.submission_data,
             updated_at: new Date().toISOString()
@@ -421,6 +468,91 @@ serve(async (req: Request): Promise<Response> => {
         result = rejectedTask
         break;
 
+      case 'get-blogs': {
+        const { data: allBlogs, error: blogsError } = await supabaseClient
+          .from('blogs')
+          .select('id, title, status, created_at')
+          .order('created_at', { ascending: false })
+
+        if (blogsError) throw blogsError
+        result = allBlogs || []
+        break
+      }
+
+      case 'get-blog': {
+        const { blogId } = data
+        if (!blogId) throw new Error('Blog ID is required')
+
+        const { data: blogData, error: blogError } = await supabaseClient
+          .from('blogs')
+          .select('*')
+          .eq('id', blogId)
+          .single()
+
+        if (blogError) throw blogError
+        result = blogData
+        break
+      }
+
+      case 'create-blog': {
+        const { data: newBlog, error: createBlogError } = await supabaseClient
+          .from('blogs')
+          .insert([{
+            title: data.title,
+            slug: data.slug,
+            excerpt: data.excerpt,
+            content: data.content,
+            cover_image: data.cover_image,
+            status: data.status,
+            seo_title: data.seo_title,
+            seo_description: data.seo_description,
+            primary_keywords: data.primary_keywords,
+            secondary_keywords: data.secondary_keywords,
+            tags: data.tags,
+            hashtags: data.hashtags,
+            category: data.category,
+            author: data.author,
+          }])
+          .select()
+          .single()
+
+        if (createBlogError) throw createBlogError
+        result = newBlog
+        break
+      }
+
+      case 'update-blog': {
+        const { blogId: updateBlogId, ...blogPayload } = data
+        if (!updateBlogId) throw new Error('Blog ID is required')
+
+        const { data: updatedBlog, error: updateBlogError } = await supabaseClient
+          .from('blogs')
+          .update({
+            title: blogPayload.title,
+            slug: blogPayload.slug,
+            excerpt: blogPayload.excerpt,
+            content: blogPayload.content,
+            cover_image: blogPayload.cover_image,
+            status: blogPayload.status,
+            seo_title: blogPayload.seo_title,
+            seo_description: blogPayload.seo_description,
+            primary_keywords: blogPayload.primary_keywords,
+            secondary_keywords: blogPayload.secondary_keywords,
+            tags: blogPayload.tags,
+            hashtags: blogPayload.hashtags,
+            category: blogPayload.category,
+            author: blogPayload.author,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', updateBlogId)
+          .select()
+          .single()
+
+        if (updateBlogError) throw updateBlogError
+        result = updatedBlog
+        break
+      }
+
       default:
         throw new Error('Invalid action')
     }
@@ -432,10 +564,10 @@ serve(async (req: Request): Promise<Response> => {
 
   } catch (error: any) {
     console.error('Admin API Error:', error)
-    const statusCode = error.message?.includes('Unauthorized') ? 401 
-      : error.message?.includes('not found') ? 404 
-      : 400
-    return new Response(JSON.stringify({ 
+    const statusCode = error.message?.includes('Unauthorized') ? 401
+      : error.message?.includes('not found') ? 404
+        : 400
+    return new Response(JSON.stringify({
       error: error.message || 'An error occurred',
       stack: Deno.env.get('DENO_ENV') === 'development' ? error.stack : undefined
     }), {

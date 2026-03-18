@@ -1,0 +1,75 @@
+
+D:\mudralaya\admin\src\app\dashboard\advisor\page.tsx
+  35:14  warning  'err' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\mudralaya\admin\src\app\dashboard\clients\[id]\page.tsx
+   9:3   warning  'X' is defined but never used                                                                                   @typescript-eslint/no-unused-vars
+  20:9   warning  'router' is assigned a value but never used                                                                     @typescript-eslint/no-unused-vars
+  23:40  error    Unexpected any. Specify a different type                                                                        @typescript-eslint/no-explicit-any
+  41:6   warning  React Hook useEffect has a missing dependency: 'fetchClient'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  63:21  error    Unexpected any. Specify a different type                                                                        @typescript-eslint/no-explicit-any
+
+D:\mudralaya\admin\src\app\dashboard\clients\page.tsx
+  10:36  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  99:27  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\mudralaya\admin\src\app\dashboard\contacts\page.tsx
+  36:14  warning  'err' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\mudralaya\admin\src\app\dashboard\join\page.tsx
+  32:21  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  37:21  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  62:14  warning  'err' is defined but never used           @typescript-eslint/no-unused-vars
+
+D:\mudralaya\admin\src\app\dashboard\kyc\page.tsx
+   13:3   warning  'Search' is defined but never used                                                                                                                                                                                                                                                       @typescript-eslint/no-unused-vars
+   14:3   warning  'Check' is defined but never used                                                                                                                                                                                                                                                        @typescript-eslint/no-unused-vars
+   52:6   warning  React Hook useEffect has a missing dependency: 'fetchKYCRecords'. Either include it or remove the dependency array                                                                                                                                                                       react-hooks/exhaustive-deps
+  133:5   warning  'reason' is defined but never used                                                                                                                                                                                                                                                       @typescript-eslint/no-unused-vars
+  330:21  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+D:\mudralaya\admin\src\app\dashboard\page.tsx
+  35:21  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  63:14  warning  'err' is defined but never used           @typescript-eslint/no-unused-vars
+  97:52  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\mudralaya\admin\src\app\login\page.tsx
+  43:19  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\mudralaya\admin\src\components\Sidebar.tsx
+  13:3  warning  'Users' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\mudralaya\admin\src\components\TopHeader.tsx
+  5:24  warning  'Settings' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\mudralaya\admin\src\components\dashboard\DataTable.tsx
+  21:20  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  21:30  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  27:9   error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\mudralaya\admin\src\components\dashboard\TaskManager.tsx
+   35:10  warning  'loading' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  118:19  error    Unexpected any. Specify a different type      @typescript-eslint/no-explicit-any
+  154:19  error    Unexpected any. Specify a different type      @typescript-eslint/no-explicit-any
+  171:19  error    Unexpected any. Specify a different type      @typescript-eslint/no-explicit-any
+  181:21  error    Unexpected any. Specify a different type      @typescript-eslint/no-explicit-any
+  191:19  error    Unexpected any. Specify a different type      @typescript-eslint/no-explicit-any
+
+D:\mudralaya\admin\src\hooks\useAdminData.ts
+   9:36  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  24:19  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\mudralaya\admin\src\lib\adminApi.ts
+    5:61  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   31:33  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   46:89  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   76:26  warning  'e' is defined but never used             @typescript-eslint/no-unused-vars
+   92:28  warning  'e' is defined but never used             @typescript-eslint/no-unused-vars
+  125:20  warning  'e' is defined but never used             @typescript-eslint/no-unused-vars
+  186:23  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\mudralaya\admin\src\utils\supabase\client.ts
+  16:39  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+✖ 42 problems (24 errors, 18 warnings)
+

@@ -75,34 +75,58 @@ export default function Login() {
       return;
     }
 
-    const { error } = await supabase.auth.signInWithOtp({
-      phone: formattedPhone,
+    const timeoutPromise = new Promise<{ error: Error }>((_, reject) => {
+      setTimeout(() => reject(new Error("Connection to server timed out. Check internet/VPN.")), 10000);
     });
 
-    if (error) {
-      Alert.alert("Error", error.message);
-      setLoading(false);
-    } else {
+    try {
+      const { error } = await Promise.race([
+        supabase.auth.signInWithOtp({
+          phone: formattedPhone,
+        }),
+        timeoutPromise
+      ]);
+
+      if (error) throw error;
       setPhone(formattedPhone);
       setStep("otp");
       setTimer(60);
+    } catch (err: any) {
+      if (err.message.includes("fetch") || err.message.includes("timed out")) {
+        Alert.alert("Network Error", "Unable to connect to the server.");
+      } else {
+        Alert.alert("Error", err.message);
+      }
+    } finally {
       setLoading(false);
     }
   }
 
   async function handleVerifyOtp() {
     setLoading(true);
-    const { error } = await supabase.auth.verifyOtp({
-      phone: phone,
-      token: otp,
-      type: "sms",
+    const timeoutPromise = new Promise<{ error: Error }>((_, reject) => {
+      setTimeout(() => reject(new Error("Connection to server timed out. Check internet/VPN.")), 10000);
     });
 
-    if (error) {
-      Alert.alert("Error", error.message);
-      setLoading(false);
-    } else {
+    try {
+      const { error } = await Promise.race([
+        supabase.auth.verifyOtp({
+          phone: phone,
+          token: otp,
+          type: "sms",
+        }),
+        timeoutPromise
+      ]);
+
+      if (error) throw error;
       router.replace("/(drawer)/(tabs)");
+    } catch (err: any) {
+      if (err.message.includes("fetch") || err.message.includes("timed out")) {
+        Alert.alert("Network Error", "Unable to connect to the server.");
+      } else {
+        Alert.alert("Error", err.message);
+      }
+      setLoading(false);
     }
   }
 
@@ -110,18 +134,31 @@ export default function Login() {
     if (resendAttempts >= 3) return;
 
     setLoading(true);
-    const { error } = await supabase.auth.signInWithOtp({
-      phone: phone,
+    const timeoutPromise = new Promise<{ error: Error }>((_, reject) => {
+      setTimeout(() => reject(new Error("Connection to server timed out. Check internet/VPN.")), 10000);
     });
 
-    if (error) {
-      Alert.alert("Error", error.message);
-    } else {
+    try {
+      const { error } = await Promise.race([
+        supabase.auth.signInWithOtp({
+          phone: phone,
+        }),
+        timeoutPromise
+      ]);
+
+      if (error) throw error;
       setTimer(60);
       setResendAttempts((prev) => prev + 1);
       Alert.alert("OTP Resent", "Please check your messages.");
+    } catch (err: any) {
+      if (err.message.includes("fetch") || err.message.includes("timed out")) {
+        Alert.alert("Network Error", "Unable to connect to the server.");
+      } else {
+        Alert.alert("Error", err.message);
+      }
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   }
 
   const handleChangePhoneNumber = () => {
@@ -201,7 +238,7 @@ export default function Login() {
                       style={[
                         styles.button,
                         (loading || phone.replace("+91", "").length !== 10) &&
-                          styles.buttonDisabled,
+                        styles.buttonDisabled,
                       ]}
                       onPress={handleSendOtp}
                       disabled={

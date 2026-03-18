@@ -233,9 +233,9 @@ const PlanCard = ({
               style={[
                 styles.checkboxRow,
                 plan.name === "INDIVIDUAL" &&
-                  currentPlan === "INDIVIDUAL" && {
-                    opacity: 0.7,
-                  },
+                currentPlan === "INDIVIDUAL" && {
+                  opacity: 0.7,
+                },
               ]}
               activeOpacity={0.8}
               onPress={() => {
@@ -506,8 +506,8 @@ export default function PlansScreen() {
       if (!response.ok) {
         throw new Error(
           orderData?.error ||
-            orderData?.message ||
-            `Server Error: ${response.status}`,
+          orderData?.message ||
+          `Server Error: ${response.status}`,
         );
       }
 
@@ -758,7 +758,8 @@ export default function PlansScreen() {
                 </Text>
                 <Text style={[styles.subtitle, { color: subTextColor }]}>
                   Choose the best plan for yourself and start your journey with
-                  Mudralaya
+                  Mudralaya.{"\n"}
+                  <Text style={{ fontSize: 10, opacity: 0.8 }}>*Terms & Conditions Apply to all plans and earning claims.</Text>
                 </Text>
               </View>
 

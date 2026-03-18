@@ -11,6 +11,8 @@ import {
   Settings,
   LayoutDashboard,
   Crown,
+  ShieldCheck,
+  Info,
 } from "lucide-react-native";
 import { useTheme } from "@/lib/ThemeContext";
 
@@ -144,16 +146,26 @@ export default function CustomDrawerContent(props: any) {
               )}
               onPress={() => router.push("/(drawer)/membership")}
             />
+            onPress={() => router.push("/(drawer)/settings")}
+            />
+
+            <View style={[styles.separator, { backgroundColor: borderColor }]} />
+
             <DrawerItem
-              label="Profile & Settings"
+              label="Privacy Policy"
               labelStyle={{ color: textColor }}
               icon={({ color, size }) => (
-                <Settings
-                  size={size}
-                  color={theme === "dark" ? "#fff" : "#000"}
-                />
+                <ShieldCheck size={size} color={theme === "dark" ? "#fff" : "#000"} />
               )}
-              onPress={() => router.push("/(drawer)/settings")}
+              onPress={() => router.push("/(drawer)/privacy-policy")}
+            />
+            <DrawerItem
+              label="About Us"
+              labelStyle={{ color: textColor }}
+              icon={({ color, size }) => (
+                <Info size={size} color={theme === "dark" ? "#fff" : "#000"} />
+              )}
+              onPress={() => router.push("/(drawer)/about-us")}
             />
           </View>
         </DrawerContentScrollView>
@@ -237,5 +249,10 @@ const styles = StyleSheet.create({
   footerText: {
     fontSize: 16,
     fontWeight: "500",
+  },
+  separator: {
+    height: 1,
+    marginVertical: 10,
+    marginHorizontal: 20,
   },
 });
