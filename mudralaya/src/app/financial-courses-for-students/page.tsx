@@ -21,7 +21,6 @@ export const metadata: Metadata = {
     type: "website",
   },
 };
-
 export default function FinancialCoursesPage() {
   return <FinancialCourses />;
 }
