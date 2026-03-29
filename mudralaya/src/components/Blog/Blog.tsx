@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Instagram, Linkedin, Twitter, Youtube, ArrowRight, Calendar, Clock } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 import { supabase } from "@/lib/supabase";
 import styles from "./Blog.module.css";
 
@@ -121,10 +122,13 @@ const Blog = () => {
                                     <Link href={`/blog/${featuredPost.slug}`} className={styles.featuredHeroCard}>
                                         <div className={styles.featuredHeroImageWrapper}>
                                             <div className={styles.imageOverlay}></div>
-                                            <img
+                                            <Image
                                                 src={featuredPost.cover_image || "https://images.unsplash.com/photo-1454165833241-279435b6f9f?auto=format&fit=crop&w=1200&q=80"}
                                                 alt={featuredPost.title}
+                                                width={1200}
+                                                height={450}
                                                 className={styles.featuredHeroImage}
+                                                priority
                                             />
                                         </div>
                                         <div className={styles.featuredHeroContent}>
@@ -159,9 +163,11 @@ const Blog = () => {
                                         >
                                             <Link href={`/blog/${post.slug}`} className={styles.glassPostCard}>
                                                 <div className={styles.postImgBox}>
-                                                    <img
+                                                    <Image
                                                         src={post.cover_image || "https://images.unsplash.com/photo-1454165833241-279435b6f9f?auto=format&fit=crop&w=800&q=80"}
                                                         alt={post.title}
+                                                        width={600}
+                                                        height={300}
                                                         className={styles.postImg}
                                                     />
                                                     <div className={styles.postHoverOverlay}></div>
@@ -219,9 +225,11 @@ const Blog = () => {
                         <div className={styles.instaGrid}>
                             {instaImages.map((img, i) => (
                                 <div key={i} className={styles.instaWrapper}>
-                                    <img
+                                    <Image
                                         src={img}
                                         alt={`instagram-${i}`}
+                                        width={150}
+                                        height={150}
                                         className={styles.instaImg}
                                     />
                                     <div className={styles.instaOverlay}>
