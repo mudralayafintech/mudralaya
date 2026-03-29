@@ -318,7 +318,7 @@ serve(async (req: Request): Promise<Response> => {
           const { data: updatedUser } = await supabaseClient
             .from('users')
             .update({
-              membership_type: isYearly ? 'yearly' : 'monthly',
+              membership_type: isYearly ? 'premium' : 'member',
               membership_expiry: istExpiryString,
               membership_start_date: istStartString, // Track when this specific purchase starts
               updated_at: new Date().toISOString()

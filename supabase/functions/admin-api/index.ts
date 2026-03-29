@@ -167,6 +167,56 @@ serve(async (req: Request): Promise<Response> => {
         result = createdTask
         break;
 
+      case 'update-task': {
+        const { id, ...updatedFields } = data
+        if (!id) throw new Error('Task ID is required for update')
+
+        // Clean up the fields to match table schema
+        const taskData = {
+          title: updatedFields.title,
+          description: updatedFields.description,
+          reward_free: updatedFields.reward_free,
+          reward_member: updatedFields.reward_member,
+          reward_premium: updatedFields.reward_premium,
+          reward_min: updatedFields.reward_min,
+          reward_max: updatedFields.reward_max,
+          reward_info: updatedFields.reward_info,
+          category: updatedFields.task_type || updatedFields.type,
+          icon_type: updatedFields.icon_type,
+          video_link: updatedFields.video_link,
+          pdf_url: updatedFields.pdf_url,
+          action_link: updatedFields.action_link,
+          steps: updatedFields.steps,
+          target_audience: updatedFields.target_audience,
+          is_active: updatedFields.is_active !== undefined ? updatedFields.is_active : true
+        }
+
+        const { data: updatedTask, error: updateError } = await supabaseClient
+          .from('tasks')
+          .update(taskData)
+          .eq('id', id)
+          .select()
+          .single()
+
+        if (updateError) throw updateError
+        result = updatedTask
+        break;
+      }
+
+      case 'delete-task': {
+        const { taskId: delTaskId } = data
+        if (!delTaskId) throw new Error('Task ID is required for deletion')
+
+        const { error: deleteError } = await supabaseClient
+          .from('tasks')
+          .delete()
+          .eq('id', delTaskId)
+
+        if (deleteError) throw deleteError
+        result = { success: true, message: 'Task deleted successfully' }
+        break;
+      }
+
       case 'get-task-participants':
         const { taskId: pTaskId } = data
         // 1. Fetch participants (user_tasks)

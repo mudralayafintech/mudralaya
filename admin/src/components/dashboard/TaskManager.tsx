@@ -28,6 +28,7 @@ interface Participant {
   status: string;
   reward_earned: number;
   task_id: string;
+  submission_image_url?: string;
 }
 
 export default function TaskManager() {
@@ -59,6 +60,8 @@ export default function TaskManager() {
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [participants, setParticipants] = useState<Participant[]>([]);
   const [loadingParticipants, setLoadingParticipants] = useState(false);
+  const [showEditForm, setShowEditForm] = useState(false);
+  const [editingTask, setEditingTask] = useState<any>(null);
 
   useEffect(() => {
     fetchTasks();
@@ -175,6 +178,62 @@ export default function TaskManager() {
     }
   };
 
+  const handleEditTask = (task: Task) => {
+    setEditingTask({
+      ...task,
+      task_type: task.task_type || task.type,
+      reward_member: (task as any).reward_member || (task as any).reward_premium || "",
+      reward_premium: (task as any).reward_premium || "",
+      reward_min: (task as any).reward_min || "",
+      reward_max: (task as any).reward_max || "",
+      reward_info: (task as any).reward_info || "",
+      video_link: (task as any).video_link || (task as any).video_url || "",
+      pdf_url: (task as any).pdf_url || "",
+      action_link: (task as any).action_link || "",
+      icon_type: (task as any).icon_type || "group",
+      target_audience: (task as any).target_audience || [],
+      steps: (task as any).steps || "",
+      description: (task as any).description || ""
+    });
+    setShowEditForm(true);
+  };
+
+  const handleUpdateTask = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const taskData = {
+        ...editingTask,
+        reward_free: editingTask.reward_free === "" ? 0 : Number(editingTask.reward_free),
+        reward_member: editingTask.reward_member === "" ? null : Number(editingTask.reward_member),
+        reward_premium: editingTask.reward_premium === "" ? null : Number(editingTask.reward_premium),
+        reward_min: editingTask.reward_min === "" ? null : Number(editingTask.reward_min),
+        reward_max: editingTask.reward_max === "" ? null : Number(editingTask.reward_max),
+      };
+
+      await adminApiRequest("update-task", taskData);
+      alert("Task Updated Successfully");
+      setShowEditForm(false);
+      fetchTasks();
+    } catch (err) {
+      alert("Failed to update task: " + (err as Error).message);
+    }
+  };
+
+  const handleDeleteTask = async (taskId: string) => {
+    if (!confirm("Are you sure you want to delete this task? This action cannot be undone.")) return;
+    try {
+      await adminApiRequest("delete-task", { taskId });
+      alert("Task Deleted Successfully");
+      fetchTasks();
+      if (selectedTask?.id === taskId) {
+        setSelectedTask(null);
+        setParticipants([]);
+      }
+    } catch (err) {
+      alert("Failed to delete task: " + (err as Error).message);
+    }
+  };
+
   const columns = [
     { key: "title", label: "Title" },
     {
@@ -193,12 +252,28 @@ export default function TaskManager() {
       label: "Action",
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       format: (_: any, row: Task) => (
-        <button
-          className={styles.viewBtn}
-          onClick={() => handleViewProgress(row)}
-        >
-          View Progress
-        </button>
+        <div style={{ display: 'flex', gap: '8px' }}>
+          <button
+            className={styles.viewBtn}
+            onClick={() => handleViewProgress(row)}
+          >
+            Progress
+          </button>
+          <button
+            className={styles.editBtn}
+            onClick={() => handleEditTask(row)}
+            style={{ padding: '6px 10px', background: '#f59e0b', color: 'white', borderRadius: '6px', border: 'none', cursor: 'pointer' }}
+          >
+            Edit
+          </button>
+          <button
+            className={styles.deleteBtn}
+            onClick={() => handleDeleteTask(row.id)}
+            style={{ padding: '6px 10px', background: '#ef4444', color: 'white', borderRadius: '6px', border: 'none', cursor: 'pointer' }}
+          >
+            Delete
+          </button>
+        </div>
       ),
     },
   ];
@@ -215,20 +290,20 @@ export default function TaskManager() {
 
   return (
     <div className={styles.container}>
-      {showCreateForm && (
+      {showEditForm && editingTask && (
         <div className={styles.formCard}>
-          <div className={styles.cardHeader}>Create New Task</div>
+          <div className={styles.cardHeader}>Edit Task: {editingTask.title}</div>
           <div className={styles.cardBody}>
-            <form onSubmit={handleCreateTask}>
+            <form onSubmit={handleUpdateTask}>
               <div className={styles.formGrid}>
                 <div className={styles.col6}>
                   <label className={styles.label}>Task Title</label>
                   <input
                     type="text"
                     className={styles.input}
-                    value={newTask.title}
+                    value={editingTask.title}
                     onChange={(e) =>
-                      setNewTask({ ...newTask, title: e.target.value })
+                      setEditingTask({ ...editingTask, title: e.target.value })
                     }
                     placeholder="Enter task title"
                     required
@@ -238,10 +313,10 @@ export default function TaskManager() {
                   <label className={styles.label}>Type</label>
                   <select
                     className={styles.select}
-                    value={newTask.task_type}
+                    value={editingTask.task_type}
                     onChange={(e) =>
-                      setNewTask({
-                        ...newTask,
+                      setEditingTask({
+                        ...editingTask,
                         task_type: e.target.value,
                         type: e.target.value,
                       })
@@ -255,9 +330,9 @@ export default function TaskManager() {
                   <label className={styles.label}>Icon Type</label>
                   <select
                     className={styles.select}
-                    value={newTask.icon_type}
+                    value={editingTask.icon_type}
                     onChange={(e) =>
-                      setNewTask({ ...newTask, icon_type: e.target.value })
+                      setEditingTask({ ...editingTask, icon_type: e.target.value })
                     }
                   >
                     <option value="group">Group</option>
@@ -276,9 +351,9 @@ export default function TaskManager() {
                   <textarea
                     className={styles.textarea}
                     rows={3}
-                    value={newTask.description}
+                    value={editingTask.description}
                     onChange={(e) =>
-                      setNewTask({ ...newTask, description: e.target.value })
+                      setEditingTask({ ...editingTask, description: e.target.value })
                     }
                     placeholder="Describe the task..."
                   />
@@ -289,9 +364,9 @@ export default function TaskManager() {
                   <textarea
                     className={styles.textarea}
                     rows={2}
-                    value={newTask.steps}
+                    value={editingTask.steps}
                     onChange={(e) =>
-                      setNewTask({ ...newTask, steps: e.target.value })
+                      setEditingTask({ ...editingTask, steps: e.target.value })
                     }
                     placeholder="Step-by-step instructions..."
                   />
@@ -302,9 +377,9 @@ export default function TaskManager() {
                   <input
                     type="number"
                     className={styles.input}
-                    value={newTask.reward_free}
+                    value={editingTask.reward_free}
                     onChange={(e) =>
-                      setNewTask({ ...newTask, reward_free: e.target.value })
+                      setEditingTask({ ...editingTask, reward_free: e.target.value })
                     }
                     placeholder="0"
                   />
@@ -314,9 +389,9 @@ export default function TaskManager() {
                   <input
                     type="number"
                     className={styles.input}
-                    value={newTask.reward_member}
+                    value={editingTask.reward_member}
                     onChange={(e) =>
-                      setNewTask({ ...newTask, reward_member: e.target.value })
+                      setEditingTask({ ...editingTask, reward_member: e.target.value })
                     }
                     placeholder="0"
                   />
@@ -326,9 +401,9 @@ export default function TaskManager() {
                   <input
                     type="number"
                     className={styles.input}
-                    value={newTask.reward_premium}
+                    value={editingTask.reward_premium}
                     onChange={(e) =>
-                      setNewTask({ ...newTask, reward_premium: e.target.value })
+                      setEditingTask({ ...editingTask, reward_premium: e.target.value })
                     }
                     placeholder="0"
                   />
@@ -338,9 +413,9 @@ export default function TaskManager() {
                   <input
                     type="text"
                     className={styles.input}
-                    value={newTask.reward_info}
+                    value={editingTask.reward_info}
                     onChange={(e) =>
-                      setNewTask({ ...newTask, reward_info: e.target.value })
+                      setEditingTask({ ...editingTask, reward_info: e.target.value })
                     }
                     placeholder="e.g., Up to ₹500"
                   />
@@ -351,9 +426,9 @@ export default function TaskManager() {
                   <input
                     type="url"
                     className={styles.input}
-                    value={newTask.video_link}
+                    value={editingTask.video_link}
                     onChange={(e) =>
-                      setNewTask({ ...newTask, video_link: e.target.value })
+                      setEditingTask({ ...editingTask, video_link: e.target.value })
                     }
                     placeholder="https://youtube.com/..."
                   />
@@ -363,9 +438,9 @@ export default function TaskManager() {
                   <input
                     type="url"
                     className={styles.input}
-                    value={newTask.pdf_url}
+                    value={editingTask.pdf_url}
                     onChange={(e) =>
-                      setNewTask({ ...newTask, pdf_url: e.target.value })
+                      setEditingTask({ ...editingTask, pdf_url: e.target.value })
                     }
                     placeholder="https://..."
                   />
@@ -376,9 +451,9 @@ export default function TaskManager() {
                   <input
                     type="url"
                     className={styles.input}
-                    value={newTask.action_link}
+                    value={editingTask.action_link}
                     onChange={(e) =>
-                      setNewTask({ ...newTask, action_link: e.target.value })
+                      setEditingTask({ ...editingTask, action_link: e.target.value })
                     }
                     placeholder="https://..."
                   />
@@ -400,21 +475,22 @@ export default function TaskManager() {
                       >
                         <input
                           type="checkbox"
-                          checked={newTask.target_audience.includes(audience)}
+                          checked={editingTask.target_audience?.includes(audience)}
                           onChange={(e) => {
+                            const current = editingTask.target_audience || [];
                             if (e.target.checked) {
-                              setNewTask({
-                                ...newTask,
+                              setEditingTask({
+                                ...editingTask,
                                 target_audience: [
-                                  ...newTask.target_audience,
+                                  ...current,
                                   audience,
                                 ],
                               });
                             } else {
-                              setNewTask({
-                                ...newTask,
-                                target_audience: newTask.target_audience.filter(
-                                  (a) => a !== audience,
+                              setEditingTask({
+                                ...editingTask,
+                                target_audience: current.filter(
+                                  (a: string) => a !== audience,
                                 ),
                               });
                             }
@@ -426,9 +502,12 @@ export default function TaskManager() {
                   </div>
                 </div>
 
-                <div className={styles.col12} style={{ textAlign: "right" }}>
+                <div className={styles.col12} style={{ textAlign: "right", display: 'flex', justifyContent: 'flex-end', gap: '12px' }}>
+                  <button type="button" className={styles.cancelBtn} onClick={() => setShowEditForm(false)} style={{ padding: '10px 20px', background: '#e2e8f0', border: 'none', borderRadius: '8px', cursor: 'pointer' }}>
+                    Cancel
+                  </button>
                   <button type="submit" className={styles.saveBtn}>
-                    Save Task
+                    Update Task
                   </button>
                 </div>
               </div>
@@ -476,74 +555,89 @@ export default function TaskManager() {
             ) : (
               <ul>
                 {participants.map((p, idx) => (
-                  <li key={idx} className={styles.participantItem}>
-                    <div>
-                      <span className={styles.userName}>
-                        {p.users?.full_name || "Unknown User"}
-                      </span>
-                      <span className={styles.userEmail}>
-                        {p.users?.email_id}
-                      </span>
-                      {p.reward_earned > 0 && (
-                        <span className={styles.rewardText}>
-                          Reward: ₹{p.reward_earned}
+                  <li key={idx} className={styles.participantItem} style={{ flexDirection: 'column', alignItems: 'stretch' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
+                      <div>
+                        <span className={styles.userName}>
+                          {p.users?.full_name || "Unknown User"}
                         </span>
-                      )}
-                    </div>
-                    <div
-                      style={{
-                        display: "flex",
-                        gap: "8px",
-                        alignItems: "center",
-                      }}
-                    >
-                      <span
-                        className={clsx(
-                          styles.statusPill,
-                          p.status === "completed" || p.status === "approved"
-                            ? styles.completed
-                            : p.status === "rejected"
-                              ? styles.rejected
-                              : styles.pending,
+                        <span className={styles.userEmail}>
+                          {p.users?.email_id}
+                        </span>
+                        {p.reward_earned > 0 && (
+                          <span className={styles.rewardText}>
+                            Reward: ₹{p.reward_earned}
+                          </span>
                         )}
+                      </div>
+                      <div
+                        style={{
+                          display: "flex",
+                          gap: "8px",
+                          alignItems: "center",
+                        }}
                       >
-                        {p.status}
-                      </span>
-                      {p.status === "completed" && (
-                        <>
-                          <button
-                            className={styles.approveBtn}
-                            onClick={() => handleApproveTask(p.id)}
-                            style={{
-                              padding: "6px 12px",
-                              fontSize: "12px",
-                              background: "#10b981",
-                              color: "white",
-                              border: "none",
-                              borderRadius: "6px",
-                              cursor: "pointer",
-                            }}
-                          >
-                            Approve
-                          </button>
-                          <button
-                            className={styles.rejectBtn}
-                            onClick={() => handleRejectTask(p.id)}
-                            style={{
-                              padding: "6px 12px",
-                              fontSize: "12px",
-                              background: "#ef4444",
-                              color: "white",
-                              border: "none",
-                              borderRadius: "6px",
-                              cursor: "pointer",
-                            }}
-                          >
-                            Reject
-                          </button>
-                        </>
-                      )}
+                        <span
+                          className={clsx(
+                            styles.statusPill,
+                            p.status === "completed" || p.status === "approved"
+                              ? styles.completed
+                              : p.status === "rejected"
+                                ? styles.rejected
+                                : styles.pending,
+                          )}
+                        >
+                          {p.status === 'completed' ? 'In Process' : p.status}
+                        </span>
+                        {p.status === "completed" && (
+                          <>
+                            <button
+                              className={styles.approveBtn}
+                              onClick={() => handleApproveTask(p.id)}
+                              style={{
+                                padding: "6px 12px",
+                                fontSize: "12px",
+                                background: "#10b981",
+                                color: "white",
+                                border: "none",
+                                borderRadius: "6px",
+                                cursor: "pointer",
+                              }}
+                            >
+                              Approve
+                            </button>
+                            <button
+                              className={styles.rejectBtn}
+                              onClick={() => handleRejectTask(p.id)}
+                              style={{
+                                padding: "6px 12px",
+                                fontSize: "12px",
+                                background: "#ef4444",
+                                color: "white",
+                                border: "none",
+                                borderRadius: "6px",
+                                cursor: "pointer",
+                              }}
+                            >
+                              Reject
+                            </button>
+                          </>
+                        )}
+                      </div>
                     </div>
+                    {p.submission_image_url && (
+                      <div className={styles.evidenceContainer} style={{ marginTop: '12px', padding: '10px', background: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+                        <span style={{ fontSize: '11px', fontWeight: 'bold', color: '#64748b', display: 'block', marginBottom: '8px' }}>SUBMITTED EVIDENCE:</span>
+                        <a href={p.submission_image_url} target="_blank" rel="noreferrer">
+                           {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img 
+                            src={p.submission_image_url} 
+                            alt="Task Evidence" 
+                            style={{ maxWidth: '100%', borderRadius: '4px', cursor: 'zoom-in', maxHeight: '200px', objectFit: 'contain' }}
+                          />
+                        </a>
+                      </div>
+                    )}
                   </li>
                 ))}
               </ul>

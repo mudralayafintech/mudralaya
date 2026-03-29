@@ -15,6 +15,7 @@ import {
   FileText,
   Gem,
   Youtube,
+  Upload,
 } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
 import styles from "./tasks.module.css";
@@ -131,19 +132,52 @@ export default function TasksPage() {
 
   const getSmartButtonLabel = (task: Task) => {
     if (task.status === "approved") return "Reward Claimed";
-    if (task.status === "completed") return "Pending Approval";
+    if (task.status === "completed") return "In Process";
     if (task.status === "ongoing" || task.status === "in_progress")
       return "Complete Task";
     if (task.status === "rejected") return "Task Rejected";
     return "Start Task";
   };
 
+  const [selectedImage, setSelectedImage] = useState<{ [key: string]: File | null }>({});
+  const [isUploading, setIsUploading] = useState(false);
+
+  const handleFileChange = (taskId: string, e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setSelectedImage(prev => ({ ...prev, [taskId]: e.target.files![0] }));
+    }
+  };
+
   const handleCompleteTask = async (task: Task) => {
     try {
+      setIsUploading(true);
+      let imageUrl = null;
+
+      // 1. Upload image if selected
+      const file = selectedImage[task.id];
+      if (file) {
+        const timestamp = Date.now();
+        const path = `${task.id}/${timestamp}_${file.name}`;
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from("task-submissions")
+          .upload(path, file);
+
+        if (uploadError) throw uploadError;
+        
+        // Get public URL
+        const { data: { publicUrl } } = supabase.storage
+          .from("task-submissions")
+          .getPublicUrl(uploadData.path);
+        
+        imageUrl = publicUrl;
+      }
+
+      // 2. Call API
       const { error } = await supabase.functions.invoke("dashboard-api", {
         body: {
           action: "complete-task",
           taskId: task.id,
+          submissionImageUrl: imageUrl,
           submissionData: {
             completed_at: new Date().toISOString(),
             action_link_visited: task.action_link ? true : false,
@@ -163,10 +197,12 @@ export default function TasksPage() {
           t.id === task.id ? { ...t, status: "completed" } : t,
         ),
       );
-      alert("Task completed! Waiting for admin approval.");
+      alert("Task submitted successfully! Status: In Process");
     } catch (err) {
       console.error("Failed to complete task:", err);
       alert("Failed to complete task. Please try again.");
+    } finally {
+      setIsUploading(false);
     }
   };
 
@@ -178,7 +214,7 @@ export default function TasksPage() {
       setTimeout(() => {
         if (
           confirm(
-            "Have you completed the task? Click OK to submit for approval.",
+            "Have you completed the task? You can also upload a screenshot for faster approval. Click OK to submit.",
           )
         ) {
           handleCompleteTask(task);
@@ -794,7 +830,7 @@ export default function TasksPage() {
                             <div className="ms-auto">
                               <FileText
                                 style={{
-                                  color: "#e53935",
+                                  color: "#6366f1",
                                   width: "24px",
                                   height: "24px",
                                 }}
@@ -805,32 +841,76 @@ export default function TasksPage() {
                       </div>
                     )}
 
-                    <div className="mt-3" style={{ marginTop: "16px" }}>
+                    {/* Image Submission Section */}
+                    {(task.status === "ongoing" || task.status === "in_progress") && (
+                      <div className={styles.submissionSection} style={{ marginTop: '20px', padding: '16px', borderRadius: '12px', border: '1px dashed #cbd5e1', backgroundColor: '#f8fafc' }}>
+                        <h4 style={{ fontSize: '14px', fontWeight: '600', marginBottom: '12px', color: '#1e293b' }}>Task Evidence (Optional)</h4>
+                        <div className={styles.fileUploadWrapper} style={{ position: 'relative' }}>
+                          <input 
+                            type="file" 
+                            accept="image/*" 
+                            onChange={(e) => handleFileChange(task.id, e)}
+                            style={{ opacity: 0, position: 'absolute', inset: 0, cursor: 'pointer', zIndex: 2 }}
+                            disabled={isUploading}
+                          />
+                          <div className={styles.fileDisplay} style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '10px', backgroundColor: '#fff', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+                            <div style={{ padding: '8px', borderRadius: '6px', backgroundColor: '#eff6ff', color: '#2563eb' }}>
+                              <Upload size={18} />
+                            </div>
+                            <span style={{ fontSize: '13px', color: '#64748b' }}>
+                              {selectedImage[task.id] ? selectedImage[task.id]?.name : "Upload screenshot of task completion"}
+                            </span>
+                          </div>
+                        </div>
+                        {selectedImage[task.id] && (
+                          <div className={styles.imagePreview} style={{ marginTop: '12px' }}>
+                             {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img 
+                              src={URL.createObjectURL(selectedImage[task.id]!)} 
+                              alt="Submission Preview" 
+                              style={{ maxWidth: '100%', maxHeight: '200px', borderRadius: '8px', border: '1px solid #e2e8f0' }}
+                            />
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    <div className="mt-3" style={{ marginTop: "24px" }}>
                       <button
-                        className={`${styles.btnTakeTask} ${task.status === "approved" ||
-                          task.status === "rejected"
-                          ? styles.btnDisabled
-                          : ""
-                          }`}
+                        className={`${styles.btnTakeTask} ${
+                          getSmartButtonLabel(task) === "Reward Claimed" ||
+                          getSmartButtonLabel(task) === "In Process" ||
+                          getSmartButtonLabel(task) === "Task Rejected"
+                            ? styles.btnDisabled
+                            : ""
+                        }`}
                         onClick={() => handleSmartAction(task)}
                         disabled={
-                          task.status === "approved" ||
-                          task.status === "rejected"
+                          isUploading ||
+                          getSmartButtonLabel(task) === "Reward Claimed" ||
+                          getSmartButtonLabel(task) === "In Process" ||
+                          getSmartButtonLabel(task) === "Task Rejected"
                         }
                         style={{
                           opacity:
-                            task.status === "approved" ||
-                              task.status === "rejected"
+                            getSmartButtonLabel(task) === "Reward Claimed" ||
+                            getSmartButtonLabel(task) === "In Process" ||
+                            getSmartButtonLabel(task) === "Task Rejected"
                               ? 0.6
                               : 1,
                           cursor:
-                            task.status === "approved" ||
-                              task.status === "rejected"
+                            getSmartButtonLabel(task) === "Reward Claimed" ||
+                            getSmartButtonLabel(task) === "In Process" ||
+                            getSmartButtonLabel(task) === "Task Rejected"
                               ? "not-allowed"
-                              : "pointer",
+                              : isUploading 
+                                ? "wait" 
+                                : "pointer",
+                          width: "100%",
+                          backgroundColor: getSmartButtonLabel(task) === "Complete Task" ? "#22c55e" : undefined
                         }}
                       >
-                        {getSmartButtonLabel(task)}
+                        {isUploading ? "Uploading..." : getSmartButtonLabel(task)}
                       </button>
                     </div>
                   </div>

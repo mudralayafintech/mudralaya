@@ -221,6 +221,7 @@ serve(async (req: Request): Promise<Response> => {
           .update({
             status: 'completed',
             submission_data: submissionData || null,
+            submission_image_url: requestData.submissionImageUrl || null,
             reward_earned: rewardAmount,
             updated_at: new Date().toISOString()
           })
