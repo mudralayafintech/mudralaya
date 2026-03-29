@@ -107,6 +107,7 @@
     letter-spacing: -0.02em;
     background: linear-gradient(180deg, #ffffff 0%, #cbd5e1 100%);
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
 }
 
@@ -155,9 +156,10 @@
     color: #334155;
     word-break: break-word; /* Let standard breaking handle text */
     overflow-wrap: break-word;
+    white-space: pre-wrap; /* Preserve spaces and manual line breaks */
 }
 
-/* Rich text styles injected by TinyMCE */
+/* Rich text styles injected by Quill Editor (react-quill-new) */
 .content h1,
 .content h2,
 .content h3,
@@ -178,6 +180,25 @@
     word-break: break-word;
 }
 
+/* Quill Alignment Classes */
+.content :global(.ql-align-center) {
+    text-align: center;
+}
+
+.content :global(.ql-align-right) {
+    text-align: right;
+}
+
+.content :global(.ql-align-justify) {
+    text-align: justify;
+}
+
+/* Quill Indent Classes */
+.content :global(.ql-indent-1) { padding-left: 3em; }
+.content :global(.ql-indent-2) { padding-left: 6em; }
+.content :global(.ql-indent-3) { padding-left: 9em; }
+.content :global(.ql-indent-4) { padding-left: 12em; }
+
 @media (max-width: 768px) {
     .content h2 {
         font-size: 1.75rem;
@@ -192,7 +213,7 @@
 }
 
 .content p {
-    margin-bottom: 1.8em;
+    margin-bottom: 1.5rem; /* Standard paragraph spacing */
 }
 
 .content a {
