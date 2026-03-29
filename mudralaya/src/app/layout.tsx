@@ -1,9 +1,5 @@
 import type { Metadata } from "next";
-<<<<<<< HEAD
 import { Inter, Plus_Jakarta_Sans } from "next/font/google"; // Optimized fonts
-=======
-import { Inter, Playfair_Display } from "next/font/google"; // Optimized fonts
->>>>>>> main
 import "./globals.css";
 import LocalBusinessSchema from "@/components/LocalBusinessSchema";
 import OrganizationSchema from "@/components/OrganizationSchema";
