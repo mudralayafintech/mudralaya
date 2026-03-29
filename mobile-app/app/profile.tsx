@@ -144,7 +144,7 @@ export default function ProfileScreen() {
       return;
     }
 
-    const result = await ImagePicker.launchImagePickerAsync({
+    const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
       aspect: [1, 1],
@@ -439,6 +439,7 @@ export default function ProfileScreen() {
 // React Native usually needs 'base-64' package.
 // We will replace `atob` with `Buffer` if available or `base-64`.
 // For now, let's assume `global.atob` might not exist.
+// @ts-ignore
 import { decode as atob } from "base-64";
 if (!global.atob) {
   global.atob = atob;

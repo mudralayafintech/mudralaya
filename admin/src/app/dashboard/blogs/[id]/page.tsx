@@ -8,9 +8,11 @@ import dynamic from "next/dynamic";
 import { createClient } from "@/utils/supabase/client";
 import { adminApiRequest } from "@/lib/adminApi";
 import styles from "./editor.module.css";
+// @ts-ignore
 import "react-quill-new/dist/quill.snow.css";
 
-const ReactQuill = dynamic(() => import("react-quill-new"), { ssr: false });
+// @ts-ignore
+const ReactQuill: any = dynamic(() => import("react-quill-new"), { ssr: false });
 
 export default function BlogEditor() {
     const { id } = useParams();

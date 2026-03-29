@@ -251,7 +251,7 @@ export default function Membership() {
 
       const token = sessionData?.session?.access_token;
       if (!token) {
-        alert("Session expired. Please log in again.");
+        showAlert("Error", "Session expired. Please log in again.", "error");
         return;
       }
 

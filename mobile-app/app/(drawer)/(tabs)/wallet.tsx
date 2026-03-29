@@ -838,16 +838,24 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.05,
     shadowRadius: 4,
   },
-  notificationDot: {
+  notificationBadge: {
     position: "absolute",
     top: 8,
     right: 8,
-    width: 8,
-    height: 8,
-    borderRadius: 4,
     backgroundColor: "#ef4444",
+    borderRadius: 10,
+    minWidth: 20,
+    height: 20,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 4,
     borderWidth: 1.5,
     borderColor: "#fff",
+  },
+  notificationCountText: {
+    color: "#fff",
+    fontSize: 10,
+    fontWeight: "bold",
   },
   header: {
     flexDirection: "row",

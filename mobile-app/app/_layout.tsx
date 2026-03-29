@@ -137,7 +137,7 @@ export default function RootLayout() {
     const isPublicRoute =
       segments[0] === "login" ||
       segments[0] === "create-task" ||
-      segments.length === 0; // Root path
+      !segments[0]; // Root path
 
     if (session && !inAuthGroup) {
       router.replace("/(drawer)/(tabs)");

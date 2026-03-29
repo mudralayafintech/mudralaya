@@ -268,6 +268,15 @@ export default function CreateTaskPage() {
   );
 }
 
+interface InputProps {
+  label: string;
+  value: string;
+  onChangeText: (text: string) => void;
+  placeholder?: string;
+  multiline?: boolean;
+  keyboardType?: any;
+}
+
 function Input({
   label,
   value,
@@ -275,7 +284,7 @@ function Input({
   placeholder,
   multiline,
   keyboardType,
-}: any) {
+}: InputProps) {
   return (
     <View style={styles.inputGroup}>
       <Text style={styles.label}>{label}</Text>

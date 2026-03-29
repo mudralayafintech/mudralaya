@@ -1,0 +1,8 @@
+﻿src/app/dashboard/blogs/[id]/page.tsx(13,41): error TS2307: Cannot find module 'react-quill-new' or its corresponding type declarations.
+src/app/dashboard/blogs/[id]/page.tsx(240,33): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(props: {}, context?: any): string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | Promise<...> | Component<...> | null | undefined', gave the following error.
+    Type '{ theme: string; value: string; onChange: (value: string) => void; modules: { toolbar: (string[] | { header: (number | boolean)[]; }[] | ({ color: never[]; background?: undefined; } | { background: never[]; color?: undefined; })[] | { ...; }[] | { ...; }[])[]; }; style: { ...; }; }' is not assignable to type 'IntrinsicAttributes'.
+      Property 'theme' does not exist on type 'IntrinsicAttributes'.
+  Overload 2 of 2, '(props: {}): string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | Promise<...> | Component<...> | null | undefined', gave the following error.
+    Type '{ theme: string; value: string; onChange: (value: string) => void; modules: { toolbar: (string[] | { header: (number | boolean)[]; }[] | ({ color: never[]; background?: undefined; } | { background: never[]; color?: undefined; })[] | { ...; }[] | { ...; }[])[]; }; style: { ...; }; }' is not assignable to type 'IntrinsicAttributes'.
+      Property 'theme' does not exist on type 'IntrinsicAttributes'.

@@ -146,7 +146,13 @@ export default function CustomDrawerContent(props: any) {
               )}
               onPress={() => router.push("/(drawer)/membership")}
             />
-            onPress={() => router.push("/(drawer)/settings")}
+            <DrawerItem
+              label="Settings"
+              labelStyle={{ color: textColor }}
+              icon={({ color, size }) => (
+                <Settings size={size} color={theme === "dark" ? "#fff" : "#000"} />
+              )}
+              onPress={() => router.push("/(drawer)/settings")}
             />
 
             <View style={[styles.separator, { backgroundColor: borderColor }]} />
