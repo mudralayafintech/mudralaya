@@ -114,9 +114,7 @@ const FinancialCourses = () => {
               </div>
 
               <h1 className={styles.heroTitle}>
-                Master Money Skills Before{" "}
-                <span className={styles.gradientText}>Life Throws</span> Real
-                Bills at You
+                Start Your Career in Mudralaya
               </h1>
 
               <p className={styles.heroSub}>
@@ -178,8 +176,7 @@ const FinancialCourses = () => {
               className={styles.benefitsContent}
             >
               <h2 className={styles.sectionTitle}>
-                Why Every Student Needs{" "}
-                <span className={styles.accent}>Financial Education</span> Now
+                Financial Courses for Students
               </h2>
               <p className={styles.sectionSub}>
                 Starting early gives massive advantages. Whether you&apos;re in

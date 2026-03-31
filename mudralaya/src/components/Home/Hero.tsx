@@ -61,7 +61,7 @@ const Hero = () => {
           >
             <div className={styles.imageInner}>
               <Image
-                src="/images/banner-2.png"
+                src="/images/team.png"
                 alt="Business Professionals"
                 width={650}
                 height={760}

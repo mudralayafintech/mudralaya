@@ -123,9 +123,7 @@ const FinancialEntrepreneurship = () => {
             </div>
 
             <h1 className={styles.heroTitle}>
-              Turn Your Ideas into{" "}
-              <span className={styles.gradientText}>Profitable Ventures</span>{" "}
-              – With Smart Finance at the Core
+              Financial Entrepreneurship Platform
             </h1>
 
             <p className={styles.heroDesc}>
@@ -181,8 +179,7 @@ const FinancialEntrepreneurship = () => {
               className={styles.whyLeft}
             >
               <h2 className={styles.sectionTitle}>
-                What Makes a Financial Entrepreneurship Platform{" "}
-                <span className={styles.accent}>Essential Today</span>
+                Financial Entrepreneurship Platform
               </h2>
               <p className={styles.sectionSub}>
                 Starting and running a business isn&apos;t just about a great

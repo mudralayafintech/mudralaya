@@ -142,9 +142,7 @@ const FintechServices = () => {
               </div>
 
               <h1 className={styles.heroTitle}>
-                India&apos;s Fintech Revolution:{" "}
-                <span className={styles.gradientText}>Where Innovation</span>{" "}
-                Meets Everyday Money
+                Fintech Financial Services in India
               </h1>
 
               <p className={styles.heroDesc}>
@@ -228,9 +226,7 @@ const FintechServices = () => {
               className={styles.growthContent}
             >
               <h2 className={styles.sectionTitle}>
-                The Explosive Growth of{" "}
-                <span className={styles.accent}>Fintech Financial Services</span>{" "}
-                in India
+                Fintech Investment in India
               </h2>
               <p className={styles.sectionSub}>
                 India leads the world in digital payments thanks to UPI, with
