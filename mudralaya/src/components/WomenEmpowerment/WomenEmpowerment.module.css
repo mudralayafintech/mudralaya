@@ -1,0 +1,299 @@
+.container {
+  width: 100%;
+  overflow-x: hidden;
+}
+
+/* Hero Section */
+.heroSection {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 80px 20px;
+  text-align: center;
+}
+
+.heroContent {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.heroTitle {
+  font-size: 3.5rem;
+  font-weight: 700;
+  margin-bottom: 20px;
+  line-height: 1.2;
+}
+
+.heroSubtitle {
+  font-size: 1.5rem;
+  margin-bottom: 40px;
+  opacity: 0.95;
+  line-height: 1.6;
+}
+
+.ctaButton {
+  background: white;
+  color: #667eea;
+  padding: 14px 40px;
+  font-size: 1rem;
+  border: none;
+  border-radius: 50px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.ctaButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+/* Benefits Section */
+.benefitsSection {
+  padding: 80px 20px;
+  background-color: #f8f9fa;
+}
+
+.benefitsSection h2 {
+  text-align: center;
+  font-size: 2.5rem;
+  margin-bottom: 60px;
+  color: #222;
+}
+
+.benefitsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 30px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.benefitCard {
+  background: white;
+  padding: 40px 30px;
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.benefitCard:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+}
+
+.benefitCard h3 {
+  font-size: 1.5rem;
+  margin-bottom: 15px;
+  color: #667eea;
+}
+
+.benefitCard p {
+  color: #555;
+  line-height: 1.6;
+  font-size: 1rem;
+}
+
+/* Programs Section */
+.programsSection {
+  padding: 80px 20px;
+  background: white;
+}
+
+.programsSection h2 {
+  text-align: center;
+  font-size: 2.5rem;
+  margin-bottom: 60px;
+  color: #222;
+}
+
+.programsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 30px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.programCard {
+  background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+  padding: 40px;
+  border-radius: 10px;
+  border-left: 5px solid #667eea;
+  transition: all 0.3s;
+}
+
+.programCard:hover {
+  background: linear-gradient(135deg, #667eea25 0%, #764ba225 100%);
+  transform: translateX(5px);
+}
+
+.programCard h3 {
+  font-size: 1.4rem;
+  margin-bottom: 15px;
+  color: #222;
+}
+
+.programCard p {
+  color: #666;
+  line-height: 1.6;
+  font-size: 1rem;
+}
+
+/* Statistics Section */
+.statsSection {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 80px 20px;
+}
+
+.statsSection h2 {
+  text-align: center;
+  font-size: 2.5rem;
+  margin-bottom: 60px;
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 40px;
+  max-width: 1000px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.statCard h4 {
+  font-size: 2.5rem;
+  margin-bottom: 10px;
+  font-weight: 700;
+}
+
+.statCard p {
+  font-size: 1.1rem;
+  opacity: 0.9;
+}
+
+/* CTA Section */
+.ctaSection {
+  padding: 80px 20px;
+  text-align: center;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e8eef7 100%);
+}
+
+.ctaSection h2 {
+  font-size: 2.5rem;
+  margin-bottom: 20px;
+  color: #222;
+}
+
+.ctaSection p {
+  font-size: 1.2rem;
+  color: #666;
+  margin-bottom: 40px;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.ctaButtonPrimary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 16px 50px;
+  font-size: 1.1rem;
+  border: none;
+  border-radius: 50px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.ctaButtonPrimary:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 15px 40px rgba(102, 126, 234, 0.4);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .heroTitle {
+    font-size: 2.25rem;
+  }
+
+  .heroSubtitle {
+    font-size: 1.1rem;
+  }
+
+  .benefitsSection h2,
+  .programsSection h2,
+  .ctaSection h2 {
+    font-size: 2rem;
+  }
+
+  .benefitsGrid,
+  .programsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .statsGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 30px;
+  }
+
+  .statCard h4 {
+    font-size: 1.8rem;
+  }
+
+  .ctaSection p {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .heroSection {
+    padding: 50px 15px;
+  }
+
+  .heroTitle {
+    font-size: 1.75rem;
+    margin-bottom: 15px;
+  }
+
+  .heroSubtitle {
+    font-size: 0.95rem;
+    margin-bottom: 25px;
+  }
+
+  .ctaButton,
+  .ctaButtonPrimary {
+    padding: 12px 30px;
+    font-size: 0.9rem;
+  }
+
+  .benefitsSection,
+  .programsSection,
+  .statsSection,
+  .ctaSection {
+    padding: 50px 15px;
+  }
+
+  .benefitCard,
+  .programCard {
+    padding: 25px 20px;
+  }
+
+  .benefitCard h3,
+  .programCard h3 {
+    font-size: 1.2rem;
+  }
+
+  .statsGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+
+  .statCard h4 {
+    font-size: 1.5rem;
+  }
+
+  .statCard p {
+    font-size: 0.9rem;
+  }
+}

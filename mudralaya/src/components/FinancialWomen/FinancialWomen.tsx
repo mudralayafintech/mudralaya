@@ -122,9 +122,7 @@ const FinancialWomen = () => {
               </div>
 
               <h1 className={styles.heroTitle}>
-                Your Money,{" "}
-                <span className={styles.gradientText}>Your Power</span> –
-                Build the Freedom You Deserve
+                Financial Independence for Women
               </h1>
 
               <p className={styles.heroDesc}>
@@ -203,9 +201,7 @@ const FinancialWomen = () => {
               className={styles.whyContent}
             >
               <h2 className={styles.sectionTitle}>
-                Why Financial Independence{" "}
-                <span className={styles.accent}>Matters More</span> for Women
-                Today
+                Women and Financial Independence
               </h2>
               <p className={styles.sectionSub}>
                 Women often face unique financial realities. Yet when women
