@@ -140,20 +140,21 @@ serve(async (req: Request): Promise<Response> => {
         break;
 
       case 'create-task':
-        const { title, description, reward_free, reward_member, reward_premium, type, video_url, video_link, pdf_url, action_link, icon_type, target_audience, steps, reward_min, reward_max, reward_info } = data
+        const { title, description, reward_free, reward_member, reward_premium, type, task_type, video_url, video_link, pdf_url, action_link, icon_type, target_audience, steps, reward_min, reward_max, reward_info } = data
         const { data: createdTask, error: createTaskError } = await supabaseClient
           .from('tasks')
           .insert({
             title,
             description,
             reward_free: reward_free || 0,
-            reward_premium: reward_premium || reward_member || 0,
+            reward_member: reward_member || 0,
+            reward_premium: reward_premium || 0,
             video_link: video_link || video_url,
             steps: steps,
             reward_min: reward_min,
             reward_max: reward_max,
             reward_info: reward_info,
-            category: type,
+            task_type: task_type || type || 'Daily',
             icon_type: icon_type || 'group',
             pdf_url,
             action_link,
@@ -181,7 +182,7 @@ serve(async (req: Request): Promise<Response> => {
           reward_min: updatedFields.reward_min,
           reward_max: updatedFields.reward_max,
           reward_info: updatedFields.reward_info,
-          category: updatedFields.task_type || updatedFields.type,
+          task_type: updatedFields.task_type || updatedFields.type,
           icon_type: updatedFields.icon_type,
           video_link: updatedFields.video_link,
           pdf_url: updatedFields.pdf_url,

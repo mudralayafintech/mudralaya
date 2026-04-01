@@ -719,7 +719,7 @@ export default function TasksPage() {
                     <div className={styles.taskInfo}>
                       <h3>{task.title}</h3>
                       <div className={styles.taskMeta}>
-                        <span>{task.task_type || task.type || task.category}</span>
+                        <span>{task.category || task.type}</span>
                         <div
                           className={styles.infoTooltipContainer}
                           onClick={(e) => e.stopPropagation()}
@@ -763,7 +763,7 @@ export default function TasksPage() {
                                 ₹{" "}
                                 {task.reward_member ||
                                   task.reward_premium ||
-                                  0}
+                                  800}
                               </div>
                             </div>
                             <div className={styles.priceItem}>
