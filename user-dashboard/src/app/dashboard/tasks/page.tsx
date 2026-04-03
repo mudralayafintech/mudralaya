@@ -406,6 +406,8 @@ export default function TasksPage() {
       if (
         !selectedProfs.includes("All") &&
         task.target_audience &&
+        Array.isArray(task.target_audience) &&
+        task.target_audience.length > 0 &&
         !task.target_audience.some((prof) => selectedProfs.includes(prof))
       ) {
         return false;
@@ -424,23 +426,18 @@ export default function TasksPage() {
       }
 
       // Task Type Filter (Daily/Dedicated buttons)
-      // Use task_type if available, otherwise fall back to checking title/category
-      const taskType = task.type || task.task_type || "Daily";
+      // Use task_type if available, otherwise fall back to checking category or type
+      const taskTypeRaw = task.task_type || task.type || task.category || "Daily";
+      const isActuallyDedicated = taskTypeRaw === "Dedicated" || taskTypeRaw?.toLowerCase().includes("dedicated");
 
       if (activeTaskType === "Daily") {
-        // Show Daily tasks (anything that's not Dedicated)
-        if (
-          taskType === "Dedicated" ||
-          taskType?.toLowerCase().includes("dedicated")
-        ) {
+        // Show Daily tasks (anything that's not explicitly Dedicated)
+        if (isActuallyDedicated) {
           return false;
         }
       } else {
         // Show Dedicated tasks only
-        if (
-          taskType !== "Dedicated" &&
-          !taskType?.toLowerCase().includes("dedicated")
-        ) {
+        if (!isActuallyDedicated) {
           return false;
         }
       }
@@ -719,7 +716,7 @@ export default function TasksPage() {
                     <div className={styles.taskInfo}>
                       <h3>{task.title}</h3>
                       <div className={styles.taskMeta}>
-                        <span>{task.task_type || task.type || task.category}</span>
+                        <span>{task.task_type || task.category || task.type || "Daily Task"}</span>
                         <div
                           className={styles.infoTooltipContainer}
                           onClick={(e) => e.stopPropagation()}

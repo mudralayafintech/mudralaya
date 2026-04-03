@@ -139,26 +139,37 @@ serve(async (req: Request): Promise<Response> => {
         result = allTasks
         break;
 
-      case 'create-task':
+      case 'create-task': {
         const { title, description, reward_free, reward_member, reward_premium, type, task_type, video_url, video_link, pdf_url, action_link, icon_type, target_audience, steps, reward_min, reward_max, reward_info } = data
+        
+        // Ensure target_audience is an array
+        let finalAudience = ['All']
+        if (target_audience) {
+          if (Array.isArray(target_audience)) {
+            if (target_audience.length > 0) finalAudience = target_audience
+          } else if (typeof target_audience === 'string') {
+            finalAudience = [target_audience]
+          }
+        }
+
         const { data: createdTask, error: createTaskError } = await supabaseClient
           .from('tasks')
           .insert({
             title,
-            description,
+            description: description || '',
             reward_free: reward_free || 0,
             reward_member: reward_member || 0,
             reward_premium: reward_premium || 0,
-            video_link: video_link || video_url,
-            steps: steps,
-            reward_min: reward_min,
-            reward_max: reward_max,
-            reward_info: reward_info,
+            video_link: video_link || video_url || null,
+            steps: steps || '',
+            reward_min: reward_min || 0,
+            reward_max: reward_max || 0,
+            reward_info: reward_info || '',
             task_type: task_type || type || 'Daily',
             icon_type: icon_type || 'group',
-            pdf_url,
-            action_link,
-            target_audience: target_audience && target_audience.length > 0 ? target_audience : ['All'],
+            pdf_url: pdf_url || null,
+            action_link: action_link || null,
+            target_audience: finalAudience,
             is_active: true
           })
           .select()
@@ -167,29 +178,39 @@ serve(async (req: Request): Promise<Response> => {
         if (createTaskError) throw createTaskError
         result = createdTask
         break;
+      }
 
       case 'update-task': {
         const { id, ...updatedFields } = data
         if (!id) throw new Error('Task ID is required for update')
 
+        // Ensure target_audience is an array
+        let finalAudience = updatedFields.target_audience
+        if (finalAudience) {
+          if (!Array.isArray(finalAudience)) {
+            finalAudience = typeof finalAudience === 'string' ? [finalAudience] : ['All']
+          }
+        }
+
         // Clean up the fields to match table schema
         const taskData = {
           title: updatedFields.title,
-          description: updatedFields.description,
-          reward_free: updatedFields.reward_free,
-          reward_member: updatedFields.reward_member,
-          reward_premium: updatedFields.reward_premium,
-          reward_min: updatedFields.reward_min,
-          reward_max: updatedFields.reward_max,
-          reward_info: updatedFields.reward_info,
-          task_type: updatedFields.task_type || updatedFields.type,
-          icon_type: updatedFields.icon_type,
-          video_link: updatedFields.video_link,
-          pdf_url: updatedFields.pdf_url,
-          action_link: updatedFields.action_link,
-          steps: updatedFields.steps,
-          target_audience: updatedFields.target_audience,
-          is_active: updatedFields.is_active !== undefined ? updatedFields.is_active : true
+          description: updatedFields.description || '',
+          reward_free: updatedFields.reward_free || 0,
+          reward_member: updatedFields.reward_member || 0,
+          reward_premium: updatedFields.reward_premium || 0,
+          reward_min: updatedFields.reward_min || 0,
+          reward_max: updatedFields.reward_max || 0,
+          reward_info: updatedFields.reward_info || '',
+          task_type: updatedFields.task_type || updatedFields.type || 'Daily',
+          icon_type: updatedFields.icon_type || 'group',
+          video_link: updatedFields.video_link || null,
+          pdf_url: updatedFields.pdf_url || null,
+          action_link: updatedFields.action_link || null,
+          steps: updatedFields.steps || '',
+          target_audience: finalAudience && finalAudience.length > 0 ? finalAudience : ['All'],
+          is_active: updatedFields.is_active !== undefined ? updatedFields.is_active : true,
+          updated_at: new Date().toISOString()
         }
 
         const { data: updatedTask, error: updateError } = await supabaseClient
