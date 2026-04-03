@@ -1,0 +1,54 @@
+Initialising login role...
+Connecting to remote database...
+Do you want to push these migrations to the remote database?
+ • 20260111_kyc_admin_policy_update.sql
+ • 20260115_wallet_schema.sql
+ • 20260124_add_task_completion_flow.sql
+ • 20260124_fix_wallet_stats_rpc.sql
+ • 20260125_ensure_tasks_table.sql
+ • 20260125_kyc_rls.sql
+ • 20260131170000_create_notifications_table.sql
+ • 20260131_add_profile_fields.sql
+ • 20260202182118_add_is_global_to_notifications.sql
+ • 20260202182246_task_notification_trigger.sql
+ • 20260202201837_enable_pg_net.sql
+ • 20260202_add_notifications_metadata.sql
+ • 20260202_add_task_type.sql
+ • 20260202_remove_category.sql
+ • 20260202_task_notification_trigger.sql
+ • 20260203214000_add_membership_fields.sql
+ • 20260203233000_fix_user_tasks_rls.sql
+ • 20260203234000_fix_user_tasks_fks.sql
+ • 20260203_insert_new_tasks.sql
+ • 20260204053000_add_razorpay_columns.sql
+ • 20260204185000_alter_tasks_table.sql
+ • 20260204191500_add_reward_range.sql
+ • 20260204194500_add_reward_info.sql
+ • 20260204215500_add_transactions_table.sql
+ • 20260205_combined_notifications_and_tasks.sql
+ • 20260303200108_create_blogs_table.sql
+ • 20260303204313_create_admin_users_table.sql
+ • 20260308160000_add_blog_keywords.sql
+ • 20260330_enhance_tasks_flow.sql
+ • 20260330_storage_setup.sql
+ • 20260330_update_wallet_rpc.sql
+ • 20260402_fix_task_trigger.sql
+ • 20260403_add_partner_schema.sql
+
+ [Y/n] 
+Applying migration 20260111_kyc_admin_policy_update.sql...
+ERROR: policy "Allow all authenticated users to view all KYC" for table "user_kyc" already exists (SQLSTATE 42710)
+At statement: 0                                                                                                   
+-- Allow Admins (or all authenticated users for now) to view/update all KYC records                               
+                                                                                                                  
+-- 1. Drop existing restrictive policies if necessary, or just add a broader one.                                 
+-- Ideally, we should check for an 'admin' role, but if specific role management isn't robust yet,                
+-- we'll allow all authenticated users to READ (so Admin Panel works).                                            
+-- WRITING should still be restricted or handled via Edge Functions if strict.                                    
+                                                                                                                  
+-- Policy: Allow all authenticated users to SELECT from user_kyc                                                  
+-- This allows the Admin Dashboard to fetch the list.                                                             
+create policy "Allow all authenticated users to view all KYC"                                                     
+on public.user_kyc for select                                                                                     
+using ( auth.role() = 'authenticated' )                                                                           
+Try rerunning the command with --debug to troubleshoot the error.
