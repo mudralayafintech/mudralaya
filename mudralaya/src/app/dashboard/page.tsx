@@ -129,8 +129,10 @@ export default function DashboardHome() {
         window.open(task.action_link, "_blank");
       }
 
+      const { data: { session } } = await supabase.auth.getSession();
       const { error } = await supabase.functions.invoke("dashboard-api", {
         body: { action: "start-task", taskId: task.id },
+        headers: session ? { Authorization: `Bearer ${session.access_token}` } : undefined
       });
 
       if (error) {

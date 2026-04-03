@@ -82,10 +82,12 @@ export default function TasksPage() {
   useEffect(() => {
     const fetchTasks = async () => {
       try {
+        const { data: { session } } = await supabase.auth.getSession();
         const { data, error } = await supabase.functions.invoke(
           "dashboard-api",
           {
             body: { action: "get-tasks" },
+            headers: session ? { Authorization: `Bearer ${session.access_token}` } : undefined
           },
         );
 
@@ -112,8 +114,10 @@ export default function TasksPage() {
     }
 
     try {
+      const { data: { session } } = await supabase.auth.getSession();
       const { error } = await supabase.functions.invoke("dashboard-api", {
         body: { action: "start-task", taskId: task.id },
+        headers: session ? { Authorization: `Bearer ${session.access_token}` } : undefined
       });
 
       if (error) {
@@ -173,6 +177,7 @@ export default function TasksPage() {
       }
 
       // 2. Call API
+      const { data: { session } } = await supabase.auth.getSession();
       const { error } = await supabase.functions.invoke("dashboard-api", {
         body: {
           action: "complete-task",
@@ -183,6 +188,7 @@ export default function TasksPage() {
             action_link_visited: task.action_link ? true : false,
           },
         },
+        headers: session ? { Authorization: `Bearer ${session.access_token}` } : undefined
       });
 
       if (error) {

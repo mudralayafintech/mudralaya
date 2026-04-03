@@ -123,6 +123,7 @@ export default function Wallet() {
         "bank-account",
         {
           method: "GET",
+          headers: session ? { Authorization: `Bearer ${session.access_token}` } : undefined
         }
       );
 
@@ -141,6 +142,7 @@ export default function Wallet() {
         "dashboard-api",
         {
           body: { action: "get-dashboard-summary" },
+          headers: session ? { Authorization: `Bearer ${session.access_token}` } : undefined
         }
       );
 
@@ -149,6 +151,7 @@ export default function Wallet() {
         "dashboard-api",
         {
           body: { action: "get-wallet" },
+          headers: session ? { Authorization: `Bearer ${session.access_token}` } : undefined
         }
       );
 
@@ -187,9 +190,11 @@ export default function Wallet() {
     if (!validateForm()) return;
 
     try {
+      const { data: { session } } = await supabase.auth.getSession();
       const { error } = await supabase.functions.invoke("bank-account", {
         method: "POST",
         body: formData,
+        headers: session ? { Authorization: `Bearer ${session.access_token}` } : undefined
       });
 
       if (error) throw error;
