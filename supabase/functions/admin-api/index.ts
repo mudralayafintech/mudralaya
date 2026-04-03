@@ -377,55 +377,92 @@ serve(async (req: Request): Promise<Response> => {
         break;
 
       case 'get-client-details':
-        const { clientId } = data // This is actually the kyc_id from the URL
+        const { clientId } = data // Could be kyc_id or user_id
 
-        // 1. Fetch KYC record
-        const { data: kycRecord, error: kycError } = await supabaseClient
+        if (!clientId) throw new Error('Client ID is required');
+
+        // Try searching for KYC record first (since URLs used KYC ID before)
+        let { data: kycRecord, error: kycError } = await supabaseClient
           .from('user_kyc')
           .select('*')
           .eq('id', clientId)
-          .single()
+          .maybeSingle()
 
-        if (kycError) throw kycError
+        let targetUserId = kycRecord?.user_id
 
-        // 2. Fetch User record using reliable user_id
-        const { data: userRecord, error: userDetailsError } = await supabaseClient
-          .from('users')
-          .select('*')
-          .eq('id', kycRecord.user_id)
-          .single()
+        if (!kycRecord) {
+          // If not found by kyc ID, maybe clientId is actually the user_id
+          targetUserId = clientId
+          const { data: kycByUserId } = await supabaseClient
+            .from('user_kyc')
+            .select('*')
+            .eq('user_id', targetUserId)
+            .order('created_at', { ascending: false })
+            .limit(1)
+            .maybeSingle()
+            
+          kycRecord = kycByUserId
+        }
 
-        if (userDetailsError) throw userDetailsError
+        // Fetch User record using targetUserId
+        let userRecord = null;
+        if (targetUserId) {
+          const { data: fetchedUser, error: userDetailsError } = await supabaseClient
+            .from('users')
+            .select('*')
+            .eq('id', targetUserId)
+            .maybeSingle()
 
+          if (!userDetailsError && fetchedUser) {
+            userRecord = fetchedUser;
+          }
+        }
+
+        if (!userRecord && !kycRecord) {
+          throw new Error('Client not found')
+        }
 
         // Polyfill mobile_number if missing
         if (userRecord && !userRecord.mobile_number && userRecord.phone) {
           userRecord.mobile_number = userRecord.phone
         }
 
-        // 3. Return structure matching frontend expectation: User object with user_kyc array
+        // Return structure matching frontend expectation: User object with user_kyc array
         result = {
-          ...userRecord,
-          user_kyc: [kycRecord]
+          ...(userRecord || { id: targetUserId || clientId, full_name: 'Unknown User' }),
+          user_kyc: kycRecord ? [kycRecord] : []
         }
         break;
 
       case 'update-kyc-status':
-        const { userId: kycId, status, reason } = data // "userId" payload is actually KYC ID
+        const { userId: kycSearchId, status, reason } = data; // "userId" payload is actually KYC ID OR user_id
+        
+        let updateQuery = supabaseClient.from('user_kyc').update({
+          status: status,
+          rejection_reason: reason || null,
+          updated_at: new Date().toISOString()
+        });
 
-        // 1. Update user_kyc table using KYC ID
-        const { data: updatedKyc, error: updateKycError } = await supabaseClient
+        // Determine if kycSearchId is a user_id or kyc.id by checking if it exists as a kyc.id
+        const { data: checkKyc } = await supabaseClient
           .from('user_kyc')
-          .update({
-            status: status,
-            rejection_reason: reason || null,
-            updated_at: new Date()
-          })
-          .eq('id', kycId) // Correct column is id, not user_id
-          .select()
-          .single()
+          .select('id')
+          .eq('id', kycSearchId)
+          .maybeSingle();
 
-        if (updateKycError) throw updateKycError
+        if (checkKyc) {
+          updateQuery = updateQuery.eq('id', kycSearchId);
+        } else {
+          updateQuery = updateQuery.eq('user_id', kycSearchId);
+        }
+
+        const { data: updatedKycList, error: updateKycError } = await updateQuery.select();
+
+        if (updateKycError) throw updateKycError;
+        
+        const updatedKyc = updatedKycList && updatedKycList.length > 0 ? updatedKycList[0] : null;
+
+        if (!updatedKyc) throw new Error('KYC record not found to update');
 
         // 2. If approved, verify the user profile using the CORRECT user_id from the kyc record
         if (status === 'verified' && updatedKyc?.user_id) {
