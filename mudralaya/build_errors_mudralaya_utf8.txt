@@ -1,0 +1,2577 @@
+﻿
+> mudralaya-next@0.1.0 build
+> next build
+
+node.exe : ΓÜá 
+Warning: Next.js 
+inferred your 
+workspace root, but it 
+may not be correct.
+At line:1 char:1
++ & "C:\Program 
+Files\nodejs/node.exe" 
+"C:\Users\nisha\AppData
+\Roaming\ ...
++ ~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~
+~~
+    + CategoryInfo     
+         : 
+NotSpecified: (Γ    Üá 
+Warning: Ne...not     
+be correct.:String) [  
+  ], RemoteException
+    + 
+FullyQualifiedError    
+Id : NativeCommandErr  
+  or
+ 
+ We detected multiple 
+lockfiles and selected 
+the directory of D:\mud
+ralaya\package-lock.jso
+n as the root 
+directory.
+ To silence this 
+warning, set 
+`turbopack.root` in 
+your Next.js config, 
+or consider removing 
+one of the lockfiles 
+if it's not needed.
+   See https://nextjs.o
+rg/docs/app/api-referen
+ce/config/next-config-j
+s/turbopack#root-direct
+ory for more 
+information.
+ Detected additional 
+lockfiles: 
+   * D:\mudralaya\mudra
+laya\package-lock.json
+
+Γû▓ Next.js 16.1.1 (Turbopack)
+- Environments: .env
+
+  Creating an optimized production build ...
+
+> Build error occurred
+Error: Turbopack build 
+failed with 22 errors:
+./mudralaya/src/app/adm
+in/layout.tsx:1:1
+Module not found: 
+Can't resolve '@/compon
+ents/DashboardShell'
+[0m[31m[1m>[22m[39
+m[90m 1 |[39m 
+[36mimport[39m [33mD
+ashboardShell[39m 
+[36mfrom[39m [32m"@/
+components/DashboardShe
+ll"[39m[33m;[39m
+ [90m   |[39m [31m[
+1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[2
+2m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39
+m[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m[
+39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[3
+1m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1m
+^[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[
+1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[2
+2m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39
+m[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m[
+39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[3
+1m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1m
+^[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[
+1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[2
+2m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39
+m[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22
+m[39m
+ [90m 2 |[39m
+ [90m 3 |[39m 
+[36mexport[39m 
+[36mdefault[39m 
+[36mfunction[39m [33
+mDashboardLayout[39m({
+ [90m 4 |[39m   
+children[33m,[39m[0m
+
+Import map: aliased to 
+relative './src/compone
+nts/DashboardShell' 
+inside of 
+[project]/mudralaya
+
+
+https://nextjs.org/docs
+/messages/module-not-fo
+und
+
+
+./mudralaya/src/app/adm
+in/advisor/page.tsx:5:1
+Module not found: 
+Can't resolve '@/compon
+ents/dashboard/DataTabl
+e'
+[0m [90m 3 |[39m 
+[36mimport[39m 
+[33mReact[39m 
+[36mfrom[39m [32m"re
+act"[39m[33m;[39m
+ [90m 4 |[39m 
+[36mimport[39m { 
+useAdminData } 
+[36mfrom[39m [32m"@/
+hooks/useAdminData"[39
+m[33m;[39m
+[31m[1m>[22m[39m[9
+0m 5 |[39m 
+[36mimport[39m 
+[33mDataTable[39m 
+[36mfrom[39m [32m"@/
+components/dashboard/Da
+taTable"[39m[33m;[39
+m
+ [90m   |[39m [31m[
+1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[2
+2m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39
+m[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m[
+39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[3
+1m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1m
+^[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[
+1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[2
+2m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39
+m[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m[
+39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[3
+1m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1m
+^[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[
+1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[2
+2m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39
+m[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22
+m[39m
+ [90m 6 |[39m 
+[36mimport[39m { 
+adminApiRequest } 
+[36mfrom[39m [32m"@/
+lib/adminApi"[39m[33m
+;[39m
+ [90m 7 |[39m
+ [90m 8 |[39m 
+[36mexport[39m 
+[36mdefault[39m 
+[36mfunction[39m [33
+mAdvisorPage[39m() 
+{[0m
+
+Import map: aliased to 
+relative './src/compone
+nts/dashboard/DataTable
+' inside of 
+[project]/mudralaya
+
+
+Import traces:
+  Client Component 
+Browser:
+    ./mudralaya/src/app
+/admin/advisor/page.tsx
+ [Client Component 
+Browser]
+    ./mudralaya/src/app
+/admin/advisor/page.tsx
+ [Server Component]
+
+  Client Component SSR:
+    ./mudralaya/src/app
+/admin/advisor/page.tsx
+ [Client Component SSR]
+    ./mudralaya/src/app
+/admin/advisor/page.tsx
+ [Server Component]
+
+https://nextjs.org/docs
+/messages/module-not-fo
+und
+
+
+./mudralaya/src/app/adm
+in/contacts/page.tsx:5:
+1
+Module not found: 
+Can't resolve '@/compon
+ents/dashboard/DataTabl
+e'
+[0m [90m 3 |[39m 
+[36mimport[39m 
+[33mReact[39m 
+[36mfrom[39m [32m"re
+act"[39m[33m;[39m
+ [90m 4 |[39m 
+[36mimport[39m { 
+useAdminData } 
+[36mfrom[39m [32m"@/
+hooks/useAdminData"[39
+m[33m;[39m
+[31m[1m>[22m[39m[9
+0m 5 |[39m 
+[36mimport[39m 
+[33mDataTable[39m 
+[36mfrom[39m [32m"@/
+components/dashboard/Da
+taTable"[39m[33m;[39
+m
+ [90m   |[39m [31m[
+1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[2
+2m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39
+m[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m[
+39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[3
+1m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1m
+^[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[
+1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[2
+2m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39
+m[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m[
+39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[3
+1m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1m
+^[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[
+1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[2
+2m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39
+m[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22
+m[39m
+ [90m 6 |[39m 
+[36mimport[39m { 
+adminApiRequest } 
+[36mfrom[39m [32m"@/
+lib/adminApi"[39m[33m
+;[39m
+ [90m 7 |[39m
+ [90m 8 |[39m 
+[36mexport[39m 
+[36mdefault[39m 
+[36mfunction[39m [33
+mContactsPage[39m() 
+{[0m
+
+Import map: aliased to 
+relative './src/compone
+nts/dashboard/DataTable
+' inside of 
+[project]/mudralaya
+
+
+Import traces:
+  Client Component 
+Browser:
+    ./mudralaya/src/app
+/admin/contacts/page.ts
+x [Client Component 
+Browser]
+    ./mudralaya/src/app
+/admin/contacts/page.ts
+x [Server Component]
+
+  Client Component SSR:
+    ./mudralaya/src/app
+/admin/contacts/page.ts
+x [Client Component 
+SSR]
+    ./mudralaya/src/app
+/admin/contacts/page.ts
+x [Server Component]
+
+https://nextjs.org/docs
+/messages/module-not-fo
+und
+
+
+./mudralaya/src/app/adm
+in/join/page.tsx:5:1
+Module not found: 
+Can't resolve '@/compon
+ents/dashboard/DataTabl
+e'
+[0m [90m 3 |[39m 
+[36mimport[39m 
+[33mReact[39m 
+[36mfrom[39m [32m"re
+act"[39m[33m;[39m
+ [90m 4 |[39m 
+[36mimport[39m { 
+useAdminData } 
+[36mfrom[39m [32m"@/
+hooks/useAdminData"[39
+m[33m;[39m
+[31m[1m>[22m[39m[9
+0m 5 |[39m 
+[36mimport[39m 
+[33mDataTable[39m 
+[36mfrom[39m [32m"@/
+components/dashboard/Da
+taTable"[39m[33m;[39
+m
+ [90m   |[39m [31m[
+1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[2
+2m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39
+m[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m[
+39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[3
+1m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1m
+^[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[
+1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[2
+2m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39
+m[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m[
+39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[3
+1m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1m
+^[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[
+1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[2
+2m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39
+m[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22
+m[39m
+ [90m 6 |[39m 
+[36mimport[39m { 
+adminApiRequest } 
+[36mfrom[39m [32m"@/
+lib/adminApi"[39m[33m
+;[39m
+ [90m 7 |[39m
+ [90m 8 |[39m 
+[36mexport[39m 
+[36mdefault[39m 
+[36mfunction[39m [33
+mJoinRequestsPage[39m(
+) {[0m
+
+Import map: aliased to 
+relative './src/compone
+nts/dashboard/DataTable
+' inside of 
+[project]/mudralaya
+
+
+Import traces:
+  Client Component 
+Browser:
+    ./mudralaya/src/app
+/admin/join/page.tsx 
+[Client Component 
+Browser]
+    ./mudralaya/src/app
+/admin/join/page.tsx 
+[Server Component]
+
+  Client Component SSR:
+    ./mudralaya/src/app
+/admin/join/page.tsx 
+[Client Component SSR]
+    ./mudralaya/src/app
+/admin/join/page.tsx 
+[Server Component]
+
+https://nextjs.org/docs
+/messages/module-not-fo
+und
+
+
+./mudralaya/src/app/adm
+in/page.tsx:6:1
+Module not found: 
+Can't resolve '@/compon
+ents/dashboard/DataTabl
+e'
+[0m [90m 4 |[39m 
+[36mimport[39m { 
+useAdminData } 
+[36mfrom[39m [32m"@/
+hooks/useAdminData"[39
+m[33m;[39m
+ [90m 5 |[39m 
+[36mimport[39m [33mS
+tatsOverview[39m 
+[36mfrom[39m [32m"@/
+components/dashboard/St
+atsOverview"[39m[33m;
+[39m
+[31m[1m>[22m[39m[9
+0m 6 |[39m 
+[36mimport[39m 
+[33mDataTable[39m 
+[36mfrom[39m [32m"@/
+components/dashboard/Da
+taTable"[39m[33m;[39
+m
+ [90m   |[39m [31m[
+1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[2
+2m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39
+m[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m[
+39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[3
+1m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1m
+^[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[
+1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[2
+2m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39
+m[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m[
+39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[3
+1m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1m
+^[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[
+1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[2
+2m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39
+m[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22
+m[39m
+ [90m 7 |[39m 
+[36mimport[39m { 
+adminApiRequest } 
+[36mfrom[39m [32m"@/
+lib/adminApi"[39m[33m
+;[39m
+ [90m 8 |[39m
+ [90m 9 |[39m 
+[36mimport[39m 
+styles [36mfrom[39m 
+[32m"./dashboard.module
+.css"[39m[33m;[39m[
+0m
+
+Import map: aliased to 
+relative './src/compone
+nts/dashboard/DataTable
+' inside of 
+[project]/mudralaya
+
+
+Import traces:
+  Client Component 
+Browser:
+    ./mudralaya/src/app
+/admin/page.tsx 
+[Client Component 
+Browser]
+    ./mudralaya/src/app
+/admin/page.tsx 
+[Server Component]
+
+  Client Component SSR:
+    ./mudralaya/src/app
+/admin/page.tsx 
+[Client Component SSR]
+    ./mudralaya/src/app
+/admin/page.tsx 
+[Server Component]
+
+https://nextjs.org/docs
+/messages/module-not-fo
+und
+
+
+./mudralaya/src/app/das
+hboard/layout.tsx:5:1
+Module not found: 
+Can't resolve '@/compon
+ents/dashboard/Header'
+[0m [90m 3 |[39m 
+[36mimport[39m [33mR
+eact[39m[33m,[39m { 
+useState } 
+[36mfrom[39m [32m"re
+act"[39m[33m;[39m
+ [90m 4 |[39m 
+[36mimport[39m 
+[33mSidebar[39m 
+[36mfrom[39m [32m"@/
+components/dashboard/Si
+debar"[39m[33m;[39m
+[31m[1m>[22m[39m[9
+0m 5 |[39m 
+[36mimport[39m 
+[33mHeader[39m 
+[36mfrom[39m [32m"@/
+components/dashboard/He
+ader"[39m[33m;[39m
+ [90m   |[39m [31m[
+1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[2
+2m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39
+m[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m[
+39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[3
+1m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1m
+^[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[
+1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[2
+2m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39
+m[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m[
+39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[3
+1m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1m
+^[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[
+1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[2
+2m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39
+m
+ [90m 6 |[39m 
+[36mimport[39m 
+styles [36mfrom[39m 
+[32m"./layout.module.cs
+s"[39m[33m;[39m
+ [90m 7 |[39m
+ [90m 8 |[39m 
+[36mexport[39m 
+[36mdefault[39m 
+[36mfunction[39m [33
+mDashboardLayout[39m({
+[0m
+
+Import map: aliased to 
+relative './src/compone
+nts/dashboard/Header' 
+inside of 
+[project]/mudralaya
+
+
+Import traces:
+  Client Component 
+Browser:
+    ./mudralaya/src/app
+/dashboard/layout.tsx 
+[Client Component 
+Browser]
+    ./mudralaya/src/app
+/dashboard/layout.tsx 
+[Server Component]
+
+  Client Component SSR:
+    ./mudralaya/src/app
+/dashboard/layout.tsx 
+[Client Component SSR]
+    ./mudralaya/src/app
+/dashboard/layout.tsx 
+[Server Component]
+
+https://nextjs.org/docs
+/messages/module-not-fo
+und
+
+
+./mudralaya/src/app/das
+hboard/wallet/page.tsx:
+21:1
+Module not found: 
+Can't resolve '@/compon
+ents/dashboard/KYCModal
+'
+[0m [90m 19 |[39m 
+[36mimport[39m { 
+createClient } 
+[36mfrom[39m [32m"@/
+utils/supabase/client"
+[39m[33m;[39m
+ [90m 20 |[39m 
+[36mimport[39m 
+styles [36mfrom[39m 
+[32m"./wallet.module.cs
+s"[39m[33m;[39m
+[31m[1m>[22m[39m[9
+0m 21 |[39m 
+[36mimport[39m 
+[33mKYCModal[39m 
+[36mfrom[39m [32m"@/
+components/dashboard/KY
+CModal"[39m[33m;[39m
+ [90m    |[39m [31m
+[1m^[22m[39m[31m[1m
+^[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[
+1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[2
+2m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39
+m[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m[
+39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[3
+1m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1m
+^[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[
+1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[2
+2m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39
+m[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m[
+39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[3
+1m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1m
+^[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[
+1m^[22m[39m
+ [90m 22 |[39m
+ [90m 23 |[39m 
+[36mexport[39m 
+[36mdefault[39m 
+[36mfunction[39m 
+[33mWallet[39m() {
+ [90m 24 |[39m   
+[90m// eslint-disable-
+next-line @typescript-e
+slint/no-explicit-any[
+39m[0m
+
+Import map: aliased to 
+relative './src/compone
+nts/dashboard/KYCModal'
+ inside of 
+[project]/mudralaya
+
+
+Import traces:
+  Client Component 
+Browser:
+    ./mudralaya/src/app
+/dashboard/wallet/page.
+tsx [Client Component 
+Browser]
+    ./mudralaya/src/app
+/dashboard/wallet/page.
+tsx [Server Component]
+
+  Client Component SSR:
+    ./mudralaya/src/app
+/dashboard/wallet/page.
+tsx [Client Component 
+SSR]
+    ./mudralaya/src/app
+/dashboard/wallet/page.
+tsx [Server Component]
+
+https://nextjs.org/docs
+/messages/module-not-fo
+und
+
+
+./mudralaya/src/app/das
+hboard/layout.tsx:4:1
+Module not found: 
+Can't resolve '@/compon
+ents/dashboard/Sidebar'
+[0m [90m 2 |[39m
+ [90m 3 |[39m 
+[36mimport[39m [33mR
+eact[39m[33m,[39m { 
+useState } 
+[36mfrom[39m [32m"re
+act"[39m[33m;[39m
+[31m[1m>[22m[39m[9
+0m 4 |[39m 
+[36mimport[39m 
+[33mSidebar[39m 
+[36mfrom[39m [32m"@/
+components/dashboard/Si
+debar"[39m[33m;[39m
+ [90m   |[39m [31m[
+1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[2
+2m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39
+m[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m[
+39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[3
+1m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1m
+^[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[
+1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[2
+2m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39
+m[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m[
+39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[3
+1m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1m
+^[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[
+1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[2
+2m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39
+m[31m[1m^[22m[39m[
+31m[1m^[22m[39m
+ [90m 5 |[39m 
+[36mimport[39m 
+[33mHeader[39m 
+[36mfrom[39m [32m"@/
+components/dashboard/He
+ader"[39m[33m;[39m
+ [90m 6 |[39m 
+[36mimport[39m 
+styles [36mfrom[39m 
+[32m"./layout.module.cs
+s"[39m[33m;[39m
+ [90m 7 |[39m[0m
+
+Import map: aliased to 
+relative './src/compone
+nts/dashboard/Sidebar' 
+inside of 
+[project]/mudralaya
+
+
+Import traces:
+  Client Component 
+Browser:
+    ./mudralaya/src/app
+/dashboard/layout.tsx 
+[Client Component 
+Browser]
+    ./mudralaya/src/app
+/dashboard/layout.tsx 
+[Server Component]
+
+  Client Component SSR:
+    ./mudralaya/src/app
+/dashboard/layout.tsx 
+[Client Component SSR]
+    ./mudralaya/src/app
+/dashboard/layout.tsx 
+[Server Component]
+
+https://nextjs.org/docs
+/messages/module-not-fo
+und
+
+
+./mudralaya/src/app/adm
+in/page.tsx:5:1
+Module not found: 
+Can't resolve '@/compon
+ents/dashboard/StatsOve
+rview'
+[0m [90m 3 |[39m 
+[36mimport[39m 
+[33mReact[39m 
+[36mfrom[39m [32m"re
+act"[39m[33m;[39m
+ [90m 4 |[39m 
+[36mimport[39m { 
+useAdminData } 
+[36mfrom[39m [32m"@/
+hooks/useAdminData"[39
+m[33m;[39m
+[31m[1m>[22m[39m[9
+0m 5 |[39m 
+[36mimport[39m [33mS
+tatsOverview[39m 
+[36mfrom[39m [32m"@/
+components/dashboard/St
+atsOverview"[39m[33m;
+[39m
+ [90m   |[39m [31m[
+1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[2
+2m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39
+m[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m[
+39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[3
+1m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1m
+^[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[
+1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[2
+2m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39
+m[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m[
+39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[3
+1m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1m
+^[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[
+1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[2
+2m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39
+m[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m[
+39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[3
+1m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1m
+^[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22m
+[39m
+ [90m 6 |[39m 
+[36mimport[39m 
+[33mDataTable[39m 
+[36mfrom[39m [32m"@/
+components/dashboard/Da
+taTable"[39m[33m;[39
+m
+ [90m 7 |[39m 
+[36mimport[39m { 
+adminApiRequest } 
+[36mfrom[39m [32m"@/
+lib/adminApi"[39m[33m
+;[39m
+ [90m 8 |[39m[0m
+
+Import map: aliased to 
+relative './src/compone
+nts/dashboard/StatsOver
+view' inside of 
+[project]/mudralaya
+
+
+Import traces:
+  Client Component 
+Browser:
+    ./mudralaya/src/app
+/admin/page.tsx 
+[Client Component 
+Browser]
+    ./mudralaya/src/app
+/admin/page.tsx 
+[Server Component]
+
+  Client Component SSR:
+    ./mudralaya/src/app
+/admin/page.tsx 
+[Client Component SSR]
+    ./mudralaya/src/app
+/admin/page.tsx 
+[Server Component]
+
+https://nextjs.org/docs
+/messages/module-not-fo
+und
+
+
+./mudralaya/src/app/adm
+in/tasks/page.tsx:3:1
+Module not found: 
+Can't resolve '@/compon
+ents/dashboard/TaskMana
+ger'
+[0m [90m 1 |[39m 
+[32m"use 
+client"[39m[33m;[39m
+ [90m 2 |[39m
+[31m[1m>[22m[39m[9
+0m 3 |[39m 
+[36mimport[39m 
+[33mTaskManager[39m 
+[36mfrom[39m [32m"@/
+components/dashboard/Ta
+skManager"[39m[33m;[
+39m
+ [90m   |[39m [31m[
+1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[2
+2m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39
+m[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m[
+39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[3
+1m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1m
+^[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[
+1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[2
+2m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39
+m[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m[
+39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[3
+1m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1m
+^[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[
+1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[2
+2m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39
+m[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m[
+39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[3
+1m[1m^[22m[39m
+ [90m 4 |[39m
+ [90m 5 |[39m 
+[36mexport[39m 
+[36mdefault[39m 
+[36mfunction[39m 
+[33mTasksPage[39m() {
+ [90m 6 |[39m   
+[36mreturn[39m [33m<
+[39m[33mTaskManager[
+39m [33m/[39m[33m>[
+39m[33m;[39m[0m
+
+Import map: aliased to 
+relative './src/compone
+nts/dashboard/TaskManag
+er' inside of 
+[project]/mudralaya
+
+
+Import traces:
+  Client Component 
+Browser:
+    ./mudralaya/src/app
+/admin/tasks/page.tsx 
+[Client Component 
+Browser]
+    ./mudralaya/src/app
+/admin/tasks/page.tsx 
+[Server Component]
+
+  Client Component SSR:
+    ./mudralaya/src/app
+/admin/tasks/page.tsx 
+[Client Component SSR]
+    ./mudralaya/src/app
+/admin/tasks/page.tsx 
+[Server Component]
+
+https://nextjs.org/docs
+/messages/module-not-fo
+und
+
+
+./mudralaya/src/app/das
+hboard/page.tsx:20:1
+Module not found: 
+Can't resolve '@/compon
+ents/dashboard/VideoMod
+al'
+[0m [90m 18 |[39m } 
+[36mfrom[39m [32m"lu
+cide-react"[39m[33m;
+[39m
+ [90m 19 |[39m 
+[36mimport[39m 
+styles [36mfrom[39m 
+[32m"./dashboard.module
+.css"[39m[33m;[39m
+[31m[1m>[22m[39m[9
+0m 20 |[39m 
+[36mimport[39m 
+[33mVideoModal[39m 
+[36mfrom[39m [32m"@/
+components/dashboard/Vi
+deoModal"[39m[33m;[3
+9m
+ [90m    |[39m [31m
+[1m^[22m[39m[31m[1m
+^[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[
+1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[2
+2m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39
+m[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m[
+39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[3
+1m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1m
+^[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[
+1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[2
+2m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39
+m[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m[
+39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[3
+1m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1m
+^[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[
+1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[2
+2m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39
+m
+ [90m 21 |[39m
+ [90m 22 |[39m 
+[36minterface[39m 
+[33mTask[39m {
+ [90m 23 |[39m   
+id[33m:[39m 
+string[33m;[39m[0m
+
+Import map: aliased to 
+relative './src/compone
+nts/dashboard/VideoModa
+l' inside of 
+[project]/mudralaya
+
+
+Import traces:
+  Client Component 
+Browser:
+    ./mudralaya/src/app
+/dashboard/page.tsx 
+[Client Component 
+Browser]
+    ./mudralaya/src/app
+/dashboard/page.tsx 
+[Server Component]
+
+  Client Component SSR:
+    ./mudralaya/src/app
+/dashboard/page.tsx 
+[Client Component SSR]
+    ./mudralaya/src/app
+/dashboard/page.tsx 
+[Server Component]
+
+https://nextjs.org/docs
+/messages/module-not-fo
+und
+
+
+./mudralaya/src/app/das
+hboard/membership/page.
+tsx:5:1
+Module not found: 
+Can't resolve '@/compon
+ents/ui/Skeleton'
+[0m [90m 3 |[39m 
+[36mimport[39m [33mR
+eact[39m[33m,[39m { 
+useState[33m,[39m 
+useEffect } 
+[36mfrom[39m [32m"re
+act"[39m[33m;[39m
+ [90m 4 |[39m 
+[36mimport[39m { [33
+mArrowRight[39m[33m,
+[39m [33mCrown[39m[3
+3m,[39m 
+[33mSparkles[39m } 
+[36mfrom[39m [32m"lu
+cide-react"[39m[33m;
+[39m
+[31m[1m>[22m[39m[9
+0m 5 |[39m 
+[36mimport[39m 
+[33mSkeleton[39m 
+[36mfrom[39m [32m"@/
+components/ui/Skeleton"
+[39m[33m;[39m
+ [90m   |[39m [31m[
+1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[2
+2m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39
+m[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m[
+39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[3
+1m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1m
+^[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[
+1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[2
+2m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39
+m[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m[
+39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[3
+1m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1m
+^[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[
+1m^[22m[39m[31m[1m^
+[22m[39m
+ [90m 6 |[39m 
+[36mimport[39m { 
+createClient } 
+[36mfrom[39m [32m"@/
+utils/supabase/client"
+[39m[33m;[39m
+ [90m 7 |[39m 
+[36mimport[39m 
+styles [36mfrom[39m 
+[32m"./membership.modul
+e.css"[39m[33m;[39m
+ [90m 8 |[39m[0m
+
+Import map: aliased to 
+relative './src/compone
+nts/ui/Skeleton' 
+inside of 
+[project]/mudralaya
+
+
+Import traces:
+  Client Component 
+Browser:
+    ./mudralaya/src/app
+/dashboard/membership/p
+age.tsx [Client 
+Component Browser]
+    ./mudralaya/src/app
+/dashboard/membership/p
+age.tsx [Server 
+Component]
+
+  Client Component SSR:
+    ./mudralaya/src/app
+/dashboard/membership/p
+age.tsx [Client 
+Component SSR]
+    ./mudralaya/src/app
+/dashboard/membership/p
+age.tsx [Server 
+Component]
+
+https://nextjs.org/docs
+/messages/module-not-fo
+und
+
+
+./mudralaya/src/app/das
+hboard/page.tsx:6:1
+Module not found: 
+Can't resolve '@/compon
+ents/ui/Skeleton'
+[0m [90m 4 |[39m 
+[36mimport[39m { 
+useRouter } 
+[36mfrom[39m [32m"ne
+xt/navigation"[39m[33
+m;[39m
+ [90m 5 |[39m 
+[36mimport[39m { 
+createClient } 
+[36mfrom[39m [32m"@/
+utils/supabase/client"
+[39m[33m;[39m
+[31m[1m>[22m[39m[9
+0m 6 |[39m 
+[36mimport[39m 
+[33mSkeleton[39m 
+[36mfrom[39m [32m"@/
+components/ui/Skeleton"
+[39m[33m;[39m
+ [90m   |[39m [31m[
+1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[2
+2m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39
+m[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m[
+39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[3
+1m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1m
+^[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[
+1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[2
+2m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39
+m[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m[
+39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[3
+1m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1m
+^[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[
+1m^[22m[39m[31m[1m^
+[22m[39m
+ [90m 7 |[39m 
+[36mimport[39m {
+ [90m 8 |[39m   [33m
+Play[39m[33m,[39m
+ [90m 9 |[39m   [33m
+TrendingUp[39m[33m,[
+39m[0m
+
+Import map: aliased to 
+relative './src/compone
+nts/ui/Skeleton' 
+inside of 
+[project]/mudralaya
+
+
+Import traces:
+  Client Component 
+Browser:
+    ./mudralaya/src/app
+/dashboard/page.tsx 
+[Client Component 
+Browser]
+    ./mudralaya/src/app
+/dashboard/page.tsx 
+[Server Component]
+
+  Client Component SSR:
+    ./mudralaya/src/app
+/dashboard/page.tsx 
+[Client Component SSR]
+    ./mudralaya/src/app
+/dashboard/page.tsx 
+[Server Component]
+
+https://nextjs.org/docs
+/messages/module-not-fo
+und
+
+
+./mudralaya/src/app/das
+hboard/plans/page.tsx:4
+:1
+Module not found: 
+Can't resolve '@/compon
+ents/ui/Skeleton'
+[0m [90m 2 |[39m
+ [90m 3 |[39m 
+[36mimport[39m [33mR
+eact[39m[33m,[39m { 
+useState[33m,[39m 
+useEffect } 
+[36mfrom[39m [32m"re
+act"[39m[33m;[39m
+[31m[1m>[22m[39m[9
+0m 4 |[39m 
+[36mimport[39m 
+[33mSkeleton[39m 
+[36mfrom[39m [32m"@/
+components/ui/Skeleton"
+[39m[33m;[39m
+ [90m   |[39m [31m[
+1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[2
+2m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39
+m[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m[
+39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[3
+1m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1m
+^[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[
+1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[2
+2m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39
+m[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m[
+39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[3
+1m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1m
+^[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[
+1m^[22m[39m[31m[1m^
+[22m[39m
+ [90m 5 |[39m 
+[36mimport[39m { 
+createClient } 
+[36mfrom[39m [32m"@/
+utils/supabase/client"
+[39m[33m;[39m
+ [90m 6 |[39m 
+[36mimport[39m 
+styles [36mfrom[39m 
+[32m"./plans.module.css
+"[39m[33m;[39m
+ [90m 7 |[39m[0m
+
+Import map: aliased to 
+relative './src/compone
+nts/ui/Skeleton' 
+inside of 
+[project]/mudralaya
+
+
+Import traces:
+  Client Component 
+Browser:
+    ./mudralaya/src/app
+/dashboard/plans/page.t
+sx [Client Component 
+Browser]
+    ./mudralaya/src/app
+/dashboard/plans/page.t
+sx [Server Component]
+
+  Client Component SSR:
+    ./mudralaya/src/app
+/dashboard/plans/page.t
+sx [Client Component 
+SSR]
+    ./mudralaya/src/app
+/dashboard/plans/page.t
+sx [Server Component]
+
+https://nextjs.org/docs
+/messages/module-not-fo
+und
+
+
+./mudralaya/src/app/das
+hboard/profile/page.tsx
+:15:1
+Module not found: 
+Can't resolve '@/compon
+ents/ui/Skeleton'
+[0m [90m 13 |[39m   
+[33mLoader2[39m[33m,
+[39m
+ [90m 14 |[39m } 
+[36mfrom[39m [32m"lu
+cide-react"[39m[33m;
+[39m
+[31m[1m>[22m[39m[9
+0m 15 |[39m 
+[36mimport[39m 
+[33mSkeleton[39m 
+[36mfrom[39m [32m"@/
+components/ui/Skeleton"
+[39m[33m;[39m
+ [90m    |[39m [31m
+[1m^[22m[39m[31m[1m
+^[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[
+1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[2
+2m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39
+m[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m[
+39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[3
+1m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1m
+^[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[
+1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[2
+2m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39
+m[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m[
+39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[3
+1m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1m
+^[22m[39m
+ [90m 16 |[39m 
+[36mimport[39m { 
+createClient } 
+[36mfrom[39m [32m"@/
+utils/supabase/client"
+[39m[33m;[39m
+ [90m 17 |[39m 
+[36mimport[39m 
+styles [36mfrom[39m 
+[32m"./profile.module.c
+ss"[39m[33m;[39m
+ [90m 18 |[39m[0m
+
+Import map: aliased to 
+relative './src/compone
+nts/ui/Skeleton' 
+inside of 
+[project]/mudralaya
+
+
+Import traces:
+  Client Component 
+Browser:
+    ./mudralaya/src/app
+/dashboard/profile/page
+.tsx [Client Component 
+Browser]
+    ./mudralaya/src/app
+/dashboard/profile/page
+.tsx [Server Component]
+
+  Client Component SSR:
+    ./mudralaya/src/app
+/dashboard/profile/page
+.tsx [Client Component 
+SSR]
+    ./mudralaya/src/app
+/dashboard/profile/page
+.tsx [Server Component]
+
+https://nextjs.org/docs
+/messages/module-not-fo
+und
+
+
+./mudralaya/src/app/das
+hboard/settings/page.ts
+x:15:1
+Module not found: 
+Can't resolve '@/compon
+ents/ui/Skeleton'
+[0m [90m 13 |[39m   
+[33mAlertCircle[39m[
+33m,[39m
+ [90m 14 |[39m } 
+[36mfrom[39m [32m"lu
+cide-react"[39m[33m;
+[39m
+[31m[1m>[22m[39m[9
+0m 15 |[39m 
+[36mimport[39m 
+[33mSkeleton[39m 
+[36mfrom[39m [32m"@/
+components/ui/Skeleton"
+[39m[33m;[39m
+ [90m    |[39m [31m
+[1m^[22m[39m[31m[1m
+^[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[
+1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[2
+2m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39
+m[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m[
+39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[3
+1m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1m
+^[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[
+1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[2
+2m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39
+m[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m[
+39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[3
+1m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1m
+^[22m[39m
+ [90m 16 |[39m 
+[36mimport[39m { 
+createClient } 
+[36mfrom[39m [32m"@/
+utils/supabase/client"
+[39m[33m;[39m
+ [90m 17 |[39m 
+[36mimport[39m 
+styles [36mfrom[39m 
+[32m"./settings.module.
+css"[39m[33m;[39m
+ [90m 18 |[39m[0m
+
+Import map: aliased to 
+relative './src/compone
+nts/ui/Skeleton' 
+inside of 
+[project]/mudralaya
+
+
+Import traces:
+  Client Component 
+Browser:
+    ./mudralaya/src/app
+/dashboard/settings/pag
+e.tsx [Client 
+Component Browser]
+    ./mudralaya/src/app
+/dashboard/settings/pag
+e.tsx [Server 
+Component]
+
+  Client Component SSR:
+    ./mudralaya/src/app
+/dashboard/settings/pag
+e.tsx [Client 
+Component SSR]
+    ./mudralaya/src/app
+/dashboard/settings/pag
+e.tsx [Server 
+Component]
+
+https://nextjs.org/docs
+/messages/module-not-fo
+und
+
+
+./mudralaya/src/app/das
+hboard/tasks/page.tsx:4
+:1
+Module not found: 
+Can't resolve '@/compon
+ents/ui/Skeleton'
+[0m [90m 2 |[39m
+ [90m 3 |[39m 
+[36mimport[39m [33mR
+eact[39m[33m,[39m { 
+useState[33m,[39m 
+useEffect } 
+[36mfrom[39m [32m"re
+act"[39m[33m;[39m
+[31m[1m>[22m[39m[9
+0m 4 |[39m 
+[36mimport[39m 
+[33mSkeleton[39m 
+[36mfrom[39m [32m"@/
+components/ui/Skeleton"
+[39m[33m;[39m
+ [90m   |[39m [31m[
+1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[2
+2m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39
+m[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m[
+39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[3
+1m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1m
+^[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[
+1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[2
+2m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39
+m[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m[
+39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[3
+1m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1m
+^[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[
+1m^[22m[39m[31m[1m^
+[22m[39m
+ [90m 5 |[39m 
+[36mimport[39m {
+ [90m 6 |[39m   [33m
+Search[39m[33m,[39m
+ [90m 7 |[39m   [33m
+Filter[39m[33m,[39m
+[0m
+
+Import map: aliased to 
+relative './src/compone
+nts/ui/Skeleton' 
+inside of 
+[project]/mudralaya
+
+
+Import traces:
+  Client Component 
+Browser:
+    ./mudralaya/src/app
+/dashboard/tasks/page.t
+sx [Client Component 
+Browser]
+    ./mudralaya/src/app
+/dashboard/tasks/page.t
+sx [Server Component]
+
+  Client Component SSR:
+    ./mudralaya/src/app
+/dashboard/tasks/page.t
+sx [Client Component 
+SSR]
+    ./mudralaya/src/app
+/dashboard/tasks/page.t
+sx [Server Component]
+
+https://nextjs.org/docs
+/messages/module-not-fo
+und
+
+
+./mudralaya/src/app/das
+hboard/wallet/page.tsx:
+18:1
+Module not found: 
+Can't resolve '@/compon
+ents/ui/Skeleton'
+[0m [90m 16 |[39m   
+[33mAlertCircle[39m[
+33m,[39m
+ [90m 17 |[39m } 
+[36mfrom[39m [32m"lu
+cide-react"[39m[33m;
+[39m
+[31m[1m>[22m[39m[9
+0m 18 |[39m 
+[36mimport[39m 
+[33mSkeleton[39m 
+[36mfrom[39m [32m"@/
+components/ui/Skeleton"
+[39m[33m;[39m
+ [90m    |[39m [31m
+[1m^[22m[39m[31m[1m
+^[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[
+1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[2
+2m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39
+m[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m[
+39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[3
+1m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1m
+^[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[
+1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[2
+2m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39
+m[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m[
+39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[3
+1m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1m
+^[22m[39m
+ [90m 19 |[39m 
+[36mimport[39m { 
+createClient } 
+[36mfrom[39m [32m"@/
+utils/supabase/client"
+[39m[33m;[39m
+ [90m 20 |[39m 
+[36mimport[39m 
+styles [36mfrom[39m 
+[32m"./wallet.module.cs
+s"[39m[33m;[39m
+ [90m 21 |[39m 
+[36mimport[39m 
+[33mKYCModal[39m 
+[36mfrom[39m [32m"@/
+components/dashboard/KY
+CModal"[39m[33m;[39m
+[0m
+
+Import map: aliased to 
+relative './src/compone
+nts/ui/Skeleton' 
+inside of 
+[project]/mudralaya
+
+
+Import traces:
+  Client Component 
+Browser:
+    ./mudralaya/src/app
+/dashboard/wallet/page.
+tsx [Client Component 
+Browser]
+    ./mudralaya/src/app
+/dashboard/wallet/page.
+tsx [Server Component]
+
+  Client Component SSR:
+    ./mudralaya/src/app
+/dashboard/wallet/page.
+tsx [Client Component 
+SSR]
+    ./mudralaya/src/app
+/dashboard/wallet/page.
+tsx [Server Component]
+
+https://nextjs.org/docs
+/messages/module-not-fo
+und
+
+
+./mudralaya/src/utils/s
+upabase/client.ts:1:1
+Module not found: 
+Can't resolve 
+'@supabase/ssr'
+[0m[31m[1m>[22m[39
+m[90m 1 |[39m 
+[36mimport[39m { 
+createBrowserClient } 
+[36mfrom[39m [32m"@s
+upabase/ssr"[39m[33m;
+[39m
+ [90m   |[39m [31m[
+1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[2
+2m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39
+m[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m[
+39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[3
+1m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1m
+^[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[
+1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[2
+2m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39
+m[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m[
+39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[3
+1m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1m
+^[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[
+1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[2
+2m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39
+m[31m[1m^[22m[39m
+ [90m 2 |[39m
+ [90m 3 |[39m 
+[36mconst[39m 
+supabaseUrl 
+[33m=[39m process[33
+m.[39menv[33m.[39m[
+33mNEXT_PUBLIC_SUPABASE
+_URL[39m [33m||[39m 
+[32m"https://mhsizqmhq
+ngcaztresmh.supabase.co
+"[39m[33m;[39m
+ [90m 4 |[39m 
+[36mconst[39m 
+supabaseAnonKey 
+[33m=[39m process[33
+m.[39menv[33m.[39m[
+33mNEXT_PUBLIC_SUPABASE
+_ANON_KEY[39m 
+[33m||[39m [32m"eyJh
+bGciOiJIUzI1NiIsInR5cCI
+6IkpXVCJ9.eyJpc3MiOiJzd
+XBhYmFzZSIsInJlZiI6Im1o
+c2l6cW1ocW5nY2F6dHJlc21
+oIiwicm9sZSI6ImFub24iLC
+JpYXQiOjE3NjcwMjQ0NDYsI
+mV4cCI6MjA4MjYwMDQ0Nn0.
+mURvS7dVh0jE5SSWDW2laVe
+00IhpUtgizBuMWPzEKH0"[
+39m[33m;[39m[0m
+
+
+
+Import traces:
+  Client Component 
+Browser:
+    ./mudralaya/src/uti
+ls/supabase/client.ts 
+[Client Component 
+Browser]
+    ./mudralaya/src/app
+/admin/kyc/page.tsx 
+[Client Component 
+Browser]
+    ./mudralaya/src/app
+/admin/kyc/page.tsx 
+[Server Component]
+
+  Client Component SSR:
+    ./mudralaya/src/uti
+ls/supabase/client.ts 
+[Client Component SSR]
+    ./mudralaya/src/app
+/admin/kyc/page.tsx 
+[Client Component SSR]
+    ./mudralaya/src/app
+/admin/kyc/page.tsx 
+[Server Component]
+
+https://nextjs.org/docs
+/messages/module-not-fo
+und
+
+
+./mudralaya/src/app/adm
+in/blogs/[id]/page.tsx
+Module not found: 
+Can't resolve 
+'react-quill-new'
+
+
+Import traces:
+  Client Component 
+Browser:
+    ./mudralaya/src/app
+/admin/blogs/[id]/page.
+tsx [Client Component 
+Browser]
+    ./mudralaya/src/app
+/admin/blogs/[id]/page.
+tsx [Server Component]
+
+  Client Component SSR:
+    ./mudralaya/src/app
+/admin/blogs/[id]/page.
+tsx [Client Component 
+SSR]
+    ./mudralaya/src/app
+/admin/blogs/[id]/page.
+tsx [Server Component]
+
+https://nextjs.org/docs
+/messages/module-not-fo
+und
+
+
+./mudralaya/src/app/adm
+in/blogs/[id]/page.tsx:
+15:39
+Module not found: 
+Can't resolve 
+'react-quill-new'
+[0m [90m 13 |[39m
+ [90m 14 |[39m 
+[90m// @ts-ignore[39m
+[31m[1m>[22m[39m[9
+0m 15 |[39m 
+[36mconst[39m [33mRe
+actQuill[39m[33m:[39
+m any [33m=[39m 
+dynamic(() 
+[33m=>[39m [36mimpor
+t[39m([32m"react-quil
+l-new"[39m)[33m,[39m
+ { ssr[33m:[39m 
+[36mfalse[39m 
+})[33m;[39m
+ [90m    |[39m       
+                       
+         [31m[1m^[22
+m[39m[31m[1m^[22m[
+39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[3
+1m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1m
+^[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[
+1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[2
+2m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39
+m[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m[
+39m
+ [90m 16 |[39m
+ [90m 17 |[39m 
+[36mexport[39m 
+[36mdefault[39m 
+[36mfunction[39m 
+[33mBlogEditor[39m() 
+{
+ [90m 18 |[39m     
+[36mconst[39m { id } 
+[33m=[39m useParams()
+[33m;[39m[0m
+
+
+
+Import traces:
+  Client Component 
+Browser:
+    ./mudralaya/src/app
+/admin/blogs/[id]/page.
+tsx [Client Component 
+Browser]
+    ./mudralaya/src/app
+/admin/blogs/[id]/page.
+tsx [Server Component]
+
+  Client Component SSR:
+    ./mudralaya/src/app
+/admin/blogs/[id]/page.
+tsx [Client Component 
+SSR]
+    ./mudralaya/src/app
+/admin/blogs/[id]/page.
+tsx [Server Component]
+
+https://nextjs.org/docs
+/messages/module-not-fo
+und
+
+
+./mudralaya/src/app/adm
+in/blogs/[id]/page.tsx:
+12:1
+Module not found: 
+Can't resolve 'react-qu
+ill-new/dist/quill.snow
+.css'
+[0m [90m 10 |[39m 
+[36mimport[39m 
+styles [36mfrom[39m 
+[32m"./editor.module.cs
+s"[39m[33m;[39m
+ [90m 11 |[39m 
+[90m// @ts-ignore[39m
+[31m[1m>[22m[39m[9
+0m 12 |[39m 
+[36mimport[39m [32m"
+react-quill-new/dist/qu
+ill.snow.css"[39m[33m
+;[39m
+ [90m    |[39m [31m
+[1m^[22m[39m[31m[1m
+^[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[
+1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[2
+2m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39
+m[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m[
+39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[3
+1m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1m
+^[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[
+1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[2
+2m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39
+m[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m[
+39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m
+ [90m 13 |[39m
+ [90m 14 |[39m 
+[90m// @ts-ignore[39m
+ [90m 15 |[39m 
+[36mconst[39m [33mRe
+actQuill[39m[33m:[39
+m any [33m=[39m 
+dynamic(() 
+[33m=>[39m [36mimpor
+t[39m([32m"react-quil
+l-new"[39m)[33m,[39m
+ { ssr[33m:[39m 
+[36mfalse[39m 
+})[33m;[39m[0m
+
+
+
+Import traces:
+  Client Component 
+Browser:
+    ./mudralaya/src/app
+/admin/blogs/[id]/page.
+tsx [Client Component 
+Browser]
+    ./mudralaya/src/app
+/admin/blogs/[id]/page.
+tsx [Server Component]
+
+  Client Component SSR:
+    ./mudralaya/src/app
+/admin/blogs/[id]/page.
+tsx [Client Component 
+SSR]
+    ./mudralaya/src/app
+/admin/blogs/[id]/page.
+tsx [Server Component]
+
+https://nextjs.org/docs
+/messages/module-not-fo
+und
+
+
+    at <unknown> (./mud
+ralaya/src/app/admin/la
+yout.tsx:1:1)
+    at <unknown> (https
+://nextjs.org/docs/mess
+ages/module-not-found)
+    at <unknown> (./mud
+ralaya/src/app/admin/ad
+visor/page.tsx:5:1)
+    at <unknown> (https
+://nextjs.org/docs/mess
+ages/module-not-found)
+    at <unknown> (./mud
+ralaya/src/app/admin/co
+ntacts/page.tsx:5:1)
+    at <unknown> (https
+://nextjs.org/docs/mess
+ages/module-not-found)
+    at <unknown> (./mud
+ralaya/src/app/admin/jo
+in/page.tsx:5:1)
+    at <unknown> (https
+://nextjs.org/docs/mess
+ages/module-not-found)
+    at <unknown> (./mud
+ralaya/src/app/admin/pa
+ge.tsx:6:1)
+    at <unknown> (https
+://nextjs.org/docs/mess
+ages/module-not-found)
+    at <unknown> (./mud
+ralaya/src/app/dashboar
+d/layout.tsx:5:1)
+    at <unknown> (https
+://nextjs.org/docs/mess
+ages/module-not-found)
+    at <unknown> (./mud
+ralaya/src/app/dashboar
+d/wallet/page.tsx:21:1)
+    at <unknown> (https
+://nextjs.org/docs/mess
+ages/module-not-found)
+    at <unknown> (./mud
+ralaya/src/app/dashboar
+d/layout.tsx:4:1)
+    at <unknown> (https
+://nextjs.org/docs/mess
+ages/module-not-found)
+    at <unknown> (./mud
+ralaya/src/app/admin/pa
+ge.tsx:5:1)
+    at <unknown> (https
+://nextjs.org/docs/mess
+ages/module-not-found)
+    at <unknown> (./mud
+ralaya/src/app/admin/ta
+sks/page.tsx:3:1)
+    at <unknown> (https
+://nextjs.org/docs/mess
+ages/module-not-found)
+    at <unknown> (./mud
+ralaya/src/app/dashboar
+d/page.tsx:20:1)
+    at <unknown> (https
+://nextjs.org/docs/mess
+ages/module-not-found)
+    at <unknown> (./mud
+ralaya/src/app/dashboar
+d/membership/page.tsx:5
+:1)
+    at <unknown> (https
+://nextjs.org/docs/mess
+ages/module-not-found)
+    at <unknown> (./mud
+ralaya/src/app/dashboar
+d/page.tsx:6:1)
+    at <unknown> (https
+://nextjs.org/docs/mess
+ages/module-not-found)
+    at <unknown> (./mud
+ralaya/src/app/dashboar
+d/plans/page.tsx:4:1)
+    at <unknown> (https
+://nextjs.org/docs/mess
+ages/module-not-found)
+    at <unknown> (./mud
+ralaya/src/app/dashboar
+d/profile/page.tsx:15:1
+)
+    at <unknown> (https
+://nextjs.org/docs/mess
+ages/module-not-found)
+    at <unknown> (./mud
+ralaya/src/app/dashboar
+d/settings/page.tsx:15:
+1)
+    at <unknown> (https
+://nextjs.org/docs/mess
+ages/module-not-found)
+    at <unknown> (./mud
+ralaya/src/app/dashboar
+d/tasks/page.tsx:4:1)
+    at <unknown> (https
+://nextjs.org/docs/mess
+ages/module-not-found)
+    at <unknown> (./mud
+ralaya/src/app/dashboar
+d/wallet/page.tsx:18:1)
+    at <unknown> (https
+://nextjs.org/docs/mess
+ages/module-not-found)
+    at <unknown> (./mud
+ralaya/src/utils/supaba
+se/client.ts:1:1)
+    at <unknown> (https
+://nextjs.org/docs/mess
+ages/module-not-found)
+    at <unknown> (https
+://nextjs.org/docs/mess
+ages/module-not-found)
+    at <unknown> (./mud
+ralaya/src/app/admin/bl
+ogs/[id]/page.tsx:15:39
+)
+    at <unknown> (https
+://nextjs.org/docs/mess
+ages/module-not-found)
+    at <unknown> (./mud
+ralaya/src/app/admin/bl
+ogs/[id]/page.tsx:12:1)
+    at <unknown> (https
+://nextjs.org/docs/mess
+ages/module-not-found)

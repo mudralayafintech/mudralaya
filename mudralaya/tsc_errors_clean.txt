@@ -1,0 +1,26 @@
+﻿src/app/admin/kyc/page.tsx(71,30): error TS7006: Parameter 'r' implicitly has an 'any' type.
+src/app/admin/kyc/page.tsx(74,30): error TS7006: Parameter 'r' implicitly has an 'any' type.
+src/app/admin/kyc/page.tsx(98,42): error TS7006: Parameter 'record' implicitly has an 'any' type.
+src/app/admin/kyc/page.tsx(101,12): error TS7006: Parameter 'u' implicitly has an 'any' type.
+src/app/admin/kyc/page.tsx(105,12): error TS7006: Parameter 'a' implicitly has an 'any' type.
+src/app/dashboard/membership/page.tsx(5,22): error TS2307: Cannot find module '@/components/ui/Skeleton' or its corresponding type declarations.
+src/app/dashboard/page.tsx(6,22): error TS2307: Cannot find module '@/components/ui/Skeleton' or its corresponding type declarations.
+src/app/dashboard/plans/page.tsx(4,22): error TS2307: Cannot find module '@/components/ui/Skeleton' or its corresponding type declarations.
+src/app/dashboard/profile/page.tsx(15,22): error TS2307: Cannot find module '@/components/ui/Skeleton' or its corresponding type declarations.
+src/app/dashboard/settings/page.tsx(15,22): error TS2307: Cannot find module '@/components/ui/Skeleton' or its corresponding type declarations.
+src/app/dashboard/tasks/page.tsx(4,22): error TS2307: Cannot find module '@/components/ui/Skeleton' or its corresponding type declarations.
+src/app/dashboard/wallet/page.tsx(18,22): error TS2307: Cannot find module '@/components/ui/Skeleton' or its corresponding type declarations.
+src/components/dashboard/KYCModal.tsx(4,20): error TS2307: Cannot find module 'react-webcam' or its corresponding type declarations.
+src/utils/supabase/client.ts(1,37): error TS2307: Cannot find module '@supabase/ssr' or its corresponding type declarations.
+src/utils/supabase/middleware.ts(2,36): error TS2307: Cannot find module '@supabase/ssr' or its corresponding type declarations.
+src/utils/supabase/middleware.ts(20,16): error TS7006: Parameter 'cookiesToSet' implicitly has an 'any' type.
+src/utils/supabase/middleware.ts(21,35): error TS7031: Binding element 'name' implicitly has an 'any' type.
+src/utils/supabase/middleware.ts(21,41): error TS7031: Binding element 'value' implicitly has an 'any' type.
+src/utils/supabase/middleware.ts(29,35): error TS7031: Binding element 'name' implicitly has an 'any' type.
+src/utils/supabase/middleware.ts(29,41): error TS7031: Binding element 'value' implicitly has an 'any' type.
+src/utils/supabase/middleware.ts(29,48): error TS7031: Binding element 'options' implicitly has an 'any' type.
+src/utils/supabase/server.ts(1,36): error TS2307: Cannot find module '@supabase/ssr' or its corresponding type declarations.
+src/utils/supabase/server.ts(19,16): error TS7006: Parameter 'cookiesToSet' implicitly has an 'any' type.
+src/utils/supabase/server.ts(21,37): error TS7031: Binding element 'name' implicitly has an 'any' type.
+src/utils/supabase/server.ts(21,43): error TS7031: Binding element 'value' implicitly has an 'any' type.
+src/utils/supabase/server.ts(21,50): error TS7031: Binding element 'options' implicitly has an 'any' type.

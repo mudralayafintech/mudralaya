@@ -68,10 +68,10 @@ export default function KYCPage() {
 
       // 2. Extract IDs to batch fetch details
       const userIds = Array.from(
-        new Set(kycData.map((r) => r.user_id).filter(Boolean))
+        new Set(kycData.map((r: any) => r.user_id).filter(Boolean))
       );
       const accountIds = Array.from(
-        new Set(kycData.map((r) => r.account_id).filter(Boolean))
+        new Set(kycData.map((r: any) => r.account_id).filter(Boolean))
       );
 
       // Combine IDs for user fetch (assuming account_id also points to users table users)
@@ -95,14 +95,14 @@ export default function KYCPage() {
       if (accountError) console.error("Error fetching accounts:", accountError);
 
       // 5. Merge Data
-      const mergedRecords = kycData.map((record) => {
+      const mergedRecords = kycData.map((record: any) => {
         // Find mapped user profile (try account_id first, then user_id)
         const profile = usersData?.find(
-          (u) => u.id === record.account_id || u.id === record.user_id
+          (u: any) => u.id === record.account_id || u.id === record.user_id
         );
         // Find mapped account details
         const bank = accountData?.find(
-          (a) => a.user_id === record.account_id || a.user_id === record.user_id
+          (a: any) => a.user_id === record.account_id || a.user_id === record.user_id
         );
 
         return {

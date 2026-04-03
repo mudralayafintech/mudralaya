@@ -2,7 +2,7 @@
 
 import React from "react";
 import { useAdminData } from "@/hooks/useAdminData";
-import DataTable from "@/components/dashboard/DataTable";
+import DataTable from "@/components/admin/dashboard/DataTable";
 import { adminApiRequest } from "@/lib/adminApi";
 
 export default function ContactsPage() {

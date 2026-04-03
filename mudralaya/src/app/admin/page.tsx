@@ -2,8 +2,8 @@
 
 import React from "react";
 import { useAdminData } from "@/hooks/useAdminData";
-import StatsOverview from "@/components/dashboard/StatsOverview";
-import DataTable from "@/components/dashboard/DataTable";
+import StatsOverview from "@/components/admin/dashboard/StatsOverview";
+import DataTable from "@/components/admin/dashboard/DataTable";
 import { adminApiRequest } from "@/lib/adminApi";
 
 import styles from "./dashboard.module.css";
