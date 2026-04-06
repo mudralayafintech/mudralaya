@@ -209,8 +209,7 @@ serve(async (req: Request): Promise<Response> => {
           action_link: updatedFields.action_link || null,
           steps: updatedFields.steps || '',
           target_audience: finalAudience && finalAudience.length > 0 ? finalAudience : ['All'],
-          is_active: updatedFields.is_active !== undefined ? updatedFields.is_active : true,
-          updated_at: new Date().toISOString()
+          is_active: updatedFields.is_active !== undefined ? updatedFields.is_active : true
         }
 
         const { data: updatedTask, error: updateError } = await supabaseClient
