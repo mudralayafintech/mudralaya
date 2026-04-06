@@ -5,7 +5,8 @@ import { adminApiRequest } from "@/lib/adminApi";
 import styles from "./TaskManager.module.css";
 import clsx from "clsx";
 import DataTable from "./DataTable";
-import { PlusCircle, Users } from "lucide-react";
+import { PlusCircle, Users, Loader2 } from "lucide-react";
+import { createClient } from "@/utils/supabase/client";
 
 interface Task {
   id: string;
@@ -62,6 +63,58 @@ export default function TaskManager() {
   const [loadingParticipants, setLoadingParticipants] = useState(false);
   const [showEditForm, setShowEditForm] = useState(false);
   const [editingTask, setEditingTask] = useState<any>(null);
+
+  const supabase = createClient();
+  const [uploadingPdfCreate, setUploadingPdfCreate] = useState(false);
+  const [uploadingVideoCreate, setUploadingVideoCreate] = useState(false);
+  const [uploadingPdfEdit, setUploadingPdfEdit] = useState(false);
+  const [uploadingVideoEdit, setUploadingVideoEdit] = useState(false);
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, fieldName: 'video_link' | 'pdf_url', isEditing: boolean) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (isEditing) {
+      if (fieldName === 'video_link') setUploadingVideoEdit(true);
+      if (fieldName === 'pdf_url') setUploadingPdfEdit(true);
+    } else {
+      if (fieldName === 'video_link') setUploadingVideoCreate(true);
+      if (fieldName === 'pdf_url') setUploadingPdfCreate(true);
+    }
+
+    try {
+      const fileExt = file.name.split(".").pop();
+      const fileName = `task_${Math.random().toString(36).substring(2, 15)}_${Date.now()}.${fileExt}`;
+      const filePath = `assets/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from("task-submissions")
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data } = supabase.storage
+        .from("task-submissions")
+        .getPublicUrl(filePath);
+
+      if (isEditing) {
+        setEditingTask((prev: any) => ({ ...prev, [fieldName]: data.publicUrl }));
+      } else {
+        setNewTask((prev) => ({ ...prev, [fieldName]: data.publicUrl }));
+      }
+    } catch (err: any) {
+      console.error("Upload failed:", err);
+      alert("Upload failed: " + err.message);
+    } finally {
+      if (isEditing) {
+        if (fieldName === 'video_link') setUploadingVideoEdit(false);
+        if (fieldName === 'pdf_url') setUploadingPdfEdit(false);
+      } else {
+        if (fieldName === 'video_link') setUploadingVideoCreate(false);
+        if (fieldName === 'pdf_url') setUploadingPdfCreate(false);
+      }
+    }
+  };
 
   useEffect(() => {
     fetchTasks();
@@ -425,27 +478,41 @@ export default function TaskManager() {
 
                 <div className={styles.col6}>
                   <label className={styles.label}>Video Link (Optional)</label>
-                  <input
-                    type="url"
-                    className={styles.input}
-                    value={newTask.video_link}
-                    onChange={(e) =>
-                      setNewTask({ ...newTask, video_link: e.target.value })
-                    }
-                    placeholder="https://youtube.com/..."
-                  />
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    <input
+                      type="url"
+                      className={styles.input}
+                      value={newTask.video_link}
+                      onChange={(e) =>
+                        setNewTask({ ...newTask, video_link: e.target.value })
+                      }
+                      placeholder="https://youtube.com/..."
+                      style={{ flex: 1 }}
+                    />
+                    <label style={{ cursor: 'pointer', padding: '10px', background: '#e2e8f0', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px', fontWeight: '500' }}>
+                      {uploadingVideoCreate ? <Loader2 size={18} className="animate-spin" style={{ marginRight: '4px' }} /> : "Upload"}
+                      <input type="file" accept="video/*" style={{ display: 'none' }} disabled={uploadingVideoCreate} onChange={(e) => handleFileUpload(e, 'video_link', false)} />
+                    </label>
+                  </div>
                 </div>
                 <div className={styles.col6}>
                   <label className={styles.label}>PDF URL (Optional)</label>
-                  <input
-                    type="url"
-                    className={styles.input}
-                    value={newTask.pdf_url}
-                    onChange={(e) =>
-                      setNewTask({ ...newTask, pdf_url: e.target.value })
-                    }
-                    placeholder="https://..."
-                  />
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    <input
+                      type="url"
+                      className={styles.input}
+                      value={newTask.pdf_url}
+                      onChange={(e) =>
+                        setNewTask({ ...newTask, pdf_url: e.target.value })
+                      }
+                      placeholder="https://..."
+                      style={{ flex: 1 }}
+                    />
+                    <label style={{ cursor: 'pointer', padding: '10px', background: '#e2e8f0', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px', fontWeight: '500' }}>
+                      {uploadingPdfCreate ? <Loader2 size={18} className="animate-spin" style={{ marginRight: '4px' }} /> : "Upload"}
+                      <input type="file" accept="application/pdf" style={{ display: 'none' }} disabled={uploadingPdfCreate} onChange={(e) => handleFileUpload(e, 'pdf_url', false)} />
+                    </label>
+                  </div>
                 </div>
 
                 <div className={styles.col12}>
@@ -651,27 +718,41 @@ export default function TaskManager() {
 
                 <div className={styles.col6}>
                   <label className={styles.label}>Video Link (Optional)</label>
-                  <input
-                    type="url"
-                    className={styles.input}
-                    value={editingTask.video_link}
-                    onChange={(e) =>
-                      setEditingTask({ ...editingTask, video_link: e.target.value })
-                    }
-                    placeholder="https://youtube.com/..."
-                  />
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    <input
+                      type="url"
+                      className={styles.input}
+                      value={editingTask.video_link}
+                      onChange={(e) =>
+                        setEditingTask({ ...editingTask, video_link: e.target.value })
+                      }
+                      placeholder="https://youtube.com/..."
+                      style={{ flex: 1 }}
+                    />
+                    <label style={{ cursor: 'pointer', padding: '10px', background: '#e2e8f0', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px', fontWeight: '500' }}>
+                      {uploadingVideoEdit ? <Loader2 size={18} className="animate-spin" style={{ marginRight: '4px' }} /> : "Upload"}
+                      <input type="file" accept="video/*" style={{ display: 'none' }} disabled={uploadingVideoEdit} onChange={(e) => handleFileUpload(e, 'video_link', true)} />
+                    </label>
+                  </div>
                 </div>
                 <div className={styles.col6}>
                   <label className={styles.label}>PDF URL (Optional)</label>
-                  <input
-                    type="url"
-                    className={styles.input}
-                    value={editingTask.pdf_url}
-                    onChange={(e) =>
-                      setEditingTask({ ...editingTask, pdf_url: e.target.value })
-                    }
-                    placeholder="https://..."
-                  />
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    <input
+                      type="url"
+                      className={styles.input}
+                      value={editingTask.pdf_url}
+                      onChange={(e) =>
+                        setEditingTask({ ...editingTask, pdf_url: e.target.value })
+                      }
+                      placeholder="https://..."
+                      style={{ flex: 1 }}
+                    />
+                    <label style={{ cursor: 'pointer', padding: '10px', background: '#e2e8f0', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px', fontWeight: '500' }}>
+                      {uploadingPdfEdit ? <Loader2 size={18} className="animate-spin" style={{ marginRight: '4px' }} /> : "Upload"}
+                      <input type="file" accept="application/pdf" style={{ display: 'none' }} disabled={uploadingPdfEdit} onChange={(e) => handleFileUpload(e, 'pdf_url', true)} />
+                    </label>
+                  </div>
                 </div>
 
                 <div className={styles.col12}>
