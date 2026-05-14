@@ -2,6 +2,7 @@ import { createClient } from '@/utils/supabase/server';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import DownloadCertificateButton from './DownloadCertificateButton';
+import DedicatedWorkSubmission from './DedicatedWorkSubmission';
 
 export const dynamic = 'force-dynamic';
 
@@ -105,6 +106,17 @@ export default async function TrainingDashboard() {
                   </div>
                 );
               })}
+            </div>
+          )}
+
+          {/* Dedicated Work Submission Section */}
+          {!isCompleted && (
+            <div className="space-y-4 mt-8">
+              <h2 className="text-xl font-bold">Submit Work</h2>
+              <p className="text-muted-foreground text-sm -mt-2">
+                Upload proof of your completed work for {company.name}
+              </p>
+              <DedicatedWorkSubmission companyId={company.id} companyName={company.name} />
             </div>
           )}
         </div>

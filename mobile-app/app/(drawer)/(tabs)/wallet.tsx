@@ -536,9 +536,44 @@ export default function WalletScreen() {
                         styles.withdrawBtnDisabled,
                     ]}
                     disabled={walletData.stats.approved < 500}
-                    onPress={() =>
-                      Alert.alert("Payout", "Payout request logic")
-                    }
+                    onPress={async () => {
+                      if (!bankDetails) {
+                        Alert.alert(
+                          "Bank Details Required",
+                          "Please add your bank details before requesting a payout.",
+                        );
+                        return;
+                      }
+                      if (kycStatus !== "approved") {
+                        Alert.alert(
+                          "KYC Required",
+                          "Please complete your KYC verification before requesting a payout.",
+                        );
+                        return;
+                      }
+                      try {
+                        const { data, error } = await supabase.functions.invoke(
+                          "dashboard-api",
+                          {
+                            body: {
+                              action: "request-payout",
+                              amount: walletData.stats.approved,
+                            },
+                          },
+                        );
+                        if (error) throw error;
+                        Alert.alert(
+                          "Payout Requested! 🎉",
+                          `₹${walletData.stats.approved} payout request has been submitted. It will be processed within 3-5 business days.`,
+                        );
+                        fetchInitialData();
+                      } catch (e: any) {
+                        Alert.alert(
+                          "Payout Failed",
+                          e.message || "Could not process payout request. Please try again.",
+                        );
+                      }
+                    }}
                   >
                     <Text
                       style={[

@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import Skeleton from "@/components/ui/Skeleton";
 import {
   Search,
@@ -18,6 +19,8 @@ import {
   Upload,
 } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
+import TaskSubmissionModal from "@/components/dashboard/TaskSubmissionModal";
+import TaskStatusModal from "@/components/dashboard/TaskStatusModal";
 import styles from "./tasks.module.css";
 
 interface Task {
@@ -40,12 +43,20 @@ interface Task {
   video_link?: string;
   pdf_url?: string;
   created_at: string;
+  description?: string;
+  steps?: string;
+  rejection_reason?: string;
 }
 
 export default function TasksPage() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
   const supabase = createClient();
+  const router = useRouter();
+
+  // Modal States
+  const [submissionTask, setSubmissionTask] = useState<Task | null>(null);
+  const [statusTask, setStatusTask] = useState<Task | null>(null);
 
   // Search and Filter States
   const [searchQuery, setSearchQuery] = useState("");
@@ -79,30 +90,29 @@ export default function TasksPage() {
   const [expandedTaskId, setExpandedTaskId] = useState<string | null>(null);
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
 
+  const fetchTasks = useCallback(async () => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const { data, error } = await supabase.functions.invoke(
+        "dashboard-api",
+        {
+          body: { action: "get-tasks" },
+          headers: session ? { Authorization: `Bearer ${session.access_token}` } : undefined
+        },
+      );
+
+      if (error) throw error;
+      setTasks(data || []);
+    } catch (err) {
+      console.error("Error fetching tasks:", err);
+    } finally {
+      setLoading(false);
+    }
+  }, [supabase]);
+
   useEffect(() => {
-    const fetchTasks = async () => {
-      try {
-        const { data: { session } } = await supabase.auth.getSession();
-        const { data, error } = await supabase.functions.invoke(
-          "dashboard-api",
-          {
-            body: { action: "get-tasks" },
-            headers: session ? { Authorization: `Bearer ${session.access_token}` } : undefined
-          },
-        );
-
-        if (error) throw error;
-        setTasks(data || []);
-      } catch (err) {
-        console.error("Error fetching tasks:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchTasks();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [fetchTasks]);
 
   const toggleExpand = (id: string) => {
     setExpandedTaskId(expandedTaskId === id ? null : id);
@@ -215,21 +225,14 @@ export default function TasksPage() {
   const handleSmartAction = (task: Task) => {
     const label = getSmartButtonLabel(task);
     if (label === "Complete Task") {
-      if (task.action_link) window.open(task.action_link, "_blank");
-      // Small delay to let user see the action link open
-      setTimeout(() => {
-        if (
-          confirm(
-            "Have you completed the task? You can also upload a screenshot for faster approval. Click OK to submit.",
-          )
-        ) {
-          handleCompleteTask(task);
-        }
-      }, 500);
+      // Open the submission modal instead of confirm()
+      setSubmissionTask(task);
     } else if (label === "Start Task") {
       handleTakeTask(task);
+    } else if (label === "In Process" || label === "Reward Claimed" || label === "Task Rejected") {
+      // Open status modal so user can see verification state / rejection reason
+      setStatusTask(task);
     }
-    // "Reward Claimed", "Pending Approval", and "Task Rejected" are disabled states
   };
 
   const handleProfessionChange = (prof: string) => {
@@ -880,37 +883,17 @@ export default function TasksPage() {
 
                     <div className="mt-3" style={{ marginTop: "24px" }}>
                       <button
-                        className={`${styles.btnTakeTask} ${
-                          getSmartButtonLabel(task) === "Reward Claimed" ||
-                          getSmartButtonLabel(task) === "In Process" ||
-                          getSmartButtonLabel(task) === "Task Rejected"
-                            ? styles.btnDisabled
-                            : ""
-                        }`}
+                        className={`${styles.btnTakeTask}`}
                         onClick={() => handleSmartAction(task)}
-                        disabled={
-                          isUploading ||
-                          getSmartButtonLabel(task) === "Reward Claimed" ||
-                          getSmartButtonLabel(task) === "In Process" ||
-                          getSmartButtonLabel(task) === "Task Rejected"
-                        }
+                        disabled={isUploading}
                         style={{
-                          opacity:
-                            getSmartButtonLabel(task) === "Reward Claimed" ||
-                            getSmartButtonLabel(task) === "In Process" ||
-                            getSmartButtonLabel(task) === "Task Rejected"
-                              ? 0.6
-                              : 1,
-                          cursor:
-                            getSmartButtonLabel(task) === "Reward Claimed" ||
-                            getSmartButtonLabel(task) === "In Process" ||
-                            getSmartButtonLabel(task) === "Task Rejected"
-                              ? "not-allowed"
-                              : isUploading 
-                                ? "wait" 
-                                : "pointer",
                           width: "100%",
-                          backgroundColor: getSmartButtonLabel(task) === "Complete Task" ? "#22c55e" : undefined
+                          backgroundColor: getSmartButtonLabel(task) === "Complete Task" ? "#22c55e" 
+                            : getSmartButtonLabel(task) === "In Process" ? "#3b82f6"
+                            : getSmartButtonLabel(task) === "Task Rejected" ? "#ef4444"
+                            : getSmartButtonLabel(task) === "Reward Claimed" ? "#10b981"
+                            : undefined,
+                          cursor: isUploading ? "wait" : "pointer",
                         }}
                       >
                         {isUploading ? "Uploading..." : getSmartButtonLabel(task)}
@@ -923,6 +906,42 @@ export default function TasksPage() {
           </div>
         </div>
       </div>
+
+      {/* ─── Task Submission Modal (Phase 2) ─── */}
+      {submissionTask && (
+        <TaskSubmissionModal
+          isOpen={!!submissionTask}
+          onClose={() => setSubmissionTask(null)}
+          task={submissionTask}
+          onSuccess={() => {
+            setSubmissionTask(null);
+            fetchTasks();
+          }}
+        />
+      )}
+
+      {/* ─── Task Status Modal (Phase 3) ─── */}
+      {statusTask && (
+        <TaskStatusModal
+          isOpen={!!statusTask}
+          onClose={() => setStatusTask(null)}
+          task={statusTask}
+          onResubmit={() => {
+            setStatusTask(null);
+            // Re-open submission modal for resubmit
+            const taskToResubmit = tasks.find(t => t.id === statusTask.id);
+            if (taskToResubmit) {
+              // Reset status to ongoing so user can resubmit
+              setTasks(prev => prev.map(t => t.id === statusTask.id ? { ...t, status: 'ongoing' } : t));
+              setSubmissionTask({ ...taskToResubmit, status: 'ongoing' });
+            }
+          }}
+          onGoToWallet={() => {
+            setStatusTask(null);
+            router.push('/dashboard/wallet');
+          }}
+        />
+      )}
     </div>
   );
 }

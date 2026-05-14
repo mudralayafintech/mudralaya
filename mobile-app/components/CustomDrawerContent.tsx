@@ -13,6 +13,7 @@ import {
   Crown,
   ShieldCheck,
   Info,
+  Gift,
 } from "lucide-react-native";
 import { useTheme } from "@/lib/ThemeContext";
 
@@ -145,6 +146,14 @@ export default function CustomDrawerContent(props: any) {
                 <Crown size={size} color={theme === "dark" ? "#fff" : "#000"} />
               )}
               onPress={() => router.push("/(drawer)/membership")}
+            />
+            <DrawerItem
+              label="Referrals"
+              labelStyle={{ color: textColor }}
+              icon={({ color, size }) => (
+                <Gift size={size} color={theme === "dark" ? "#fff" : "#000"} />
+              )}
+              onPress={() => router.push("/(drawer)/referrals")}
             />
             <DrawerItem
               label="Settings"

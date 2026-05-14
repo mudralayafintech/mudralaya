@@ -48,6 +48,7 @@ export async function updateSession(request: NextRequest) {
     !user &&
     !request.nextUrl.pathname.startsWith('/login') &&
     !request.nextUrl.pathname.startsWith('/auth') &&
+    !request.nextUrl.pathname.startsWith('/admin') && // Admin uses its own token-based auth
     request.nextUrl.pathname !== '/' // Allow landing page if it exists, or redirect root to login
   ) {
     // If root is dashboard, redirect to login

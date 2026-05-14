@@ -32,6 +32,8 @@ import {
   Bell,
   ChevronRight,
   CheckCircle2,
+  Share2,
+  Gift,
 } from "lucide-react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
@@ -39,6 +41,7 @@ import VideoModal from "@/components/VideoModal";
 import { GlassView } from "@/components/GlassView";
 import { Skeleton } from "@/components/Skeleton";
 import { StatusBar } from "expo-status-bar";
+import { Share } from "react-native";
 
 interface Task {
   id: string;
@@ -601,6 +604,69 @@ export default function DashboardHome() {
                   );
                 })}
               </View>
+            </View>
+
+            {/* Invite & Earn Referral Widget */}
+            <View style={styles.section}>
+              <TouchableOpacity
+                activeOpacity={0.9}
+                onPress={() => router.push("/(drawer)/referrals")}
+              >
+                <LinearGradient
+                  colors={["#7c3aed", "#a855f7"]}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={{
+                    borderRadius: 20,
+                    padding: 20,
+                    flexDirection: "row",
+                    alignItems: "center",
+                    gap: 16,
+                  }}
+                >
+                  <View
+                    style={{
+                      width: 52,
+                      height: 52,
+                      borderRadius: 16,
+                      backgroundColor: "rgba(255,255,255,0.2)",
+                      justifyContent: "center",
+                      alignItems: "center",
+                    }}
+                  >
+                    <Gift size={26} color="#fff" />
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <Text
+                      style={{
+                        color: "#fff",
+                        fontSize: 17,
+                        fontWeight: "700",
+                        marginBottom: 4,
+                      }}
+                    >
+                      Invite & Earn ₹100
+                    </Text>
+                    <Text
+                      style={{
+                        color: "rgba(255,255,255,0.8)",
+                        fontSize: 13,
+                      }}
+                    >
+                      Share your referral code with friends
+                    </Text>
+                  </View>
+                  <View
+                    style={{
+                      backgroundColor: "rgba(255,255,255,0.2)",
+                      borderRadius: 12,
+                      padding: 8,
+                    }}
+                  >
+                    <Share2 size={20} color="#fff" />
+                  </View>
+                </LinearGradient>
+              </TouchableOpacity>
             </View>
           </ScrollView>
         )}

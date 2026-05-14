@@ -10,12 +10,18 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
+  Image,
 } from "react-native";
 import { supabase } from "@/lib/supabase";
 import { useRouter } from "expo-router";
 import { ArrowRight, Lock, Phone, ChevronRight } from "lucide-react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { GlassView } from "@/components/GlassView";
+import * as AuthSession from "expo-auth-session";
+import * as WebBrowser from "expo-web-browser";
+import * as Crypto from "expo-crypto";
+
+WebBrowser.maybeCompleteAuthSession();
 import Animated, {
   FadeInDown,
   FadeInUp,
@@ -31,6 +37,7 @@ export default function Login() {
   const [otp, setOtp] = useState("");
   const [step, setStep] = useState<"phone" | "otp">("phone");
   const [loading, setLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
   const [timer, setTimer] = useState(60);
   const [resendAttempts, setResendAttempts] = useState(0);
 
@@ -169,6 +176,68 @@ export default function Login() {
 
     if (phone.startsWith("+91")) {
       setPhone(phone.replace("+91", ""));
+    }
+  };
+
+  const handleGoogleSignIn = async () => {
+    try {
+      setGoogleLoading(true);
+
+      // Create PKCE verifier for secure OAuth
+      const codeVerifier = Crypto.getRandomBytes(32)
+        .reduce((acc, byte) => acc + byte.toString(16).padStart(2, "0"), "");
+
+      const redirectUrl = AuthSession.makeRedirectUri({
+        scheme: "mudralaya",
+        path: "login",
+      });
+
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: redirectUrl,
+          skipBrowserRedirect: true,
+        },
+      });
+
+      if (error) throw error;
+
+      if (data?.url) {
+        const result = await WebBrowser.openAuthSessionAsync(
+          data.url,
+          redirectUrl,
+          { showInRecents: true }
+        );
+
+        if (result.type === "success" && result.url) {
+          // Extract tokens from the callback URL
+          const url = new URL(result.url);
+          const params = new URLSearchParams(
+            url.hash ? url.hash.substring(1) : url.search.substring(1)
+          );
+
+          const accessToken = params.get("access_token");
+          const refreshToken = params.get("refresh_token");
+
+          if (accessToken && refreshToken) {
+            const { error: sessionError } = await supabase.auth.setSession({
+              access_token: accessToken,
+              refresh_token: refreshToken,
+            });
+
+            if (sessionError) throw sessionError;
+            router.replace("/(drawer)/(tabs)");
+          }
+        }
+      }
+    } catch (err: any) {
+      if (err.message?.includes("cancelled") || err.message?.includes("dismiss")) {
+        // User cancelled — do nothing
+      } else {
+        Alert.alert("Google Sign-In Error", err.message || "Something went wrong");
+      }
+    } finally {
+      setGoogleLoading(false);
     }
   };
 
@@ -337,6 +406,33 @@ export default function Login() {
                     </TouchableOpacity>
                   </Animated.View>
                 )}
+
+                {/* OR Divider */}
+                <View style={styles.dividerRow}>
+                  <View style={styles.dividerLine} />
+                  <Text style={styles.dividerText}>OR</Text>
+                  <View style={styles.dividerLine} />
+                </View>
+
+                {/* Google Sign-In */}
+                <TouchableOpacity
+                  style={styles.googleBtn}
+                  onPress={handleGoogleSignIn}
+                  disabled={googleLoading || loading}
+                >
+                  {googleLoading ? (
+                    <ActivityIndicator color="#4285F4" />
+                  ) : (
+                    <>
+                      <View style={styles.googleIconContainer}>
+                        <Text style={styles.googleIconText}>G</Text>
+                      </View>
+                      <Text style={styles.googleBtnText}>
+                        Continue with Google
+                      </Text>
+                    </>
+                  )}
+                </TouchableOpacity>
               </View>
             </GlassView>
           </Animated.View>
@@ -509,5 +605,55 @@ const styles = StyleSheet.create({
   secondaryLinkText: {
     color: "#64748b",
     fontSize: 14,
+  },
+  dividerRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginVertical: 24,
+    gap: 12,
+  },
+  dividerLine: {
+    flex: 1,
+    height: 1,
+    backgroundColor: "#cbd5e1",
+  },
+  dividerText: {
+    color: "#94a3b8",
+    fontSize: 13,
+    fontWeight: "600",
+  },
+  googleBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    height: 56,
+    borderRadius: 16,
+    backgroundColor: "#fff",
+    borderWidth: 1.5,
+    borderColor: "#e2e8f0",
+    gap: 12,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  googleIconContainer: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: "#4285F4",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  googleIconText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "700",
+  },
+  googleBtnText: {
+    color: "#334155",
+    fontSize: 16,
+    fontWeight: "600",
   },
 });

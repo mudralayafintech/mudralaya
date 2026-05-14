@@ -12,7 +12,9 @@ import {
   Alert,
   Linking,
   Platform,
+  Image,
 } from "react-native";
+import * as ImagePicker from "expo-image-picker";
 import { supabase } from "@/lib/supabase";
 import {
   Search,
@@ -46,7 +48,7 @@ interface Task {
   id: string;
   title: string;
   type?: string;
-  task_type?: string; // Added task_type
+  task_type?: string;
   target_audience?: string[];
   icon_type: string;
   status?: string;
@@ -60,6 +62,7 @@ interface Task {
   video_url?: string;
   video_link?: string;
   pdf_url?: string;
+  proof_url?: string;
   created_at: string;
 }
 
@@ -191,18 +194,120 @@ export default function TasksScreen() {
   };
 
   const getSmartLabel = (task: Task) => {
+    if (task.status === "submitted") return "Under Review";
     if (task.status === "ongoing" || task.status === "in_progress")
-      return "Resume Task";
-    if (task.status === "completed") return "Claim Reward";
+      return "Submit Proof";
+    if (task.status === "completed" || task.status === "approved") return "Claim Reward";
     return "Start Task";
+  };
+
+  const getSmartBtnColors = (task: Task): [string, string] => {
+    if (task.status === "submitted") return ["#f59e0b", "#d97706"];
+    if (task.status === "ongoing" || task.status === "in_progress")
+      return ["#3b82f6", "#2563eb"];
+    if (task.status === "completed" || task.status === "approved")
+      return ["#10b981", "#059669"];
+    return ["#0f172a", "#334155"];
+  };
+
+  const handleUploadProof = async (task: Task) => {
+    try {
+      const permResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (!permResult.granted) {
+        Alert.alert("Permission Required", "Please allow access to your photos to upload proof.");
+        return;
+      }
+
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ["images"],
+        quality: 0.7,
+        allowsEditing: true,
+      });
+
+      if (result.canceled) return;
+
+      const asset = result.assets[0];
+      const fileName = `proof_${task.id}_${Date.now()}.jpg`;
+
+      // Upload to Supabase storage
+      const response = await fetch(asset.uri);
+      const blob = await response.blob();
+      const arrayBuffer = await new Response(blob).arrayBuffer();
+
+      const { error: uploadError } = await supabase.storage
+        .from("task-proofs")
+        .upload(fileName, arrayBuffer, {
+          contentType: "image/jpeg",
+          upsert: true,
+        });
+
+      if (uploadError) throw uploadError;
+
+      // Submit proof via edge function
+      const { error } = await supabase.functions.invoke("dashboard-api", {
+        body: {
+          action: "submit-proof",
+          taskId: task.id,
+          proofUrl: fileName,
+        },
+      });
+
+      if (error) throw error;
+
+      setTasks((prev) =>
+        prev.map((t) =>
+          t.id === task.id ? { ...t, status: "submitted", proof_url: fileName } : t
+        )
+      );
+
+      Alert.alert(
+        "Proof Submitted! ✅",
+        "Your task proof has been submitted for review. You'll be notified once approved."
+      );
+    } catch (e: any) {
+      Alert.alert("Upload Failed", e.message || "Could not upload proof. Please try again.");
+    }
+  };
+
+  const handleClaimReward = async (task: Task) => {
+    try {
+      const { data, error } = await supabase.functions.invoke("dashboard-api", {
+        body: {
+          action: "claim-reward",
+          taskId: task.id,
+        },
+      });
+
+      if (error) throw error;
+
+      const reward = task.reward_member || task.reward_free || task.reward || 0;
+
+      setTasks((prev) =>
+        prev.map((t) =>
+          t.id === task.id ? { ...t, status: "claimed" } : t
+        )
+      );
+
+      Alert.alert(
+        "Reward Claimed! 🎉",
+        `₹${reward} has been credited to your Mudralaya wallet.`
+      );
+    } catch (e: any) {
+      Alert.alert("Claim Failed", e.message || "Could not claim reward. Please try again.");
+    }
   };
 
   const handleSmartAction = (task: Task) => {
     const label = getSmartLabel(task);
-    if (label === "Resume Task") {
-      if (task.action_link) Linking.openURL(task.action_link);
+    if (label === "Submit Proof") {
+      handleUploadProof(task);
     } else if (label === "Claim Reward") {
-      Alert.alert("Info", "Reward claiming logic here");
+      handleClaimReward(task);
+    } else if (label === "Under Review") {
+      Alert.alert(
+        "Under Review",
+        "Your task proof is being reviewed by our team. You'll be notified once approved."
+      );
     } else {
       handleTakeTask(task);
     }
@@ -646,19 +751,40 @@ export default function TasksScreen() {
                     <TouchableOpacity
                       activeOpacity={0.9}
                       onPress={() => handleSmartAction(item)}
+                      disabled={item.status === "claimed"}
                     >
                       <LinearGradient
-                        colors={["#0f172a", "#334155"]}
+                        colors={item.status === "claimed" ? ["#64748b", "#64748b"] : getSmartBtnColors(item)}
                         start={{ x: 0, y: 0 }}
                         end={{ x: 1, y: 0 }}
-                        style={styles.actionBtn}
+                        style={[styles.actionBtn, item.status === "claimed" && { opacity: 0.6 }]}
                       >
                         <Text style={styles.actionBtnText}>
-                          {getSmartLabel(item)}
+                          {item.status === "claimed" ? "✓ Reward Claimed" : getSmartLabel(item)}
                         </Text>
-                        <Rocket size={18} color="#fff" />
+                        {item.status !== "claimed" && item.status !== "submitted" && (
+                          <Rocket size={18} color="#fff" />
+                        )}
                       </LinearGradient>
                     </TouchableOpacity>
+
+                    {/* Show proof preview if submitted */}
+                    {item.proof_url && item.status === "submitted" && (
+                      <View style={{
+                        marginTop: 12,
+                        padding: 12,
+                        backgroundColor: isDark ? "rgba(245,158,11,0.1)" : "#fffbeb",
+                        borderRadius: 12,
+                        flexDirection: "row",
+                        alignItems: "center",
+                        gap: 8,
+                      }}>
+                        <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: "#f59e0b" }} />
+                        <Text style={{ color: isDark ? "#fbbf24" : "#92400e", fontSize: 13, fontWeight: "600" }}>
+                          Proof submitted • Awaiting admin review
+                        </Text>
+                      </View>
+                    )}
                   </View>
                 )}
               </GlassView>
