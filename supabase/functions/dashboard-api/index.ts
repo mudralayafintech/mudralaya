@@ -244,6 +244,63 @@ serve(async (req: Request): Promise<Response> => {
         result = updatedTask
         break;
 
+      case 'submit-proof': {
+        const { taskId: proofTaskId, proofFileName, proofBase64, proofUrl } = requestData
+        if (!proofTaskId) throw new Error('Task ID is required')
+
+        const supabaseAdmin = createClient(
+          Deno.env.get('SUPABASE_URL') ?? '',
+          Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+        )
+
+        let finalProofUrl = proofUrl || ''
+
+        // If base64 image data is provided, upload to storage
+        if (proofBase64 && proofFileName) {
+          // Decode base64 to Uint8Array
+          const binaryString = atob(proofBase64)
+          const bytes = new Uint8Array(binaryString.length)
+          for (let i = 0; i < binaryString.length; i++) {
+            bytes[i] = binaryString.charCodeAt(i)
+          }
+
+          const { error: uploadError } = await supabaseAdmin.storage
+            .from('task-proofs')
+            .upload(proofFileName, bytes, {
+              contentType: 'image/jpeg',
+              upsert: true,
+            })
+
+          if (uploadError) {
+            console.error('Storage upload error:', uploadError)
+            throw new Error(`Upload failed: ${uploadError.message}`)
+          }
+
+          finalProofUrl = proofFileName
+        }
+
+        // Update user_tasks with proof and status
+        const { data: proofTask, error: proofError } = await supabaseAdmin
+          .from('user_tasks')
+          .update({
+            status: 'submitted',
+            submission_image_url: finalProofUrl,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('user_id', user.id)
+          .eq('task_id', proofTaskId)
+          .select()
+          .single()
+
+        if (proofError) {
+          console.error('DB update error:', proofError)
+          throw proofError
+        }
+
+        result = proofTask
+        break;
+      }
+
       default:
         throw new Error('Invalid action')
     }

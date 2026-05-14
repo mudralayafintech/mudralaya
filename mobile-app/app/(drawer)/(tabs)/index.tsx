@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import messaging from "@react-native-firebase/messaging";
+
 import {
   View,
   Text,
@@ -88,7 +88,10 @@ export default function DashboardHome() {
     const {
       data: { user },
     } = await supabase.auth.getUser();
-    if (!user) return;
+    if (!user) {
+      setLoading(false);
+      return;
+    }
 
     try {
       // Fetch Profile
