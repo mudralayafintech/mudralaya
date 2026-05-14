@@ -67,7 +67,7 @@ export default function Profile() {
           profession: profileData.profession || "",
           email_id: profileData.email_id || "",
           date_of_birth: profileData.date_of_birth || "",
-          phone: user.phone || profileData.mobile_number || "",
+          phone: user.phone || profileData.mobile_number || profileData.phone || "",
         });
       }
     }
@@ -132,10 +132,10 @@ export default function Profile() {
   };
 
   const handleSave = async () => {
-    setMessage({ type: "", text: "" });
-
-    const currentPhone = user?.phone?.replace("+", "") || "";
-    const newPhone = formData.phone?.replace("+", "") || "";
+    // Normalize to last 10 digits for comparison
+    const normalize = (p: string) => (p || "").replace(/\D/g, "").slice(-10);
+    const currentPhone = normalize(user?.phone || profile?.mobile_number || profile?.phone || "");
+    const newPhone = normalize(formData.phone || "");
 
     if (newPhone && newPhone !== currentPhone) {
       try {
@@ -412,7 +412,7 @@ export default function Profile() {
                     placeholder="Enter Phone Number"
                   />
                 ) : (
-                  <p>{user?.phone || profile?.mobile_number || "N/A"}</p>
+                  <p>{user?.phone || profile?.mobile_number || profile?.phone || "N/A"}</p>
                 )}
               </div>
             </div>

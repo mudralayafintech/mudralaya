@@ -5,15 +5,17 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X } from "lucide-react";
+import { Menu, X, LogOut } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
+import { useUI } from "@/context/UIContext";
 import styles from "./Header.module.css";
 
 const Header = () => {
   const [scrolled, setScrolled] = useState(false);
   const [isNavOpen, setIsNavOpen] = useState(false);
 
-  const { user } = useAuth();
+  const { user, signOut } = useAuth();
+  const { openLoginModal } = useUI();
   const pathname = usePathname();
 
   useEffect(() => {
@@ -103,24 +105,40 @@ const Header = () => {
                 )}
               </li>
             ))}
-            <li className={styles.authItem}>
+            <li className={`${styles.authItem} ${user ? styles.navItemDropdown : ''}`}>
               {user ? (
-                <Link
-                  href={
-                    process.env.NEXT_PUBLIC_DASHBOARD_URL ||
-                    "https://user.mudralaya.com"
-                  }
-                  className={styles.dashboardBtn}
-                >
-                  Dashboard
-                </Link>
+                <>
+                  <button className={styles.dashboardBtn}>
+                    Dashboard
+                  </button>
+                  <div className={styles.dropdown}>
+                    <div className={styles.dropdownInner}>
+                      <Link
+                        href={
+                          process.env.NEXT_PUBLIC_DASHBOARD_URL ||
+                          "https://user.mudralaya.com"
+                        }
+                        className={styles.dropdownLink}
+                      >
+                        Go to Dashboard
+                      </Link>
+                      <button
+                        onClick={signOut}
+                        className={`${styles.dropdownLink} ${styles.logoutLink}`}
+                      >
+                        <LogOut size={15} />
+                        Logout
+                      </button>
+                    </div>
+                  </div>
+                </>
               ) : (
-                <Link
-                  href="https://user.mudralaya.com"
+                <button
+                  onClick={openLoginModal}
                   className={styles.loginBtn}
                 >
                   Login
-                </Link>
+                </button>
               )}
             </li>
           </ul>
@@ -185,22 +203,31 @@ const Header = () => {
                 ))}
                 <li>
                   {user ? (
-                    <Link
-                      href={
-                        process.env.NEXT_PUBLIC_DASHBOARD_URL ||
-                        "https://user.mudralaya.com"
-                      }
-                      className={styles.mobileDashboardBtn}
-                    >
-                      Dashboard
-                    </Link>
+                    <>
+                      <Link
+                        href={
+                          process.env.NEXT_PUBLIC_DASHBOARD_URL ||
+                          "https://user.mudralaya.com"
+                        }
+                        className={styles.mobileDashboardBtn}
+                      >
+                        Dashboard
+                      </Link>
+                      <button
+                        onClick={signOut}
+                        className={styles.mobileLogoutBtn}
+                      >
+                        <LogOut size={18} />
+                        Logout
+                      </button>
+                    </>
                   ) : (
-                    <Link
-                      href="https://user.mudralaya.com"
+                    <button
+                      onClick={openLoginModal}
                       className={styles.mobileLoginBtn}
                     >
                       Login
-                    </Link>
+                    </button>
                   )}
                 </li>
               </ul>
