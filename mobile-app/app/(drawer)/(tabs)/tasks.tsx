@@ -152,6 +152,11 @@ export default function TasksScreen() {
 
   const fetchTasks = async () => {
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        setTasks([]);
+        return;
+      }
       const { data, error } = await supabase.functions.invoke("dashboard-api", {
         body: { action: "get-tasks" },
       });
@@ -229,26 +234,28 @@ export default function TasksScreen() {
       const asset = result.assets[0];
       const fileName = `proof_${task.id}_${Date.now()}.jpg`;
 
-      // Upload to Supabase storage
+      // Read image as base64 and send to edge function (bypasses storage RLS)
       const response = await fetch(asset.uri);
       const blob = await response.blob();
-      const arrayBuffer = await new Response(blob).arrayBuffer();
+      const reader = new FileReader();
+      const base64Promise = new Promise<string>((resolve, reject) => {
+        reader.onloadend = () => {
+          const base64 = (reader.result as string).split(",")[1];
+          resolve(base64);
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+      });
 
-      const { error: uploadError } = await supabase.storage
-        .from("task-proofs")
-        .upload(fileName, arrayBuffer, {
-          contentType: "image/jpeg",
-          upsert: true,
-        });
+      const base64Data = await base64Promise;
 
-      if (uploadError) throw uploadError;
-
-      // Submit proof via edge function
-      const { error } = await supabase.functions.invoke("dashboard-api", {
+      // Submit proof via edge function (handles both upload and DB update)
+      const { data, error } = await supabase.functions.invoke("dashboard-api", {
         body: {
           action: "submit-proof",
           taskId: task.id,
-          proofUrl: fileName,
+          proofFileName: fileName,
+          proofBase64: base64Data,
         },
       });
 

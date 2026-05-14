@@ -7,7 +7,6 @@ import {
   ActivityIndicator,
   Text,
   Platform,
-  PermissionsAndroid,
   Alert,
 } from "react-native";
 import { NotificationDropdown } from "@/components/NotificationDropdown";
@@ -15,7 +14,7 @@ import { useRouter, useSegments, useRootNavigationState } from "expo-router";
 import { ThemeProvider } from "@/lib/ThemeContext";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import * as SplashScreen from "expo-splash-screen";
-import messaging from "@react-native-firebase/messaging";
+import * as Notifications from "expo-notifications";
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -23,6 +22,15 @@ import Animated, {
   withTiming,
   Easing,
 } from "react-native-reanimated";
+
+// Configure how notifications are shown when app is in foreground
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: true,
+    shouldSetBadge: false,
+  }),
+});
 
 SplashScreen.preventAutoHideAsync();
 
@@ -43,54 +51,55 @@ export default function RootLayout() {
 
   useEffect(() => {
     // 1. Request Permission
-    const requestUserPermission = async () => {
-      if (Platform.OS === "android" && Platform.Version >= 33) {
-        await PermissionsAndroid.request(
-          PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS,
-        );
+    const requestPermissions = async () => {
+      const { status: existingStatus } = await Notifications.getPermissionsAsync();
+      let finalStatus = existingStatus;
+
+      if (existingStatus !== "granted") {
+        const { status } = await Notifications.requestPermissionsAsync();
+        finalStatus = status;
       }
 
-      const authStatus = await messaging().requestPermission();
-      const enabled =
-        authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
-        authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+      if (finalStatus !== "granted") {
+        console.log("Push notification permission not granted");
+        return;
+      }
 
-      if (enabled) {
-        console.log("Authorization status:", authStatus);
-        // 2. Subscribe to general topic
-        messaging()
-          .subscribeToTopic("all_users")
-          .then(() => {
-            console.log("Subscribed to all_users topic!");
-            // Alert.alert('Subscribed', 'Connected to notifications channel');
-          })
-          .catch((e) => console.error("Subscription failed", e));
+      console.log("Push notification permission granted:", finalStatus);
+
+      // Get Expo push token for debugging
+      try {
+        const tokenData = await Notifications.getExpoPushTokenAsync();
+        console.log("Expo Push Token:", tokenData.data);
+      } catch (e) {
+        console.log("Could not get push token (expected in Expo Go):", e);
       }
     };
 
-    requestUserPermission();
+    requestPermissions();
 
-    // Debug: Log FCM status (removed alert)
-    const checkDebug = async () => {
-      const authStatus = await messaging().hasPermission();
-      console.log("FCM Debug: Auth Status", authStatus);
+    // 2. Listen for foreground notifications
+    const notificationListener = Notifications.addNotificationReceivedListener(
+      (notification) => {
+        setNotificationData({
+          title: notification.request.content.title || "New Notification",
+          message: notification.request.content.body || "",
+        });
+        setNotificationVisible(true);
+      }
+    );
 
-      const token = await messaging().getToken();
-      console.log("FCM Debug: Token", token);
+    // 3. Listen for notification taps
+    const responseListener = Notifications.addNotificationResponseReceivedListener(
+      (response) => {
+        console.log("Notification tapped:", response.notification.request.content);
+      }
+    );
+
+    return () => {
+      Notifications.removeNotificationSubscription(notificationListener);
+      Notifications.removeNotificationSubscription(responseListener);
     };
-    checkDebug();
-
-    // 3. Listen for foreground messages
-    const unsubscribe = messaging().onMessage(async (remoteMessage) => {
-      // Show custom animated dropdown
-      setNotificationData({
-        title: remoteMessage.notification?.title || "New Notification",
-        message: remoteMessage.notification?.body || "",
-      });
-      setNotificationVisible(true);
-    });
-
-    return unsubscribe;
   }, []);
 
   useEffect(() => {
@@ -131,18 +140,25 @@ export default function RootLayout() {
   useEffect(() => {
     if (!initialized || !rootNavigationState?.key) return;
 
-    // Check if in auth group
-    const inAuthGroup =
+    // Protected routes require authentication
+    const inProtectedRoute =
       segments[0] === "(drawer)" || segments[0] === "notifications";
     const isPublicRoute =
       segments[0] === "login" ||
       segments[0] === "create-task" ||
-      !segments[0]; // Root path
+      segments[0] === "signup" ||
+      segments[0] === "onboarding" ||
+      !segments[0]; // Root path (landing page)
 
-    if (session && !inAuthGroup) {
+    if (!session && inProtectedRoute) {
+      // Not logged in but on a protected route → send to landing page
+      router.replace("/");
+    } else if (session && !inProtectedRoute && !isPublicRoute) {
+      // Logged in but on unknown route → send to dashboard
       router.replace("/(drawer)/(tabs)");
-    } else if (!session && !isPublicRoute) {
-      router.replace("/"); // Redirect to Landing Page
+    } else if (session && isPublicRoute) {
+      // Logged in but on landing/login page → send to dashboard
+      router.replace("/(drawer)/(tabs)");
     }
   }, [session, initialized, segments, rootNavigationState?.key]);
 
@@ -193,8 +209,8 @@ export default function RootLayout() {
             presentation: "card",
           }}
         >
-          <Stack.Screen name="(drawer)" options={{ headerShown: false }} />
           <Stack.Screen name="index" options={{ headerShown: false }} />
+          <Stack.Screen name="(drawer)" options={{ headerShown: false }} />
           <Stack.Screen name="login" options={{ headerShown: false }} />
           <Stack.Screen name="signup" options={{ headerShown: false }} />
           <Stack.Screen name="onboarding" options={{ headerShown: false }} />
