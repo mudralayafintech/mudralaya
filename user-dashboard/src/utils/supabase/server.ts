@@ -15,14 +15,15 @@ export async function createClient() {
         },
         setAll(cookiesToSet) {
           try {
+            const isProduction = process.env.NODE_ENV === 'production'
             cookiesToSet.forEach(({ name, value, options }) => {
-              // Apply domain cookie logic
+              // Apply domain cookie logic - only set .mudralaya.com domain in production
               const cookieOptions: CookieOptions = {
                 ...options,
-                domain: '.mudralaya.com',
+                ...(isProduction ? { domain: '.mudralaya.com' } : {}),
                 path: '/',
                 sameSite: 'lax',
-                secure: true,
+                secure: isProduction,
               }
                cookieStore.set(name, value, cookieOptions)
             })
