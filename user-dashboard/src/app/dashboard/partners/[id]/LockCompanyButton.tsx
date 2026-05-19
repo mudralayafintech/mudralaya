@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/utils/supabase/client';
+import styles from '../partners.module.css';
 
 export default function LockCompanyButton({ companyId }: { companyId: string }) {
   const [loading, setLoading] = useState(false);
@@ -51,12 +52,12 @@ export default function LockCompanyButton({ companyId }: { companyId: string }) 
   };
 
   return (
-    <div className="space-y-3">
-      {error && <div className="text-sm text-red-500 bg-red-500/10 p-3 rounded-lg">{error}</div>}
+    <div className={styles.buttonStack}>
+      {error && <div className={styles.errorBox}>{error}</div>}
       <button
         onClick={handleConfirm}
         disabled={loading}
-        className="w-full bg-primary text-primary-foreground font-semibold py-3 px-4 rounded-xl shadow hover:bg-primary/90 transition-colors disabled:opacity-50"
+        className={styles.button}
       >
         {loading ? 'Confirming...' : 'Choose Company & Commit'}
       </button>

@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/utils/supabase/client';
+import styles from './training.module.css';
 
 export default function DownloadCertificateButton({ companyId }: { companyId: string }) {
   const [loading, setLoading] = useState(false);
@@ -58,11 +59,11 @@ export default function DownloadCertificateButton({ companyId }: { companyId: st
 
   return (
     <div>
-      {error && <div className="text-sm text-red-500 mb-2">{error}</div>}
+      {error && <div className={styles.errorText}>{error}</div>}
       <button
         onClick={handleDownload}
         disabled={loading}
-        className="w-full bg-primary text-primary-foreground font-semibold py-3 px-4 rounded-xl shadow hover:bg-primary/90 transition-colors disabled:opacity-50"
+        className={styles.buttonFull}
       >
         {loading ? 'Processing...' : 'Request Certificate'}
       </button>
