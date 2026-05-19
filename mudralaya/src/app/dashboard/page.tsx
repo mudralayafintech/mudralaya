@@ -15,6 +15,7 @@ import {
   HandCoins,
   ChevronUp,
   Loader2,
+  ArrowRight,
 } from "lucide-react";
 import styles from "./dashboard.module.css";
 import VideoModal from "@/components/dashboard/VideoModal";
@@ -304,6 +305,18 @@ export default function DashboardHome() {
             </div>
           </div>
         </div>
+        <div className={styles.statCard}>
+          <div className={styles.statHeader}>
+            <h3>Pending Earnings</h3>
+            <span>:</span>
+          </div>
+          <div className={styles.statContent}>
+            <div className={styles.statValue}>₹ {data.stats?.pending || 0}</div>
+            <div className={`${styles.statIconBg} ${styles.iconGraph}`}>
+              <TrendingUp size={24} />
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Main Grid: Ongoing Task & Tasks List */}
@@ -407,7 +420,25 @@ export default function DashboardHome() {
           <div className={styles.dashboardCard}>
             <div className={styles.cardHeader}>
               <h3>Tasks</h3>
-              <span>:</span>
+              <button
+                className={styles.btnViewDetails}
+                onClick={() => router.push("/dashboard/tasks")}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "4px",
+                  fontSize: "12px",
+                  fontWeight: 600,
+                  color: "#6366f1",
+                  background: "rgba(99, 102, 241, 0.08)",
+                  border: "none",
+                  borderRadius: "8px",
+                  padding: "6px 12px",
+                  cursor: "pointer",
+                }}
+              >
+                View All <ArrowRight size={12} />
+              </button>
             </div>
             <div className={styles.tasksList}>
               {data.tasks?.map((task, index) => (

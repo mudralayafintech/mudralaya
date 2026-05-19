@@ -19,8 +19,6 @@ const plusJakartaSans = Plus_Jakarta_Sans({
 });
 import { AuthProvider } from "@/context/AuthContext";
 import { UIProvider } from "@/context/UIContext";
-import Header from "@/components/Header/Header";
-import Footer from "@/components/Footer/Footer";
 import LayoutWrapper from "@/components/LayoutWrapper";
 import { Preconnect } from "@/components/Preconnect";
 
@@ -49,11 +47,9 @@ export default function RootLayout({
         <AuthProvider>
           <UIProvider>
             <Preconnect />
-            <Header />
             <LayoutWrapper>
               <main style={{ minHeight: "100vh" }}>{children}</main>
             </LayoutWrapper>
-            <Footer />
           </UIProvider>
         </AuthProvider>
       </body>

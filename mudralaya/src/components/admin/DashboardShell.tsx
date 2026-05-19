@@ -8,7 +8,7 @@ import TopHeader from "./TopHeader";
 import { usePathname } from "next/navigation";
 import { createClient } from "@/utils/supabase/client";
 
-export default function DashboardShell({
+export default function AdminDashboardShell({
   children,
 }: {
   children: React.ReactNode;
@@ -17,10 +17,16 @@ export default function DashboardShell({
   const pathname = usePathname();
 
   const getPageTitle = (path: string) => {
-    if (path.includes("/dashboard/join")) return "Join Requests";
-    if (path.includes("/dashboard/contacts")) return "Messages";
-    if (path.includes("/dashboard/advisor")) return "Advisors";
-    if (path.includes("/dashboard/tasks")) return "Task Manager";
+    if (path.includes("/admin/dashboard/join")) return "Join Requests";
+    if (path.includes("/admin/dashboard/contacts")) return "Messages";
+    if (path.includes("/admin/dashboard/advisor")) return "Advisors";
+    if (path.includes("/admin/dashboard/tasks")) return "Task Manager";
+    if (path.includes("/admin/dashboard/kyc")) return "KYC Requests";
+    if (path.includes("/admin/dashboard/blogs")) return "Blogs";
+    if (path.includes("/admin/dashboard/clients")) return "Clients";
+    if (path.includes("/admin/dashboard/companies")) return "Companies";
+    if (path.includes("/admin/dashboard/users")) return "Registered Users";
+    if (path.includes("/admin/dashboard/roles")) return "Roles & Access";
     return "Overview";
   };
 
@@ -37,6 +43,8 @@ export default function DashboardShell({
     // 1. Clear sensitive data
     localStorage.removeItem("adminToken");
     localStorage.removeItem("adminUser");
+    localStorage.removeItem("adminRole");
+    localStorage.removeItem("adminUsername");
     localStorage.removeItem("admin-storage");
 
     // 2. Clear cookies
@@ -46,8 +54,8 @@ export default function DashboardShell({
         .replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
     });
 
-    // 3. Hard redirect to login to ensure clean state
-    window.location.href = "/login";
+    // 3. Hard redirect to admin login
+    window.location.href = "/admin/login";
   };
 
   return (

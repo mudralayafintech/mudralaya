@@ -1,0 +1,250 @@
+🚀 Mudralaya Complete UX Flow 
+(Page-wise Working) 
+ 
+🟢 1. Login Page 
+What user sees: 
+●​ Mobile number input 
+●​ “Get OTP” button 
+●​ Password login option 
+ 
+What user does: 
+👉 Enters mobile number → clicks “Get OTP” 
+ 
+What system does: 
+●​ Sends OTP 
+●​ Creates temporary session 
+ 
+➡️ Next: OTP Verification Page 
+ 
+🟢 2. OTP Verification Page 
+What user sees: 
+●​ OTP input field 
+●​ “Verify” button 
+ 
+What user does: 
+👉 Enters OTP → clicks “Verify” 
+ 
+What system does: 
+●​ Validates OTP 
+●​ Logs user in 
+ 
+➡️ Next: 
+●​ New user → Onboarding Page 
+●​ Existing user → Dashboard 
+ 
+🟢 3. Onboarding Page 
+What user sees: 
+●​ Name 
+●​ City 
+●​ Skills 
+●​ Interests 
+ 
+What user does: 
+👉 Fills details → clicks “Continue” 
+ 
+What system does: 
+●​ Creates user profile 
+●​ Tags user for AI recommendations 
+ 
+➡️ Next: Dashboard 
+ 
+🏠 4. Dashboard (Home Page) 
+What user sees: 
+●​ Total earnings 
+●​ Pending earnings 
+●​ Ongoing tasks 
+●​ Trending tasks 
+ 
+What user does: 
+👉 Clicks “Tasks” (main action) 
+ 
+What system does: 
+●​ Loads Task Page 
+ 
+📌 5. Task Page (Main Split) 
+What user sees: 
+Two options: 
+●​ Daily Tasks 
+●​ Dedicated Partners 
+ 
+Default view: 
+👉 Daily Tasks 
+ 
+User decision: 
+Option 1: 
+👉 Wants quick earning → stays on Daily Tasks 
+Option 2: 
+👉 Wants stable income → clicks Dedicated Partners 
+ 
+🟡 6. Daily Tasks Page 
+What user sees: 
+●​ List of tasks 
+●​ Each task shows: 
+○​ payout 
+○​ short description 
+ 
+What user does: 
+👉 Clicks “Start Task” 
+ 
+What system does: 
+●​ Assigns task to user 
+●​ Sets status = IN_PROGRESS 
+ 
+➡️ Next: Task Detail Page 
+ 
+📄 7. Task Detail Page 
+What user sees: 
+●​ Full instructions 
+●​ Guidelines 
+●​ Proof requirements 
+ 
+What user does: 
+👉 Completes task (inside or outside app) 
+ 
+Then:​
+ 👉 Clicks “Submit Proof” 
+ 
+➡️ Next: Proof Submission Page 
+ 
+📤 8. Proof Submission Page 
+What user sees: 
+●​ Upload option (image / link / form) 
+ 
+What user does: 
+👉 Uploads proof​
+ 👉 Clicks “Submit” 
+ 
+What system does: 
+●​ Saves submission 
+●​ Changes status → UNDER_VERIFICATION 
+ 
+➡️ Next: Verification Page 
+ 
+⏳ 9. Verification Page 
+What user sees: 
+👉 Message: “Please wait, your task is under verification” 
+ 
+What system does: 
+●​ Verifies submission based on company guidelines 
+ 
+Result: 
+✅ If Approved: 
+●​ Adds money to wallet 
+❌ If Rejected: 
+●​ Shows rejection reason 
+ 
+What user does next: 
+Approved: 
+👉 Clicks “Go to Wallet” 
+Rejected: 
+👉 Clicks “Resubmit” 
+ 
+💼 10. Wallet Page 
+What user sees: 
+●​ Available balance 
+●​ Pending earnings 
+●​ Cashback 
+ 
+What user does: 
+👉 Clicks “Withdraw” 
+ 
+What system does: 
+●​ Creates withdrawal request 
+●​ Processes payment 
+ 
+🔵 11. Dedicated Partners Page 
+What user sees: 
+●​ List of companies 
+●​ Each with earning potential 
+ 
+What user does: 
+👉 Clicks “View Details” 
+ 
+➡️ Next: Company Detail Page 
+ 
+📘 12. Company Detail Page 
+What user sees: 
+●​ Company overview 
+●​ SOPs (guidelines) 
+●​ Training preview 
+●​ Work details 
+ 
+What user does: 
+👉 Clicks “Choose Company” 
+ 
+System shows: 
+●​ Confirmation (3-month commitment) 
+ 
+User action: 
+👉 Clicks “Confirm” 
+ 
+What system does: 
+●​ Assigns company 
+●​ Locks user for 3 months 
+●​ Creates training record 
+ 
+➡️ Next: Training Dashboard 
+ 
+🎓 13. Training Dashboard 
+What user sees: 
+●​ Training modules 
+ 
+What user does: 
+👉 Clicks “Start Training” 
+ 
+What system does: 
+●​ Tracks progress 
+ 
+➡️ After training → Work starts 
+ 
+💼 14. Dedicated Work Submission 
+What user does: 
+👉 Clicks “Submit Work” 
+ 
+Flow: 
+●​ Same as Daily Task: 
+○​ Upload proof 
+○​ Submit 
+○​ Verification 
+○​ Earnings 
+ 
+🎓 15. Completion (After 3 Months) 
+What user sees: 
+●​ Certificate available 
+ 
+What user does: 
+👉 Clicks “Download Certificate” 
+ 
+System: 
+●​ If unpaid → ask ₹499 
+●​ If paid → allow download 
+ 
+💳 16. Membership Page 
+What user sees: 
+●​ Plans: 
+○​ ₹299/month 
+○​ ₹2499/year 
+ 
+What user does: 
+👉 Clicks “Buy Now” 
+ 
+What system does: 
+●​ Processes payment 
+●​ Activates membership 
+●​ Adds ₹99 cashback (yearly plan) 
+ 
+⚙️ 17. Settings Page 
+What user sees: 
+●​ Profile edit 
+●​ Password change 
+●​ Logout 
+ 
+What user does: 
+👉 Clicks “Logout” 
+ 
+System: 
+●​ Clears session 
+ 
+➡️ Back to Login 
+Login → Dashboard → Tasks → Start Task → Submit Proof → Verification → Earn → Wallet 
+→ Withdraw 

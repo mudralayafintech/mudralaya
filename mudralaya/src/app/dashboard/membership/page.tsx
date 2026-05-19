@@ -113,10 +113,10 @@ export default function Membership() {
     }
 
     const amountToPay = discountApplied
-      ? 99
+      ? finalPrice
       : billingCycle === "yearly"
         ? 2499
-        : 99;
+        : 299;
 
     try {
       // 1. Create Order
@@ -281,7 +281,7 @@ export default function Membership() {
     setCouponCode("");
     setDiscountApplied(false);
     setCouponError("");
-    setFinalPrice(billingCycle === "yearly" ? 2499 : 99);
+    setFinalPrice(billingCycle === "yearly" ? 2499 : 299);
   };
 
   useEffect(() => {
@@ -289,7 +289,7 @@ export default function Membership() {
     setDiscountApplied(false);
     setCouponCode("");
     setCouponError("");
-    setFinalPrice(billingCycle === "yearly" ? 2499 : 99);
+    setFinalPrice(billingCycle === "yearly" ? 2499 : 299);
   }, [billingCycle]);
 
   // Using finalPrice state directly for amount since it tracks the applied coupon accurately

@@ -200,17 +200,23 @@ export default function TasksScreen() {
 
   const getSmartLabel = (task: Task) => {
     if (task.status === "submitted") return "Under Review";
+    // If completed with proof, it means proof was submitted and awaiting review
+    if (task.status === "completed" && task.proof_url) return "Under Review";
     if (task.status === "ongoing" || task.status === "in_progress")
       return "Submit Proof";
-    if (task.status === "completed" || task.status === "approved") return "Claim Reward";
+    if (task.status === "completed") return "Submit Proof";
+    if (task.status === "approved") return "Claim Reward";
     return "Start Task";
   };
 
   const getSmartBtnColors = (task: Task): [string, string] => {
     if (task.status === "submitted") return ["#f59e0b", "#d97706"];
+    if (task.status === "completed" && task.proof_url) return ["#f59e0b", "#d97706"];
     if (task.status === "ongoing" || task.status === "in_progress")
       return ["#3b82f6", "#2563eb"];
-    if (task.status === "completed" || task.status === "approved")
+    if (task.status === "completed")
+      return ["#3b82f6", "#2563eb"];
+    if (task.status === "approved")
       return ["#10b981", "#059669"];
     return ["#0f172a", "#334155"];
   };
@@ -263,7 +269,7 @@ export default function TasksScreen() {
 
       setTasks((prev) =>
         prev.map((t) =>
-          t.id === task.id ? { ...t, status: "submitted", proof_url: fileName } : t
+          t.id === task.id ? { ...t, status: "completed", proof_url: fileName } : t
         )
       );
 
@@ -769,14 +775,14 @@ export default function TasksScreen() {
                         <Text style={styles.actionBtnText}>
                           {item.status === "claimed" ? "✓ Reward Claimed" : getSmartLabel(item)}
                         </Text>
-                        {item.status !== "claimed" && item.status !== "submitted" && (
+                        {item.status !== "claimed" && !(item.status === "completed" && item.proof_url) && item.status !== "submitted" && (
                           <Rocket size={18} color="#fff" />
                         )}
                       </LinearGradient>
                     </TouchableOpacity>
 
                     {/* Show proof preview if submitted */}
-                    {item.proof_url && item.status === "submitted" && (
+                    {item.proof_url && (item.status === "submitted" || item.status === "completed") && (
                       <View style={{
                         marginTop: 12,
                         padding: 12,

@@ -28,7 +28,7 @@ import {
   BookOpen,
 } from "lucide-react-native";
 import { DrawerActions } from "@react-navigation/native";
-import RazorpayCheckout from "react-native-razorpay";
+import { useRazorpay } from "@codearcade/expo-razorpay";
 import { CustomAlert } from "../../components/CustomAlert";
 import { useTheme } from "../../lib/ThemeContext";
 import { BlurView } from "expo-blur";
@@ -97,6 +97,7 @@ const GoldChip = () => (
 );
 
 export default function Membership() {
+  const { openCheckout, RazorpayUI } = useRazorpay();
   const router = useRouter();
   const navigation = useNavigation();
   const { theme } = useTheme();
@@ -305,8 +306,8 @@ export default function Membership() {
         theme: { color: "#4F46E5" },
       };
 
-      RazorpayCheckout.open(options)
-        .then(async (data: any) => {
+      openCheckout(options, {
+        onSuccess: async (data: any) => {
           try {
             const verifyRes = await fetch(
               `${process.env.EXPO_PUBLIC_SUPABASE_URL}/functions/v1/razorpay-api`,
@@ -352,9 +353,11 @@ export default function Membership() {
               verifyError.message || "Verification Failed",
               "error",
             );
+          } finally {
+            setLoading(false);
           }
-        })
-        .catch((err: any) => {
+        },
+        onFailure: (err: any) => {
           if (err.code !== 2) {
             // err.code === 2 means payment was cancelled by user
             console.error("Payment Error:", err);
@@ -364,8 +367,9 @@ export default function Membership() {
               "error",
             );
           }
-        })
-        .finally(() => setLoading(false));
+          setLoading(false);
+        }
+      });
     } catch (error: any) {
       showAlert(
         "Error",
@@ -721,6 +725,7 @@ export default function Membership() {
           confirmText={alert.confirmText}
         />
       </SafeAreaView>
+      {RazorpayUI}
     </View>
   );
 }

@@ -22,7 +22,10 @@
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.mudralaya.mobile"
+      "package": "com.mudralaya.mobile",
+      "permissions": [
+        "android.permission.RECORD_AUDIO"
+      ]
     },
     "scheme": "mudralaya",
     "web": {
@@ -36,8 +39,9 @@
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "342d99cf-91e6-4a93-9451-4973731d49cf"
+        "projectId": "09f4d090-de96-4178-b8a2-f53d3fa629a1"
       }
-    }
+    },
+    "owner": "nishantsingh1005"
   }
 }

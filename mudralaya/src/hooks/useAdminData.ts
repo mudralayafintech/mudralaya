@@ -14,7 +14,7 @@ export function useAdminData() {
   const fetchData = useCallback(async () => {
     const token = localStorage.getItem("adminToken");
     if (!token) {
-      router.push("/login");
+      router.push("/admin/login");
       return;
     }
 
@@ -27,7 +27,7 @@ export function useAdminData() {
       if (err.status === 401 || err.message?.includes("Unauthorized")) {
         localStorage.removeItem("isAdminLoggedIn");
         localStorage.removeItem("adminToken");
-        router.push("/login");
+        router.push("/admin/login");
       }
       setError(err.message);
       console.error(err);

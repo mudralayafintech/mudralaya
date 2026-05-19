@@ -48,7 +48,12 @@ serve(async (req: Request): Promise<Response> => {
 
       // VALIDATE COUPON
       const code = couponCode?.toUpperCase();
-      if (code) {
+
+      // Certificate payment: fixed ₹499, no coupons
+      if (planType === 'certificate') {
+        finalAmount = 499;
+      } else if (code) {
+      // VALIDATE COUPON (membership only)
         if (planType !== 'yearly') {
           return new Response(JSON.stringify({ error: "Coupon valid only for Yearly plan" }), {
             headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -73,11 +78,9 @@ serve(async (req: Request): Promise<Response> => {
       } else {
         // Standard Price Validation
         // If no coupon, ensure amount matches standard prices (basic security)
-        const expectedPrice = planType === 'yearly' ? 999 : 99;
+        const expectedPrice = planType === 'yearly' ? 999 : 299;
         if (Number(amount) !== expectedPrice && planType !== 'individual') {
           console.warn(`Price Mismatch: Expected ${expectedPrice}, got ${amount}. Allowing for now but logging.`);
-          // You might strict enforce this later:
-          // finalAmount = expectedPrice; 
         }
       }
 
@@ -125,8 +128,10 @@ serve(async (req: Request): Promise<Response> => {
       // 1. Insert PENDING Transaction (Robust Wrapper)
       if (userId) {
         try {
-          const title = planType === 'individual' ? 'Individual Plan Purchase' : 'Mudralaya Membership';
-          const type = planType === 'individual' ? 'PLAN' : 'membership';
+          const title = planType === 'certificate' ? 'Certificate Fee' 
+            : planType === 'individual' ? 'Individual Plan Purchase' : 'Mudralaya Membership';
+          const type = planType === 'certificate' ? 'certificate'
+            : planType === 'individual' ? 'PLAN' : 'membership';
 
           const { error: pendingError } = await supabaseClient
             .from('transactions')
@@ -163,7 +168,7 @@ serve(async (req: Request): Promise<Response> => {
     }
 
     if (action === 'verify-payment') {
-      const { razorpay_payment_id, razorpay_order_id, razorpay_signature, type, userId, plan, amount, submissionId } = data || {}
+      const { razorpay_payment_id, razorpay_order_id, razorpay_signature, type, userId, plan, amount, submissionId, certificateId, companyId } = data || {}
 
       if (!razorpay_payment_id || !razorpay_order_id || !razorpay_signature) {
         return new Response(JSON.stringify({ error: "Missing payment verification parameters" }), {
@@ -276,7 +281,7 @@ serve(async (req: Request): Promise<Response> => {
           user_id: userId,
           title: 'Mudralaya Membership',
           sub_title: `${isYearly ? 'Yearly' : 'Monthly'} Membership ${isStacked ? '(Stacked)' : ''}`,
-          amount: amount || (isYearly ? 999 : 99),
+          amount: amount || (isYearly ? 999 : 299),
           type: 'membership',
           status: 'completed', // Update to success
           plan_name: isYearly ? 'yearly' : 'monthly',
@@ -372,6 +377,71 @@ serve(async (req: Request): Promise<Response> => {
         });
       }
 
+      // Handle Certificate Payment
+      if (type === 'certificate' && userId) {
+        const now = new Date();
+
+        // 1. Record transaction
+        const txPayload: any = {
+          user_id: userId,
+          title: 'Certificate Fee',
+          sub_title: 'Training completion certificate',
+          amount: 499,
+          type: 'certificate',
+          status: 'completed',
+          icon_type: 'award',
+          plan_name: 'certificate',
+          transaction_id: razorpay_payment_id,
+          razorpay_order_id: razorpay_order_id,
+          razorpay_payment_id: razorpay_payment_id,
+          updated_at: now.toISOString()
+        };
+
+        let txError: any = null;
+
+        const { data: updatedTx, error: updateError } = await supabaseClient
+          .from('transactions')
+          .update(txPayload)
+          .eq('razorpay_order_id', razorpay_order_id)
+          .select();
+
+        if (updateError || !updatedTx || updatedTx.length === 0) {
+          const { error: insertError } = await supabaseClient
+            .from('transactions')
+            .insert(txPayload);
+          txError = insertError;
+        }
+
+        if (txError) {
+          console.error('CRITICAL: Certificate Transaction Error:', txError);
+          throw new Error(`Certificate Transaction Failed: ${txError.message}`);
+        }
+
+        // 2. Mark certificate as paid (if certificate table exists)
+        if (certificateId) {
+          try {
+            await supabaseClient
+              .from('certificates')
+              .update({
+                is_paid: true,
+                payment_id: razorpay_payment_id,
+                paid_at: now.toISOString(),
+                updated_at: now.toISOString()
+              })
+              .eq('id', certificateId);
+          } catch (certErr) {
+            console.error('Certificate update failed (non-critical):', certErr);
+          }
+        }
+
+        return new Response(JSON.stringify({
+          success: true,
+          message: 'Certificate payment recorded successfully.'
+        }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 200,
+        });
+      }
 
       // Handle Individual Plan Payment
       if (type === 'plan' && userId && plan === 'individual') {

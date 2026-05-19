@@ -6,10 +6,14 @@ import { usePathname } from "next/navigation";
 import {
   BarChart3,
   UserPlus,
+  Users,
   Mail,
   Briefcase,
   CheckSquare,
   LogOut,
+  Shield,
+  Building2,
+  FileText,
 } from "lucide-react";
 import styles from "./Sidebar.module.css";
 import clsx from "clsx";
@@ -21,44 +25,27 @@ interface SidebarProps {
 }
 
 const navItems = [
-  { id: "overview", path: "/dashboard", icon: BarChart3, label: "Overview" },
-  {
-    id: "join",
-    path: "/dashboard/join",
-    icon: UserPlus,
-    label: "Join Requests",
-  },
-  {
-    id: "contacts",
-    path: "/dashboard/contacts",
-    icon: Mail,
-    label: "Messages",
-  },
-  {
-    id: "advisor",
-    path: "/dashboard/advisor",
-    icon: Briefcase,
-    label: "Advisors",
-  },
-  {
-    id: "tasks",
-    path: "/dashboard/tasks",
-    icon: CheckSquare,
-    label: "Task Manager",
-  },
-  {
-    id: "kyc",
-    path: "/dashboard/kyc",
-    icon: CheckSquare, // Using CheckSquare or similar, Sidebar.tsx imports CheckSquare (already used for tasks? Let's check imports)
-    label: "KYC Requests",
-  },
-  {
-    id: "blogs",
-    path: "/dashboard/blogs",
-    icon: BarChart3, // Will import a proper icon, let's use BarChart3 for now or add FileText
-    label: "Blogs",
-  },
+  { id: "overview", path: "/admin/dashboard", icon: BarChart3, label: "Overview", perm: "dashboard" },
+  { id: "users", path: "/admin/dashboard/users", icon: Users, label: "Registered Users", perm: "users" },
+  { id: "join", path: "/admin/dashboard/join", icon: UserPlus, label: "Join Requests", perm: "join_requests" },
+  { id: "contacts", path: "/admin/dashboard/contacts", icon: Mail, label: "Messages", perm: "contacts" },
+  { id: "advisor", path: "/admin/dashboard/advisor", icon: Briefcase, label: "Advisors", perm: "advisors" },
+  { id: "tasks", path: "/admin/dashboard/tasks", icon: CheckSquare, label: "Task Manager", perm: "tasks" },
+  { id: "kyc", path: "/admin/dashboard/kyc", icon: FileText, label: "KYC Requests", perm: "kyc" },
+  { id: "blogs", path: "/admin/dashboard/blogs", icon: BarChart3, label: "Blogs", perm: "blogs" },
+  { id: "companies", path: "/admin/dashboard/companies", icon: Building2, label: "Companies", perm: "companies" },
+  { id: "roles", path: "/admin/dashboard/roles", icon: Shield, label: "Roles & Access", perm: "roles" },
 ];
+
+// Permission map: which permissions each role has (fallback if localStorage doesn't have it)
+const ROLE_PERMISSION_MAP: Record<string, string[]> = {
+  super_admin: ['dashboard', 'users', 'roles', 'tasks', 'blogs', 'kyc', 'contacts', 'join_requests', 'advisors', 'companies', 'settings', 'reports'],
+  admin: ['dashboard', 'users', 'tasks', 'blogs', 'kyc', 'contacts', 'join_requests', 'advisors', 'companies', 'reports'],
+  seo: ['dashboard', 'blogs'],
+  sales: ['dashboard', 'contacts', 'join_requests', 'companies', 'reports'],
+  marketing_manager: ['dashboard', 'blogs', 'contacts', 'advisors', 'reports'],
+  blogger: ['blogs'],
+};
 
 export default function Sidebar({
   isMobileOpen,
@@ -76,13 +63,13 @@ export default function Sidebar({
     }
   }, []);
 
-  // Filter nav items based on RBAC
+  // Filter nav items based on RBAC permissions
+  const userPerms = ROLE_PERMISSION_MAP[role] || ROLE_PERMISSION_MAP['super_admin'];
   const visibleNavItems = navItems.filter((item) => {
-    if (role === 'blogger') {
-      return item.id === 'blogs';
-    }
-    // Super admins see everything
-    return true;
+    // Super admin sees everything
+    if (role === 'super_admin') return true;
+    // Others only see items they have permission for
+    return userPerms.includes(item.perm);
   });
 
   return (
@@ -140,7 +127,7 @@ export default function Sidebar({
             <div className={styles.info}>
               <span className={styles.name}>{username}</span>
               <span className={styles.role}>
-                {role === 'blogger' ? 'Blogger' : 'Super Admin'}
+                {role.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}
               </span>
             </div>
           </div>

@@ -6,7 +6,7 @@ const supabase = createClient();
 export async function adminApiRequest(action: string, data: any = {}) {
   const adminToken = typeof window !== "undefined" ? localStorage.getItem("adminToken") : null;
 
-  if (!adminToken && action !== "login") {
+  if (!adminToken && action !== "login" && action !== "login-google") {
     throw new Error("Unauthorized");
   }
 

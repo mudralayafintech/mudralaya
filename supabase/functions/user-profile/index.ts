@@ -105,7 +105,7 @@ serve(async (req: Request): Promise<Response> => {
     // PUT: Update Profile
     if (method === 'PUT') {
       const body = await req.json()
-      const { full_name, profession, email_id, date_of_birth, avatar_url } = body
+      const { full_name, profession, email_id, date_of_birth, avatar_url, city, skills, interests } = body
 
       const updates: any = {
           updated_at: new Date(),
@@ -116,6 +116,9 @@ serve(async (req: Request): Promise<Response> => {
       if (email_id !== undefined) updates.email_id = email_id
       if (date_of_birth !== undefined) updates.date_of_birth = date_of_birth
       if (avatar_url !== undefined) updates.avatar_url = avatar_url
+      if (city !== undefined) updates.city = city
+      if (skills !== undefined) updates.skills = skills
+      if (interests !== undefined) updates.interests = interests
 
       const { data, error } = await supabaseClient
         .from('users')

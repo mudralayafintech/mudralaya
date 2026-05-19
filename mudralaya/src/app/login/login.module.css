@@ -1,0 +1,448 @@
+/* Wrapper: Light Premium Background */
+.loginWrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 50%, #eff6ff 100%);
+  padding: 1.5rem;
+  position: relative;
+  overflow: hidden;
+  font-family: "Inter", system-ui, sans-serif;
+}
+
+/* Decorative Blobs: Soft Pastels */
+.blob1,
+.blob2,
+.blob3 {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px); /* Increased blur for softer look */
+  z-index: 0;
+  opacity: 0.45;
+  animation: float 15s infinite alternate ease-in-out;
+}
+
+.blob1 {
+  top: -15%;
+  left: -10%;
+  width: 600px;
+  height: 600px;
+  background: #bfdbfe; /* Soft Blue */
+  animation-delay: 0s;
+}
+
+.blob2 {
+  bottom: -15%;
+  right: -10%;
+  width: 500px;
+  height: 500px;
+  background: #c084fc; /* Soft Purple */
+  opacity: 0.3;
+  animation-delay: -5s;
+}
+
+.blob3 {
+  top: 40%;
+  left: 60%;
+  width: 400px;
+  height: 400px;
+  background: #60a5fa; /* Blue */
+  opacity: 0.2;
+  transform: translate(-50%, -50%);
+  animation-delay: -8s;
+}
+
+/* Glass Container: Clean White Glass */
+.loginContainer {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(25px);
+  -webkit-backdrop-filter: blur(25px);
+  padding: 3.5rem;
+  border-radius: 32px;
+  box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.08),
+    0 0 0 1px rgba(255, 255, 255, 0.6) inset;
+  width: 100%;
+  max-width: 460px;
+  text-align: center;
+  position: relative;
+  z-index: 10;
+  color: #1e293b; /* Slate 800 */
+}
+
+/* Header */
+.loginHeader {
+  margin-bottom: 2.5rem;
+}
+
+.logo {
+  height: 60px;
+  width: auto;
+  margin-bottom: 1.5rem;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.05));
+}
+
+.loginHeader h1 {
+  font-size: 2.2rem;
+  font-weight: 800;
+  margin-bottom: 0.5rem;
+  color: #1e293b;
+  letter-spacing: -0.02em;
+  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.loginHeader p {
+  color: #64748b; /* Slate 500 */
+  font-size: 1.05rem;
+  font-weight: 500;
+}
+
+/* Inputs */
+.inputGroup {
+  position: relative;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: stretch;
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.inputGroup:focus-within {
+  transform: translateY(-2px);
+}
+
+.phonePrefix {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-right: none;
+  border-radius: 16px 0 0 16px;
+  padding: 0 1.2rem;
+  display: flex;
+  align-items: center;
+  color: #334155;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: all 0.2s;
+}
+
+.inputIcon {
+  position: absolute;
+  left: 1.2rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #94a3b8;
+  font-size: 1.2rem;
+  transition: color 0.2s;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.inputGroup input {
+  width: 100%;
+  padding: 1.2rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  font-size: 1rem;
+  background: #fff;
+  color: #1e293b;
+  transition: all 0.2s ease;
+  font-weight: 500;
+}
+
+.inputGroup input::placeholder {
+  color: #cbd5e1;
+}
+
+.inputGroup:has(.phonePrefix) input {
+  border-radius: 0 16px 16px 0;
+  padding-left: 1rem;
+}
+
+.inputGroup:has(.inputIcon) input {
+  padding-left: 3.2rem;
+}
+
+.inputGroup input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+}
+
+.inputGroup:focus-within .phonePrefix {
+  border-color: #3b82f6;
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+
+.inputGroup:focus-within .inputIcon {
+  color: #3b82f6;
+}
+
+/* Primary Button */
+.btnPrimary {
+  width: 100%;
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  color: white;
+  padding: 1.1rem;
+  border-radius: 16px;
+  font-weight: 700;
+  font-size: 1.05rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.8rem;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 8px 20px -4px rgba(37, 99, 235, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+.btnPrimary:hover:not(:disabled) {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 25px -4px rgba(37, 99, 235, 0.4);
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+}
+
+.btnPrimary:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  background: #94a3b8;
+  box-shadow: none;
+  transform: none;
+}
+
+/* Secondary Actions */
+.btnText {
+  background: none;
+  color: #64748b;
+  font-size: 0.95rem;
+  margin-top: 1.5rem;
+  padding: 0.6rem 1.2rem;
+  border: 1px solid transparent;
+  border-radius: 50px;
+  font-weight: 600;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.btnText:hover {
+  color: #2563eb;
+  background: #eff6ff;
+}
+
+/* OT Info Box */
+.otpSentInfo {
+  margin-bottom: 2rem;
+  background: #eff6ff;
+  padding: 1.2rem;
+  border-radius: 16px;
+  border: 1px solid #dbeafe;
+}
+
+.otpSentText {
+  color: #1e40af;
+  font-size: 1rem;
+  margin-bottom: 0.4rem;
+}
+
+.otpDeliveryHint {
+  color: #60a5fa;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.otpSentText strong {
+  color: #1e3a8a;
+  font-weight: 700;
+}
+
+.timerText {
+  color: #64748b;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.resendBtn {
+  margin-top: 0;
+  color: #2563eb;
+  font-weight: 700;
+}
+
+/* Success State */
+.verifiedSuccess {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 0;
+  animation: scaleUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.successIcon {
+  color: #10b981; /* Green 500 */
+  margin-bottom: 1.5rem;
+  filter: drop-shadow(0 10px 20px rgba(16, 185, 129, 0.2));
+  transform: scale(1.8);
+}
+
+.verifiedSuccess h2 {
+  color: #1e293b;
+  font-size: 2.2rem;
+  font-weight: 800;
+  margin-bottom: 0.5rem;
+}
+
+.verifiedSuccess p {
+  color: #64748b;
+  font-size: 1.1rem;
+}
+
+@keyframes scaleUp {
+  0% {
+    opacity: 0;
+    transform: scale(0.9) translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes float {
+  0% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+  100% {
+    transform: translate(20px, 20px) rotate(5deg);
+  }
+}
+
+.spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Footer */
+.loginFooter {
+  margin-top: 3rem;
+  font-size: 0.85rem;
+  color: #94a3b8;
+  font-weight: 500;
+}
+
+/* Error */
+.errorMessage {
+  background: #fef2f2;
+  border: 1px solid #fee2e2;
+  color: #ef4444;
+  padding: 1rem;
+  border-radius: 12px;
+  margin-bottom: 1.5rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: shake 0.4s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+@keyframes shake {
+  10%,
+  90% {
+    transform: translate3d(-1px, 0, 0);
+  }
+  20%,
+  80% {
+    transform: translate3d(2px, 0, 0);
+  }
+  30%,
+  50%,
+  70% {
+    transform: translate3d(-4px, 0, 0);
+  }
+  40%,
+  60% {
+    transform: translate3d(4px, 0, 0);
+  }
+}
+
+/* Divider */
+.divider {
+  display: flex;
+  align-items: center;
+  margin: 1.5rem 0;
+  gap: 1rem;
+}
+
+.divider::before,
+.divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #e2e8f0, transparent);
+}
+
+.divider span {
+  color: #94a3b8;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Google Button */
+.btnGoogle {
+  width: 100%;
+  background: #ffffff;
+  color: #334155;
+  padding: 0.95rem;
+  border-radius: 16px;
+  font-weight: 600;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  border: 1.5px solid #e2e8f0;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.btnGoogle:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px -4px rgba(0, 0, 0, 0.1);
+  border-color: #cbd5e1;
+  background: #fafafa;
+}
+
+.btnGoogle:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.btnGoogle:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.googleIcon {
+  flex-shrink: 0;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .loginContainer {
+    padding: 2.5rem 1.5rem;
+    max-width: 100%;
+    border-radius: 24px;
+  }
+}

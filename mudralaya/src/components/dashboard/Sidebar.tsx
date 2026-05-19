@@ -8,8 +8,10 @@ import {
   LayoutDashboard,
   ClipboardList,
   CreditCard,
-  List,
+  Briefcase,
+  GraduationCap,
   Wallet,
+  Settings,
   LogOut,
 } from "lucide-react";
 import styles from "./sidebar.module.css";
@@ -38,10 +40,12 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
 
   const navItems = [
     { name: "Dashboard", path: "/dashboard", icon: LayoutDashboard },
-    { name: "Task", path: "/dashboard/tasks", icon: ClipboardList },
+    { name: "Tasks", path: "/dashboard/tasks", icon: ClipboardList },
+    { name: "Partners", path: "/dashboard/partners", icon: Briefcase },
+    { name: "Training", path: "/dashboard/training", icon: GraduationCap },
     { name: "Membership", path: "/dashboard/membership", icon: CreditCard },
-    { name: "Plans", path: "/dashboard/plans", icon: List },
     { name: "Wallet", path: "/dashboard/wallet", icon: Wallet },
+    { name: "Settings", path: "/dashboard/settings", icon: Settings },
   ];
 
   return (
@@ -61,7 +65,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
         <nav className={styles.sidebarNav}>
           <div className={styles.navSection}>
             {navItems.map((item) => {
-              const isActive = pathname === item.path;
+              const isActive = pathname === item.path || (item.path !== "/dashboard" && pathname.startsWith(item.path));
               return (
                 <Link
                   key={item.path}

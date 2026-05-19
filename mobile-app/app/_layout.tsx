@@ -15,6 +15,7 @@ import { ThemeProvider } from "@/lib/ThemeContext";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import * as SplashScreen from "expo-splash-screen";
 import * as Notifications from "expo-notifications";
+import Constants, { ExecutionEnvironment } from "expo-constants";
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -23,14 +24,27 @@ import Animated, {
   Easing,
 } from "react-native-reanimated";
 
+// Detect if running in Expo Go (where push notifications are unsupported since SDK 53)
+const isExpoGo =
+  Constants.executionEnvironment === ExecutionEnvironment.StoreClient;
+
 // Configure how notifications are shown when app is in foreground
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowAlert: true,
-    shouldPlaySound: true,
-    shouldSetBadge: false,
-  }),
-});
+// Only set handler in development/standalone builds (not Expo Go)
+if (!isExpoGo) {
+  Notifications.setNotificationHandler({
+    handleNotification: async () => ({
+      shouldShowAlert: true,
+      shouldPlaySound: true,
+      shouldSetBadge: false,
+      shouldShowBanner: true,
+      shouldShowList: true,
+    } as any),
+  });
+} else {
+  console.log(
+    "[Notifications] Running in Expo Go — push notifications are disabled. Use a development build for full support."
+  );
+}
 
 SplashScreen.preventAutoHideAsync();
 
@@ -50,6 +64,12 @@ export default function RootLayout() {
   const rootNavigationState = useRootNavigationState();
 
   useEffect(() => {
+    // Skip push notification setup in Expo Go (unsupported since SDK 53)
+    if (isExpoGo) {
+      console.log("[Notifications] Skipping push notification setup in Expo Go.");
+      return;
+    }
+
     // 1. Request Permission
     const requestPermissions = async () => {
       const { status: existingStatus } = await Notifications.getPermissionsAsync();
@@ -72,7 +92,7 @@ export default function RootLayout() {
         const tokenData = await Notifications.getExpoPushTokenAsync();
         console.log("Expo Push Token:", tokenData.data);
       } catch (e) {
-        console.log("Could not get push token (expected in Expo Go):", e);
+        console.log("Could not get push token:", e);
       }
     };
 
@@ -97,8 +117,8 @@ export default function RootLayout() {
     );
 
     return () => {
-      Notifications.removeNotificationSubscription(notificationListener);
-      Notifications.removeNotificationSubscription(responseListener);
+      notificationListener.remove();
+      responseListener.remove();
     };
   }, []);
 
@@ -146,8 +166,7 @@ export default function RootLayout() {
     const isPublicRoute =
       segments[0] === "login" ||
       segments[0] === "create-task" ||
-      segments[0] === "signup" ||
-      segments[0] === "onboarding" ||
+      segments[0] === "profile" ||
       !segments[0]; // Root path (landing page)
 
     if (!session && inProtectedRoute) {
@@ -212,15 +231,9 @@ export default function RootLayout() {
           <Stack.Screen name="index" options={{ headerShown: false }} />
           <Stack.Screen name="(drawer)" options={{ headerShown: false }} />
           <Stack.Screen name="login" options={{ headerShown: false }} />
-          <Stack.Screen name="signup" options={{ headerShown: false }} />
-          <Stack.Screen name="onboarding" options={{ headerShown: false }} />
           <Stack.Screen
             name="notifications"
             options={{ headerShown: false, presentation: "modal" }}
-          />
-          <Stack.Screen
-            name="+not-found"
-            options={{ title: "Oops!", headerShown: true }}
           />
         </Stack>
 

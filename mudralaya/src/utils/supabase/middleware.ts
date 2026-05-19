@@ -2,6 +2,13 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
+// Routes that require Supabase authentication
+const PROTECTED_PREFIXES = ['/dashboard', '/onboarding']
+
+function isProtectedRoute(pathname: string): boolean {
+  return PROTECTED_PREFIXES.some(prefix => pathname.startsWith(prefix))
+}
+
 export async function updateSession(request: NextRequest) {
   let response = NextResponse.next({
     request: {
@@ -40,24 +47,13 @@ export async function updateSession(request: NextRequest) {
     }
   )
 
+  // Always refresh the session (keeps cookies alive)
   const {
     data: { user },
   } = await supabase.auth.getUser()
 
-  if (
-    !user &&
-    !request.nextUrl.pathname.startsWith('/login') &&
-    !request.nextUrl.pathname.startsWith('/auth') &&
-    request.nextUrl.pathname !== '/' // Allow landing page if it exists, or redirect root to login
-  ) {
-    // If root is dashboard, redirect to login
-    if (request.nextUrl.pathname === '/') {
-        const url = request.nextUrl.clone()
-        url.pathname = '/login'
-        return NextResponse.redirect(url)
-    }
-
-    // Redirect unauthenticated users to login page
+  // Only redirect to login for protected routes
+  if (!user && isProtectedRoute(request.nextUrl.pathname)) {
     const url = request.nextUrl.clone()
     url.pathname = '/login'
     return NextResponse.redirect(url)
@@ -65,3 +61,4 @@ export async function updateSession(request: NextRequest) {
 
   return response
 }
+

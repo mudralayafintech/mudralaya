@@ -29,7 +29,7 @@ import {
   ChevronUp,
   Bell,
 } from "lucide-react-native";
-import RazorpayCheckout from "react-native-razorpay";
+import { useRazorpay } from "@codearcade/expo-razorpay";
 import { DrawerActions } from "@react-navigation/native";
 import { supabase } from "../../lib/supabase";
 import { useTheme } from "@/lib/ThemeContext";
@@ -318,6 +318,7 @@ const PlanCard = ({
 };
 
 export default function PlansScreen() {
+  const { openCheckout, RazorpayUI } = useRazorpay();
   const router = useRouter();
   const navigation = useNavigation();
   const { theme } = useTheme();
@@ -527,8 +528,8 @@ export default function PlansScreen() {
         theme: { color: "#4f46e5" },
       };
 
-      RazorpayCheckout.open(options)
-        .then(async (data: any) => {
+      openCheckout(options, {
+        onSuccess: async (data: any) => {
           try {
             const {
               data: { session: verifySession },
@@ -585,8 +586,8 @@ export default function PlansScreen() {
               "error",
             );
           }
-        })
-        .catch((error: any) => {
+        },
+        onFailure: (error: any) => {
           if (error.code && error.description) {
             showAlert(
               "Payment Failed",
@@ -596,7 +597,8 @@ export default function PlansScreen() {
           } else {
             console.log("Payment canceled", error);
           }
-        });
+        }
+      });
     } catch (error: any) {
       showAlert(
         "Error",
@@ -827,6 +829,7 @@ export default function PlansScreen() {
           />
         </ScrollView>
       </SafeAreaView>
+      {RazorpayUI}
     </View>
   );
 }

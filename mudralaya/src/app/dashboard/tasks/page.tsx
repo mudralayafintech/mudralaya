@@ -139,7 +139,7 @@ export default function TasksPage() {
     if (task.status === "completed") return "In Process";
     if (task.status === "ongoing" || task.status === "in_progress")
       return "Complete Task";
-    if (task.status === "rejected") return "Task Rejected";
+    if (task.status === "rejected") return "Resubmit Task";
     return "Start Task";
   };
 
@@ -228,8 +228,16 @@ export default function TasksPage() {
       }, 500);
     } else if (label === "Start Task") {
       handleTakeTask(task);
+    } else if (label === "Resubmit Task") {
+      // Reset local status to ongoing so the proof upload section appears
+      setTasks((prevTasks) =>
+        prevTasks.map((t) =>
+          t.id === task.id ? { ...t, status: "ongoing" } : t,
+        ),
+      );
+      setExpandedTaskId(task.id);
     }
-    // "Reward Claimed", "Pending Approval", and "Task Rejected" are disabled states
+    // "Reward Claimed" and "In Process" remain disabled states
   };
 
   const handleProfessionChange = (prof: string) => {
@@ -885,8 +893,7 @@ export default function TasksPage() {
                       <button
                         className={`${styles.btnTakeTask} ${
                           getSmartButtonLabel(task) === "Reward Claimed" ||
-                          getSmartButtonLabel(task) === "In Process" ||
-                          getSmartButtonLabel(task) === "Task Rejected"
+                          getSmartButtonLabel(task) === "In Process"
                             ? styles.btnDisabled
                             : ""
                         }`}
@@ -894,26 +901,26 @@ export default function TasksPage() {
                         disabled={
                           isUploading ||
                           getSmartButtonLabel(task) === "Reward Claimed" ||
-                          getSmartButtonLabel(task) === "In Process" ||
-                          getSmartButtonLabel(task) === "Task Rejected"
+                          getSmartButtonLabel(task) === "In Process"
                         }
                         style={{
                           opacity:
                             getSmartButtonLabel(task) === "Reward Claimed" ||
-                            getSmartButtonLabel(task) === "In Process" ||
-                            getSmartButtonLabel(task) === "Task Rejected"
+                            getSmartButtonLabel(task) === "In Process"
                               ? 0.6
                               : 1,
                           cursor:
                             getSmartButtonLabel(task) === "Reward Claimed" ||
-                            getSmartButtonLabel(task) === "In Process" ||
-                            getSmartButtonLabel(task) === "Task Rejected"
+                            getSmartButtonLabel(task) === "In Process"
                               ? "not-allowed"
                               : isUploading 
                                 ? "wait" 
                                 : "pointer",
                           width: "100%",
-                          backgroundColor: getSmartButtonLabel(task) === "Complete Task" ? "#22c55e" : undefined
+                          backgroundColor: 
+                            getSmartButtonLabel(task) === "Complete Task" ? "#22c55e" 
+                            : getSmartButtonLabel(task) === "Resubmit Task" ? "#6366f1"
+                            : undefined
                         }}
                       >
                         {isUploading ? "Uploading..." : getSmartButtonLabel(task)}

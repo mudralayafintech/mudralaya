@@ -151,6 +151,7 @@ export default function TaskManager() {
       };
 
       await adminApiRequest("create-task", taskData);
+      console.log("Task created successfully:", taskData);
       alert("Task Created Successfully");
       setShowCreateForm(false);
       // Reset form
@@ -264,6 +265,7 @@ export default function TaskManager() {
       };
 
       await adminApiRequest("update-task", taskData);
+      console.log("Task updated successfully:", taskData);
       alert("Task Updated Successfully");
       setShowEditForm(false);
       fetchTasks();

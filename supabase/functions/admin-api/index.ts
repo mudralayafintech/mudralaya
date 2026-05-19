@@ -65,6 +65,49 @@ serve(async (req: Request): Promise<Response> => {
       })
     }
 
+    // ── Google Login: match email to admin_users ──
+    if (action === 'login-google') {
+      const email = data.email
+      if (!email) {
+        return new Response(JSON.stringify({ error: 'Email is required' }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 400,
+        })
+      }
+
+      const { data: googleUser, error: googleErr } = await supabaseClient
+        .from('admin_users')
+        .select('*')
+        .eq('email', email)
+        .eq('is_active', true)
+        .maybeSingle()
+
+      if (googleUser && !googleErr) {
+        // Update last_login
+        await supabaseClient
+          .from('admin_users')
+          .update({ last_login: new Date().toISOString() })
+          .eq('id', googleUser.id)
+
+        return new Response(JSON.stringify({
+          message: 'Google login successful',
+          success: true,
+          token: googleUser.id,
+          role: googleUser.role,
+          username: googleUser.username,
+          display_name: googleUser.display_name || googleUser.username,
+        }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 200,
+        })
+      }
+
+      return new Response(JSON.stringify({ error: 'This Google account is not authorized for admin access' }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 401,
+      })
+    }
+
     // Verify token for all other actions
     let isAuthenticated = false
     let currentRole = null
@@ -97,6 +140,49 @@ serve(async (req: Request): Promise<Response> => {
     let result;
 
     switch (action) {
+      case 'get-registered-users': {
+        // Only super_admin and admin can view all registered users
+        if (currentRole !== 'super_admin' && currentRole !== 'admin') {
+          return new Response(JSON.stringify({ error: 'Forbidden: insufficient permissions' }), {
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+            status: 403,
+          })
+        }
+
+        const page = data.page || 1
+        const pageSize = data.pageSize || 50
+        const search = data.search || ''
+        const offset = (page - 1) * pageSize
+
+        let query = supabaseClient
+          .from('users')
+          .select('id, full_name, phone, email_id, mobile_number, role, profession, plan, plan_type, membership_type, membership_expiry, membership_start_date, city, has_laptop, created_at, updated_at', { count: 'exact' })
+          .order('created_at', { ascending: false })
+          .range(offset, offset + pageSize - 1)
+
+        if (search) {
+          query = query.or(`full_name.ilike.%${search}%,phone.ilike.%${search}%,email_id.ilike.%${search}%,mobile_number.ilike.%${search}%,city.ilike.%${search}%`)
+        }
+
+        const { data: users, error: usersErr, count } = await query
+
+        if (usersErr) throw usersErr
+
+        // Get summary stats
+        const { count: totalCount } = await supabaseClient
+          .from('users')
+          .select('*', { count: 'exact', head: true })
+
+        result = {
+          users: users || [],
+          total: count || 0,
+          totalAll: totalCount || 0,
+          page,
+          pageSize,
+        }
+        break
+      }
+
       case 'get-dashboard':
         const [joins, contacts, advisors, tasksList] = await Promise.all([
           supabaseClient.from('join_requests').select('*').order('created_at', { ascending: false }),
@@ -487,7 +573,7 @@ serve(async (req: Request): Promise<Response> => {
 
         if (fetchError) throw fetchError
         if (!userTask) throw new Error('User task not found')
-        if (userTask.status !== 'completed') {
+        if (userTask.status !== 'completed' && userTask.status !== 'submitted') {
           throw new Error(`Task must be completed before approval. Current status: ${userTask.status}`)
         }
 
@@ -658,6 +744,126 @@ serve(async (req: Request): Promise<Response> => {
 
         if (updateBlogError) throw updateBlogError
         result = updatedBlog
+        break
+      }
+
+      // ── ROLES & PERMISSIONS ───────────────────────────────────
+
+      case 'get-roles': {
+        const { data: roles, error: rolesErr } = await supabaseClient
+          .from('admin_roles')
+          .select('*')
+          .order('sort_order', { ascending: true })
+
+        if (rolesErr) throw rolesErr
+        result = roles
+        break
+      }
+
+      case 'get-admin-users': {
+        const { data: adminUsers, error: adminUsersErr } = await supabaseClient
+          .from('admin_users')
+          .select('id, username, email, display_name, role, is_active, permissions, last_login, created_at, updated_at')
+          .order('created_at', { ascending: true })
+
+        if (adminUsersErr) throw adminUsersErr
+        result = adminUsers
+        break
+      }
+
+      case 'create-admin-user': {
+        if (currentRole !== 'super_admin') throw new Error('Unauthorized: only super_admin can manage users')
+
+        const { username: newUsername, password: newPassword, role: newRole, email: newEmail, display_name: newDisplayName } = data
+        if (!newUsername || !newPassword || !newRole) throw new Error('username, password, and role are required')
+
+        // Check role exists
+        const { data: roleCheck } = await supabaseClient
+          .from('admin_roles')
+          .select('id')
+          .eq('id', newRole)
+          .maybeSingle()
+        if (!roleCheck) throw new Error(`Role '${newRole}' does not exist`)
+
+        // Get default permissions from role
+        const { data: rolePerms } = await supabaseClient
+          .from('admin_roles')
+          .select('permissions')
+          .eq('id', newRole)
+          .single()
+
+        const { data: newUser, error: createErr } = await supabaseClient
+          .from('admin_users')
+          .insert({
+            username: newUsername,
+            password: newPassword,
+            role: newRole,
+            email: newEmail || null,
+            display_name: newDisplayName || newUsername,
+            permissions: rolePerms?.permissions || [],
+            is_active: true,
+          })
+          .select('id, username, email, display_name, role, is_active, permissions, created_at')
+          .single()
+
+        if (createErr) {
+          if (createErr.message?.includes('duplicate')) throw new Error('Username already exists')
+          throw createErr
+        }
+        result = newUser
+        break
+      }
+
+      case 'update-admin-user': {
+        if (currentRole !== 'super_admin') throw new Error('Unauthorized: only super_admin can manage users')
+
+        const { userId, ...updateFields } = data
+        if (!userId) throw new Error('userId is required')
+
+        // Build update object with only provided fields
+        const updateObj: Record<string, any> = { updated_at: new Date().toISOString() }
+        if (updateFields.role !== undefined) updateObj.role = updateFields.role
+        if (updateFields.email !== undefined) updateObj.email = updateFields.email
+        if (updateFields.display_name !== undefined) updateObj.display_name = updateFields.display_name
+        if (updateFields.is_active !== undefined) updateObj.is_active = updateFields.is_active
+        if (updateFields.permissions !== undefined) updateObj.permissions = updateFields.permissions
+        if (updateFields.password) updateObj.password = updateFields.password
+
+        // If role is changing, update permissions to match role defaults
+        if (updateFields.role && !updateFields.permissions) {
+          const { data: rolePerms2 } = await supabaseClient
+            .from('admin_roles')
+            .select('permissions')
+            .eq('id', updateFields.role)
+            .single()
+          if (rolePerms2) updateObj.permissions = rolePerms2.permissions
+        }
+
+        const { data: updatedUser, error: updateErr } = await supabaseClient
+          .from('admin_users')
+          .update(updateObj)
+          .eq('id', userId)
+          .select('id, username, email, display_name, role, is_active, permissions, created_at, updated_at')
+          .single()
+
+        if (updateErr) throw updateErr
+        result = updatedUser
+        break
+      }
+
+      case 'delete-admin-user': {
+        if (currentRole !== 'super_admin') throw new Error('Unauthorized: only super_admin can manage users')
+
+        const deleteId = data.userId
+        if (!deleteId) throw new Error('userId is required')
+
+        const { error: deleteErr } = await supabaseClient
+          .from('admin_users')
+          .delete()
+          .eq('id', deleteId)
+
+        if (deleteErr) throw deleteErr
+        result = { success: true, message: 'User deleted' }
         break
       }
 

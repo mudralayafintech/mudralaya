@@ -279,12 +279,32 @@ serve(async (req: Request): Promise<Response> => {
           finalProofUrl = proofFileName
         }
 
-        // Update user_tasks with proof and status
+        // Get task details to compute reward
+        const { data: proofTaskDetails } = await supabaseAdmin
+          .from('tasks')
+          .select('reward_free, reward_member')
+          .eq('id', proofTaskId)
+          .maybeSingle()
+
+        // Get user membership to determine reward
+        const { data: proofUserProfile } = await supabaseAdmin
+          .from('users')
+          .select('membership_type')
+          .eq('id', user.id)
+          .maybeSingle()
+
+        const proofRewardAmount = proofUserProfile?.membership_type === 'member' || proofUserProfile?.membership_type === 'premium'
+          ? (proofTaskDetails?.reward_member || proofTaskDetails?.reward_free || 0)
+          : (proofTaskDetails?.reward_free || 0)
+
+        // Update user_tasks with proof and status = 'completed' (pending admin review)
+        // Using 'completed' so it appears in admin's "Pending Review" pipeline
         const { data: proofTask, error: proofError } = await supabaseAdmin
           .from('user_tasks')
           .update({
-            status: 'submitted',
+            status: 'completed',
             submission_image_url: finalProofUrl,
+            reward_earned: proofRewardAmount,
             updated_at: new Date().toISOString(),
           })
           .eq('user_id', user.id)
