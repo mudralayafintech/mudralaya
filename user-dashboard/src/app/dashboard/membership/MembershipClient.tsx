@@ -2,6 +2,8 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import styles from './membership.module.css';
+import { Check } from 'lucide-react';
 
 export default function MembershipClient({ 
   userProfile, 
@@ -48,17 +50,17 @@ export default function MembershipClient({
 
   if (isCertificate) {
     return (
-      <div className="flex justify-center mt-12">
-        <div className="border bg-card rounded-2xl p-8 max-w-sm w-full shadow-sm text-center">
-          <div className="space-y-6">
+      <div className={styles.certFeeContainer}>
+        <div className={`${styles.card} ${styles.certCard}`}>
+          <div className={styles.cardContent}>
             <div>
-              <h3 className="text-2xl font-bold">Certificate Fee</h3>
-              <p className="text-3xl font-extrabold mt-4">₹499</p>
+              <h3 className={styles.planTitle}>Certificate Fee</h3>
+              <p className={styles.price} style={{ marginTop: '1rem' }}>₹499</p>
             </div>
             <button 
               onClick={() => handlePayment('certificate', 499)}
               disabled={loading}
-              className="w-full bg-primary text-primary-foreground font-semibold py-3 px-4 rounded-xl hover:bg-primary/90 transition-colors disabled:opacity-50"
+              className={styles.buttonPrimary}
             >
               Pay Now
             </button>
@@ -69,60 +71,60 @@ export default function MembershipClient({
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto mt-12">
+    <div className={styles.plansGrid}>
       {/* Monthly Plan */}
-      <div className="border bg-card rounded-2xl p-8 shadow-sm flex flex-col justify-between">
-        <div className="space-y-6">
+      <div className={styles.card}>
+        <div className={styles.cardContent}>
           <div>
-            <h3 className="text-2xl font-bold">Monthly</h3>
-            <p className="text-sm text-muted-foreground mt-2">Perfect for trying things out.</p>
+            <h3 className={styles.planTitle}>Monthly</h3>
+            <p className={styles.planDesc}>Perfect for trying things out.</p>
           </div>
-          <p className="text-4xl font-extrabold">₹299 <span className="text-lg text-muted-foreground font-normal">/mo</span></p>
-          <ul className="space-y-3 mt-6">
-            <li className="flex items-center gap-3">
-              <span className="text-green-500">✓</span> Unlock premium daily tasks
+          <p className={styles.price}>₹299 <span>/mo</span></p>
+          <ul className={styles.featuresList}>
+            <li className={styles.featureItem}>
+              <Check size={18} className={styles.checkIcon} /> Unlock premium daily tasks
             </li>
-            <li className="flex items-center gap-3">
-              <span className="text-green-500">✓</span> Priority support
+            <li className={styles.featureItem}>
+              <Check size={18} className={styles.checkIcon} /> Priority support
             </li>
           </ul>
         </div>
         <button 
           onClick={() => handlePayment('monthly', 299)}
           disabled={loading}
-          className="mt-8 w-full bg-primary/10 text-primary font-semibold py-3 px-4 rounded-xl hover:bg-primary/20 transition-colors disabled:opacity-50"
+          className={styles.buttonSecondary}
         >
           Subscribe Monthly
         </button>
       </div>
 
       {/* Yearly Plan */}
-      <div className="border border-primary bg-card rounded-2xl p-8 shadow-lg flex flex-col justify-between relative">
-        <div className="absolute top-0 right-1/2 translate-x-1/2 -translate-y-1/2 bg-primary text-primary-foreground text-xs font-bold px-3 py-1 rounded-full">
+      <div className={`${styles.card} ${styles.recommendedCard}`}>
+        <div className={styles.recommendedBadge}>
           RECOMMENDED
         </div>
-        <div className="space-y-6">
+        <div className={styles.cardContent}>
           <div>
-            <h3 className="text-2xl font-bold text-primary">Yearly</h3>
-            <p className="text-sm text-muted-foreground mt-2">Best value for dedicated partners.</p>
+            <h3 className={`${styles.planTitle} ${styles.primaryText}`}>Yearly</h3>
+            <p className={styles.planDesc}>Best value for dedicated partners.</p>
           </div>
-          <p className="text-4xl font-extrabold">₹2499 <span className="text-lg text-muted-foreground font-normal">/yr</span></p>
-          <ul className="space-y-3 mt-6">
-            <li className="flex items-center gap-3">
-              <span className="text-green-500">✓</span> All Monthly benefits
+          <p className={styles.price}>₹2499 <span>/yr</span></p>
+          <ul className={styles.featuresList}>
+            <li className={styles.featureItem}>
+              <Check size={18} className={styles.checkIcon} /> All Monthly benefits
             </li>
-            <li className="flex items-center gap-3 font-semibold">
-              <span className="text-green-500">✓</span> Instant ₹99 Cashback to Wallet
+            <li className={`${styles.featureItem} ${styles.highlight}`}>
+              <Check size={18} className={styles.checkIcon} /> Instant ₹99 Cashback to Wallet
             </li>
-            <li className="flex items-center gap-3">
-              <span className="text-green-500">✓</span> Specialized Company SOP access
+            <li className={styles.featureItem}>
+              <Check size={18} className={styles.checkIcon} /> Specialized Company SOP access
             </li>
           </ul>
         </div>
         <button 
           onClick={() => handlePayment('yearly', 2499)}
           disabled={loading}
-          className="mt-8 w-full bg-primary text-primary-foreground font-semibold py-3 px-4 rounded-xl hover:bg-primary/90 transition-colors shadow shadow-primary/20 disabled:opacity-50"
+          className={styles.buttonPrimary}
         >
           Subscribe Yearly
         </button>

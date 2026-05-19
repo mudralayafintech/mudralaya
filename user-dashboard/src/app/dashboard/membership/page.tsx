@@ -1,6 +1,7 @@
 import { createClient } from '@/utils/supabase/server';
 import { redirect } from 'next/navigation';
 import MembershipClient from './MembershipClient';
+import styles from './membership.module.css';
 
 export const dynamic = 'force-dynamic';
 
@@ -23,18 +24,18 @@ export default async function MembershipPage({
   const isCertificatePayment = searchParams.type === 'certificate';
 
   return (
-    <div className="p-6 max-w-5xl mx-auto space-y-8">
+    <div className={styles.container}>
       {isCertificatePayment ? (
-        <div className="text-center space-y-4 pt-12">
-          <h1 className="text-3xl font-bold">Certificate Processing Fee</h1>
-          <p className="text-muted-foreground text-lg">
+        <div className={styles.header}>
+          <h1 className={styles.title}>Certificate Processing Fee</h1>
+          <p className={styles.subtitle}>
             Pay a one-time fee of ₹499 to issue your verified experience certificate.
           </p>
         </div>
       ) : (
-        <div className="text-center space-y-4 pt-8">
-          <h1 className="text-4xl font-bold tracking-tight">Upgrade Your Earning Potential</h1>
-          <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+        <div className={styles.header}>
+          <h1 className={styles.title}>Upgrade Your Earning Potential</h1>
+          <p className={styles.subtitle}>
             Get access to premium tasks, eliminate withdrawal fees, and earn a flat ₹99 cashback instantly on the Yearly plan.
           </p>
         </div>
