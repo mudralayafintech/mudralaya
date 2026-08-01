@@ -149,6 +149,10 @@ export default function TasksPage() {
   };
 
   const getSmartButtonLabel = (task: Task) => {
+    const isCustomTask = task.task_type === 'Mudralaya Custom' || task.type === 'Mudralaya Custom';
+    if (isCustomTask) {
+      return "Submit Data";
+    }
     if (task.status === "approved") return "Reward Claimed";
     if (task.status === "completed") return "In Process";
     if (task.status === "ongoing" || task.status === "in_progress")
@@ -227,10 +231,18 @@ export default function TasksPage() {
   };
 
   const handleSmartAction = (task: Task) => {
+    const isCustomTask = task.task_type === 'Mudralaya Custom' || task.type === 'Mudralaya Custom';
     const label = getSmartButtonLabel(task);
-    if (label === "Complete Task") {
-      // Open the submission modal instead of confirm()
-      setSubmissionTask(task);
+    
+    if (label === "Complete Task" || (label === "Submit Data" && isCustomTask)) {
+      // For web, if it's a custom task, we just ensure it's expanded so they can see the form.
+      if (isCustomTask) {
+        if (expandedTaskId !== task.id) {
+          setExpandedTaskId(task.id);
+        }
+      } else {
+        setSubmissionTask(task);
+      }
     } else if (label === "Start Task") {
       handleTakeTask(task);
     } else if (label === "In Process" || label === "Reward Claimed" || label === "Task Rejected") {
@@ -763,9 +775,11 @@ export default function TasksPage() {
                     </div>
                   </div>
                   <div className={styles.taskRight}>
-                    <button className={styles.rewardBtn}>
-                      ₹ {task.reward_free || task.reward}
-                    </button>
+                    {((task.reward_free ?? 0) > 0 || (task.reward ?? 0) > 0) && (
+                      <button className={styles.rewardBtn}>
+                        ₹ {task.reward_free || task.reward}
+                      </button>
+                    )}
                     <button className={styles.toggleBtn}>
                       {expandedTaskId === task.id ? (
                         <ChevronUp size={24} />
@@ -872,55 +886,7 @@ export default function TasksPage() {
                     )}
 
                     {/* Submission Section */}
-                    {(task.status === "ongoing" || task.status === "in_progress") && (
-                      (task.task_type === 'Mudralaya Custom' || task.type === 'Mudralaya Custom') ? (
-                        <CustomTaskRenderer 
-                          task={task} 
-                          onComplete={async (responses, imageUrl) => {
-                            try {
-                              const { data: { session } } = await supabase.auth.getSession();
-                              const { data, error } = await supabase.functions.invoke("dashboard-api", {
-                                body: {
-                                  action: "complete-task",
-                                  taskId: task.id,
-                                  submissionImageUrl: imageUrl,
-                                  submissionData: {
-                                    completed_at: new Date().toISOString(),
-                                    action_link_visited: task.action_link ? true : false,
-                                    responses: responses
-                                  },
-                                },
-                                headers: session ? { Authorization: `Bearer ${session.access_token}` } : undefined
-                              });
-
-                              if (error) {
-                                console.error("Error completing task:", error);
-                                alert("Failed to complete task. Please try again.");
-                                return;
-                              }
-                              
-                              if (data && data.success === false) {
-                                console.error("Backend Error:", data.error, data.stack);
-                                alert(`Backend Error: ${data.error}\n\nPlease copy this and show the developer!`);
-                                return;
-                              }
-                              const isCustom = task.task_type === 'Mudralaya Custom' || task.type === 'Mudralaya Custom' || !!task.steps;
-                              
-                              setTasks((prevTasks) =>
-                                prevTasks.map((t) =>
-                                  t.id === task.id ? { ...t, status: isCustom ? "new" : "completed" } : t,
-                                ),
-                              );
-                              alert(isCustom ? "Form submitted successfully! You can submit another response if you'd like." : "Task submitted successfully! Status: In Process");
-                            } catch (err) {
-                              console.error(err);
-                              alert("Failed to complete task.");
-                            }
-                          }}
-                          isUploading={isUploading}
-                          setIsUploading={setIsUploading}
-                        />
-                      ) : (
+                    {(task.status === "ongoing" || task.status === "in_progress") && !(task.task_type === 'Mudralaya Custom' || task.type === 'Mudralaya Custom') && (
                         <div className={styles.submissionSection} style={{ marginTop: '20px', padding: '16px', borderRadius: '12px', border: '1px dashed #cbd5e1', backgroundColor: '#f8fafc' }}>
                           <h4 style={{ fontSize: '14px', fontWeight: '600', marginBottom: '12px', color: '#1e293b' }}>Task Evidence (Optional)</h4>
                           <div className={styles.fileUploadWrapper} style={{ position: 'relative' }}>
@@ -951,10 +917,9 @@ export default function TasksPage() {
                             </div>
                           )}
                         </div>
-                      )
                     )}
 
-                    {(!(task.status === "ongoing" || task.status === "in_progress") || (task.task_type !== 'Mudralaya Custom' && task.type !== 'Mudralaya Custom')) && (
+                    {(!(task.status === "ongoing" || task.status === "in_progress") && (task.task_type !== 'Mudralaya Custom' && task.type !== 'Mudralaya Custom')) && (
                       <div className="mt-3" style={{ marginTop: "24px" }}>
                         <button
                           className={`${styles.btnTakeTask}`}
@@ -966,12 +931,72 @@ export default function TasksPage() {
                               : getSmartButtonLabel(task) === "In Process" ? "#3b82f6"
                               : getSmartButtonLabel(task) === "Task Rejected" ? "#ef4444"
                               : getSmartButtonLabel(task) === "Reward Claimed" ? "#10b981"
+                              : getSmartButtonLabel(task) === "Submit Data" ? "#3b82f6"
                               : undefined,
                             cursor: isUploading ? "wait" : "pointer",
                           }}
                         >
                           {isUploading ? "Uploading..." : getSmartButtonLabel(task)}
                         </button>
+                      </div>
+                    )}
+
+                    {(task.task_type === 'Mudralaya Custom' || task.type === 'Mudralaya Custom') && (
+                      <div className="mt-3" style={{ marginTop: "24px" }}>
+                        <CustomTaskRenderer 
+                          task={task} 
+                          onComplete={async (responses, imageUrl) => {
+                            try {
+                              if (task.status !== 'ongoing' && task.status !== 'in_progress') {
+                                const { data: { session } } = await supabase.auth.getSession();
+                                const { error: startError } = await supabase.functions.invoke("dashboard-api", {
+                                  body: { action: "start-task", taskId: task.id },
+                                  headers: session ? { Authorization: `Bearer ${session.access_token}` } : undefined
+                                });
+                                if (startError) throw startError;
+                              }
+
+                              const { data: { session } } = await supabase.auth.getSession();
+                              const { data, error } = await supabase.functions.invoke("dashboard-api", {
+                                body: {
+                                  action: "complete-task",
+                                  taskId: task.id,
+                                  submissionImageUrl: imageUrl,
+                                  submissionData: {
+                                    completed_at: new Date().toISOString(),
+                                    action_link_visited: task.action_link ? true : false,
+                                    responses: responses
+                                  },
+                                },
+                                headers: session ? { Authorization: `Bearer ${session.access_token}` } : undefined
+                              });
+
+                              if (error) {
+                                console.error("Error completing task:", error);
+                                alert("Failed to complete task. Please try again.");
+                                return;
+                              }
+                              
+                              if (data && data.success === false) {
+                                console.error("Backend Error:", data.error, data.stack);
+                                alert(`Backend Error: ${data.error}\n\nPlease copy this and show the developer!`);
+                                return;
+                              }
+                              
+                              setTasks((prevTasks) =>
+                                prevTasks.map((t) =>
+                                  t.id === task.id ? { ...t, status: "completed" } : t,
+                                ),
+                              );
+                              alert("Form submitted successfully! You can submit another response if you'd like.");
+                            } catch (err) {
+                              console.error(err);
+                              alert("Failed to complete task.");
+                            }
+                          }}
+                          isUploading={isUploading}
+                          setIsUploading={setIsUploading}
+                        />
                       </div>
                     )}
                   </div>

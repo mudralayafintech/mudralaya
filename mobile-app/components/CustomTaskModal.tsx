@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -37,6 +37,14 @@ export const CustomTaskModal = ({ task, visible, onClose, onSubmit }: CustomTask
   const [fileUploads, setFileUploads] = useState<Record<string, { uri: string, name: string, base64: string }>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   
+  useEffect(() => {
+    if (visible) {
+      setResponses({});
+      setFileUploads({});
+      setIsSubmitting(false);
+    }
+  }, [visible, task?.id]);
+
   const { theme } = useTheme();
   const isDark = theme === "dark";
 

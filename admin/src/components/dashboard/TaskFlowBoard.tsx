@@ -785,7 +785,13 @@ export default function TaskFlowBoard() {
 
       {/* ─── See All Data Modal ─── */}
       {viewingAllDataForTask && (() => {
-        const taskParts = allParticipants.filter(p => p.task_id === viewingAllDataForTask.id);
+        const taskParts = allParticipants
+          .filter(p => p.task_id === viewingAllDataForTask.id)
+          .sort((a, b) => {
+            const dateA = new Date(a.updated_at || a.created_at || 0).getTime();
+            const dateB = new Date(b.updated_at || b.created_at || 0).getTime();
+            return dateB - dateA;
+          });
         const allQuestions = new Set<string>();
         taskParts.forEach(p => {
           if (p.submission_data?.responses) {
@@ -803,7 +809,7 @@ export default function TaskFlowBoard() {
                     <FileText size={20} color="#059669" />
                     All Recorded Data
                   </h3>
-                  <p style={{ margin: '4px 0 0', color: '#64748b', fontSize: '13px' }}>{viewingAllDataForTask.title}</p>
+                  <p style={{ margin: '4px 0 0', color: '#64748b', fontSize: '13px' }}>{viewingAllDataForTask.title} • {taskParts.length} entries</p>
                 </div>
                 <button onClick={() => setViewingAllDataForTask(null)} style={{ background: 'none', border: 'none', fontSize: '24px', cursor: 'pointer', color: '#64748b' }}>×</button>
               </div>
@@ -815,6 +821,7 @@ export default function TaskFlowBoard() {
                   <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: '800px' }}>
                     <thead style={{ background: '#f8fafc', position: 'sticky', top: 0, zIndex: 10, boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}>
                       <tr>
+                        <th style={{ padding: '12px 16px', borderBottom: '1px solid #e2e8f0', color: '#475569', fontWeight: 600, fontSize: '13px', whiteSpace: 'nowrap' }}>Date & Time</th>
                         <th style={{ padding: '12px 16px', borderBottom: '1px solid #e2e8f0', color: '#475569', fontWeight: 600, fontSize: '13px', whiteSpace: 'nowrap' }}>User Name</th>
                         <th style={{ padding: '12px 16px', borderBottom: '1px solid #e2e8f0', color: '#475569', fontWeight: 600, fontSize: '13px', whiteSpace: 'nowrap' }}>Email</th>
                         <th style={{ padding: '12px 16px', borderBottom: '1px solid #e2e8f0', color: '#475569', fontWeight: 600, fontSize: '13px', whiteSpace: 'nowrap' }}>Phone</th>
@@ -825,8 +832,14 @@ export default function TaskFlowBoard() {
                       </tr>
                     </thead>
                     <tbody>
-                      {taskParts.map((p, idx) => (
+                      {taskParts.map((p, idx) => {
+                        const submittedDate = p.updated_at || p.created_at;
+                        const formattedDate = submittedDate 
+                          ? new Date(submittedDate).toLocaleString('en-IN', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true })
+                          : '—';
+                        return (
                         <tr key={idx} style={{ borderBottom: '1px solid #e2e8f0', background: idx % 2 === 0 ? 'white' : '#f8fafc' }}>
+                          <td style={{ padding: '12px 16px', color: '#64748b', fontSize: '13px', whiteSpace: 'nowrap' }}>{formattedDate}</td>
                           <td style={{ padding: '12px 16px', color: '#0f172a', fontSize: '14px', whiteSpace: 'nowrap' }}>{p.users?.full_name || "Unknown"}</td>
                           <td style={{ padding: '12px 16px', color: '#0f172a', fontSize: '14px', whiteSpace: 'nowrap' }}>{p.users?.email_id || "—"}</td>
                           <td style={{ padding: '12px 16px', color: '#0f172a', fontSize: '14px', whiteSpace: 'nowrap' }}>{p.users?.mobile_number || "—"}</td>
@@ -846,7 +859,8 @@ export default function TaskFlowBoard() {
                             );
                           })}
                         </tr>
-                      ))}
+                        );
+                      })}
                     </tbody>
                   </table>
                 </div>

@@ -100,7 +100,7 @@ export default function TasksScreen() {
     Dedicated: false,
   });
   // Tabs State
-  const [activeTypeTab, setActiveTypeTab] = useState<"Daily" | "Dedicated">(
+  const [activeTypeTab, setActiveTypeTab] = useState<"Daily" | "Dedicated" | "Custom">(
     "Daily",
   );
 
@@ -202,6 +202,11 @@ export default function TasksScreen() {
   };
 
   const getSmartLabel = (task: Task) => {
+    const isCustomTask = task.task_type === 'Mudralaya Custom' || task.type === 'Mudralaya Custom';
+    if (isCustomTask) {
+      return "Submit Data";
+    }
+
     if (task.status === "submitted") return "Under Review";
     // If completed with proof, it means proof was submitted and awaiting review
     if (task.status === "completed" && task.proof_url) return "Under Review";
@@ -213,15 +218,19 @@ export default function TasksScreen() {
   };
 
   const getSmartBtnColors = (task: Task): [string, string] => {
+    const isCustomTask = task.task_type === 'Mudralaya Custom' || task.type === 'Mudralaya Custom';
+    if (isCustomTask) {
+      return ["#3b82f6", "#2563eb"]; // Always active/blue for data submission
+    }
+
     if (task.status === "submitted") return ["#f59e0b", "#d97706"];
     if (task.status === "completed" && task.proof_url) return ["#f59e0b", "#d97706"];
     if (task.status === "ongoing" || task.status === "in_progress")
       return ["#3b82f6", "#2563eb"];
     if (task.status === "completed")
-      return ["#3b82f6", "#2563eb"];
-    if (task.status === "approved")
-      return ["#10b981", "#059669"];
-    return ["#0f172a", "#334155"];
+      return ["#3b82f6", "#2563eb"]; // Default complete without proof
+    if (task.status === "approved") return ["#10b981", "#059669"];
+    return ["#1e293b", "#0f172a"]; // Start Task (dark)
   };
 
   const handleUploadProof = async (task: Task) => {
@@ -315,19 +324,17 @@ export default function TasksScreen() {
 
   const handleSmartAction = (task: Task) => {
     const isCustomTask = task.task_type === 'Mudralaya Custom' || task.type === 'Mudralaya Custom';
-    if (isCustomTask && (task.status === undefined || task.status === 'ongoing' || task.status === 'in_progress' || !task.status)) {
-      setActiveCustomTask(task);
-      return;
-    }
-
     const label = getSmartLabel(task);
-    if (label === "Submit Proof") {
+
+    if (label === "Complete Task" || (label === "Start Task" && isCustomTask) || label === "Submit Data") {
+      setActiveCustomTask(task);
+    } else if (label === "Submit Proof") {
       handleUploadProof(task);
     } else if (label === "Claim Reward") {
       handleClaimReward(task);
-    } else if (label === "Under Review") {
+    } else if (label === "Under Review" || label === "In Process" || label === "Reward Claimed" || label === "Task Rejected") {
       Alert.alert(
-        "Under Review",
+        label,
         "Your task proof is being reviewed by our team. You'll be notified once approved."
       );
     } else {
@@ -442,17 +449,14 @@ export default function TasksScreen() {
       activeProfessions.length === 0;
 
     // Type Filter (Tab Based)
-    // If Daily: Show task_type='Daily' (or null/empty/not dedicated for backward compat)
-    // If Dedicated: Show task_type='Dedicated'
-    const isDailyTab = activeTypeTab === "Daily";
-    const taskType = task.task_type || "Daily"; // Default to Daily if null
+    const taskType = task.task_type || task.type || "Daily"; // Default to Daily if null
 
-    if (isDailyTab) {
-      // Show if type is Daily
-      if (taskType === "Dedicated") return false;
-    } else {
-      // Dedicated Tab
+    if (activeTypeTab === "Daily") {
+      if (taskType === "Dedicated" || taskType === "Mudralaya Custom") return false;
+    } else if (activeTypeTab === "Dedicated") {
       if (taskType !== "Dedicated") return false;
+    } else if (activeTypeTab === "Custom") {
+      if (taskType !== "Mudralaya Custom") return false;
     }
 
     return professionMatch; // Removed old typeMatch
@@ -510,99 +514,46 @@ export default function TasksScreen() {
         </GlassView>
       </View>
 
-      {/* Task Type Tabs + Filter Button Row */}
+      {/* Task Type Tabs */}
       <View
         style={{
           flexDirection: "row",
-          paddingHorizontal: 20,
-          marginBottom: 16,
-          gap: 12,
-          alignItems: "center",
+          marginHorizontal: 20,
+          marginBottom: 14,
+          gap: 8,
+          backgroundColor: isDark ? "rgba(30,41,59,0.4)" : "#f1f5f9",
+          padding: 4,
+          borderRadius: 14,
         }}
       >
-        {/* Daily Task Tab */}
-        <TouchableOpacity
-          style={{
-            flex: 1,
-            paddingVertical: 12,
-            borderRadius: 12,
-            backgroundColor:
-              activeTypeTab === "Daily"
-                ? isDark
-                  ? "#3b82f6"
-                  : "#2563eb"
-                : isDark
-                  ? "rgba(30,41,59,0.5)"
-                  : "#fff",
-            alignItems: "center",
-            borderWidth: 1,
-            borderColor:
-              activeTypeTab === "Daily"
-                ? "transparent"
-                : isDark
-                  ? "rgba(255,255,255,0.1)"
-                  : "#e2e8f0",
-          }}
-          onPress={() => setActiveTypeTab("Daily")}
-        >
-          <Text
-            style={{
-              fontWeight: "700",
-              color: activeTypeTab === "Daily" ? "#fff" : subTextColor,
-            }}
-          >
-            Daily Task
-          </Text>
-        </TouchableOpacity>
-
-        {/* Dedicated Task Tab */}
-        <TouchableOpacity
-          style={{
-            flex: 1,
-            paddingVertical: 12,
-            borderRadius: 12,
-            backgroundColor:
-              activeTypeTab === "Dedicated"
-                ? isDark
-                  ? "#db2777"
-                  : "#db2777"
-                : isDark
-                  ? "rgba(30,41,59,0.5)"
-                  : "#fff",
-            alignItems: "center",
-            borderWidth: 1,
-            borderColor:
-              activeTypeTab === "Dedicated"
-                ? "transparent"
-                : isDark
-                  ? "rgba(255,255,255,0.1)"
-                  : "#e2e8f0",
-          }}
-          onPress={() => setActiveTypeTab("Dedicated")}
-        >
-          <Text
-            style={{
-              fontWeight: "700",
-              color: activeTypeTab === "Dedicated" ? "#fff" : subTextColor,
-            }}
-          >
-            Dedicated Task
-          </Text>
-        </TouchableOpacity>
-
-        {/* Filter Button */}
-        <TouchableOpacity
-          style={[
-            styles.filterBtn,
-            isDark && {
-              backgroundColor: "rgba(30, 41, 59, 0.8)",
-              borderColor: cardBorderColor,
-            },
-          ]}
-          onPress={() => setFilterModalVisible(true)}
-        >
-          <Filter size={20} color={iconColor} />
-        </TouchableOpacity>
+        {(["Daily", "Dedicated", "Custom"] as const).map((type) => {
+          const isActive = activeTypeTab === type;
+          const activeBg = type === "Daily" ? "#2563eb" : type === "Dedicated" ? "#db2777" : "#10b981";
+          return (
+            <TouchableOpacity
+              key={type}
+              style={{
+                flex: 1,
+                paddingVertical: 10,
+                borderRadius: 11,
+                backgroundColor: isActive ? activeBg : "transparent",
+                alignItems: "center",
+              }}
+              onPress={() => setActiveTypeTab(type)}
+            >
+              <Text
+                numberOfLines={1}
+                style={{
+                  fontWeight: "700",
+                  color: isActive ? "#fff" : subTextColor,
+                  fontSize: 13,
+                }}
+              >
+                {type}
+              </Text>
+            </TouchableOpacity>
+          );
+        })}
       </View>
 
       <ScrollView
@@ -747,10 +698,21 @@ export default function TasksScreen() {
                     </View>
                   </View>
                   <View style={styles.headerRight}>
-                    <View style={styles.rewardBadge}>
-                      <Text style={styles.rewardText}>
-                        ₹ {item.reward_free || item.reward}
-                      </Text>
+                    <View style={{ alignItems: "flex-end", gap: 4 }}>
+                      {((item.reward_member ?? 0) > 0 || (item.reward_premium ?? 0) > 0) && (
+                        <View style={[styles.rewardBadge, { backgroundColor: "#dbeafe", borderColor: "#bfdbfe" }]}>
+                          <Text style={[styles.rewardText, { color: "#2563eb" }]}>
+                            ₹ {item.reward_member || item.reward_premium}
+                          </Text>
+                        </View>
+                      )}
+                      {((item.reward_free ?? 0) > 0 || (item.reward ?? 0) > 0) && (
+                        <View style={styles.rewardBadge}>
+                          <Text style={styles.rewardText}>
+                            ₹ {item.reward_free || item.reward}
+                          </Text>
+                        </View>
+                      )}
                     </View>
                     {expandedTaskId === item.id ? (
                       <ChevronUp size={20} color="#64748b" />
@@ -763,74 +725,89 @@ export default function TasksScreen() {
                 {expandedTaskId === item.id && (
                   <View style={styles.expandedContent}>
                     <View style={styles.divider} />
-                    <View
-                      style={[
-                        styles.rewardDetails,
-                        isDark && {
-                          backgroundColor: "rgba(255,255,255,0.05)",
-                          borderColor: "rgba(255,255,255,0.1)",
-                        },
-                      ]}
-                    >
-                      <View style={styles.priceColumn}>
-                        <Text
-                          style={[styles.priceLabel, { color: subTextColor }]}
-                        >
-                          Members
-                        </Text>
-                        <Text style={[styles.priceValue, { color: "#3b82f6" }]}>
-                          ₹ {item.reward_member || item.reward_premium || 800}
-                        </Text>
-                      </View>
-                      <View style={styles.verticalDivider} />
-                      <View style={styles.priceColumn}>
-                        <Text
-                          style={[styles.priceLabel, { color: subTextColor }]}
-                        >
-                          Free User
-                        </Text>
-                        <Text style={[styles.priceValue, { color: "#10b981" }]}>
-                          ₹ {item.reward_free || item.reward || 600}
-                        </Text>
-                      </View>
-                    </View>
 
-                    {item.reward_info && (
-                      <Text
-                        style={[styles.rewardInfo, { color: subTextColor }]}
-                      >
-                        {item.reward_info}
-                      </Text>
+                    {/* Only show reward details for non-custom tasks */}
+                    {!(item.task_type === 'Mudralaya Custom' || item.type === 'Mudralaya Custom') && (
+                      <>
+                        {((item.reward_free ?? 0) > 0 || (item.reward ?? 0) > 0 || (item.reward_member ?? 0) > 0 || (item.reward_premium ?? 0) > 0) && (
+                          <View
+                            style={[
+                              styles.rewardDetails,
+                              isDark && {
+                                backgroundColor: "rgba(255,255,255,0.05)",
+                                borderColor: "rgba(255,255,255,0.1)",
+                              },
+                            ]}
+                          >
+                            <View style={styles.priceColumn}>
+                              <Text
+                                style={[styles.priceLabel, { color: subTextColor }]}
+                              >
+                                Members
+                              </Text>
+                              <Text style={[styles.priceValue, { color: "#3b82f6" }]}>
+                                ₹ {item.reward_member || item.reward_premium || 0}
+                              </Text>
+                            </View>
+                            <View style={styles.verticalDivider} />
+                            <View style={styles.priceColumn}>
+                              <Text
+                                style={[styles.priceLabel, { color: subTextColor }]}
+                              >
+                                Free User
+                              </Text>
+                              <Text style={[styles.priceValue, { color: "#10b981" }]}>
+                                ₹ {item.reward_free || item.reward || 0}
+                              </Text>
+                            </View>
+                          </View>
+                        )}
+
+                        {item.reward_info && (
+                          <Text
+                            style={[styles.rewardInfo, { color: subTextColor }]}
+                          >
+                            {item.reward_info}
+                          </Text>
+                        )}
+
+                        <View style={styles.resources}>
+                          {(item.video_url || item.video_link) && (
+                            <TouchableOpacity
+                              style={styles.resourceBtn}
+                              onPress={() =>
+                                Linking.openURL(
+                                  item.video_url || item.video_link || "",
+                                )
+                              }
+                            >
+                              <PlayCircle size={18} color="#ef4444" />
+                              <Text style={styles.resourceText}>
+                                Watch Guidance
+                              </Text>
+                            </TouchableOpacity>
+                          )}
+                          {item.pdf_url && (
+                            <TouchableOpacity
+                              style={styles.resourceBtn}
+                              onPress={() => Linking.openURL(item.pdf_url || "")}
+                            >
+                              <FileText size={18} color="#ef4444" />
+                              <Text style={styles.resourceText}>
+                                Read Instructions
+                              </Text>
+                            </TouchableOpacity>
+                          )}
+                        </View>
+                      </>
                     )}
 
-                    <View style={styles.resources}>
-                      {(item.video_url || item.video_link) && (
-                        <TouchableOpacity
-                          style={styles.resourceBtn}
-                          onPress={() =>
-                            Linking.openURL(
-                              item.video_url || item.video_link || "",
-                            )
-                          }
-                        >
-                          <PlayCircle size={18} color="#ef4444" />
-                          <Text style={styles.resourceText}>
-                            Watch Guidance
-                          </Text>
-                        </TouchableOpacity>
-                      )}
-                      {item.pdf_url && (
-                        <TouchableOpacity
-                          style={styles.resourceBtn}
-                          onPress={() => Linking.openURL(item.pdf_url || "")}
-                        >
-                          <FileText size={18} color="#ef4444" />
-                          <Text style={styles.resourceText}>
-                            Read Instructions
-                          </Text>
-                        </TouchableOpacity>
-                      )}
-                    </View>
+                    {/* Custom task description */}
+                    {(item.task_type === 'Mudralaya Custom' || item.type === 'Mudralaya Custom') && item.description && (
+                      <Text style={{ color: subTextColor, fontSize: 14, lineHeight: 20, marginBottom: 12 }}>
+                        {item.description}
+                      </Text>
+                    )}
 
                     <TouchableOpacity
                       activeOpacity={0.9}

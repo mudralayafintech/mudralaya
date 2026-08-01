@@ -95,8 +95,13 @@ export default function CustomTaskRenderer({ task, onComplete, isUploading, setI
         finalResponses[qId] = publicUrl;
       }
       
+      
       // Default evidence image for custom task is null, we store it in responses JSON instead
       await onComplete(finalResponses, null);
+      
+      // Clear form data after successful submission
+      setResponses({});
+      setFileUploads({});
     } catch (err) {
       console.error("Failed to submit custom task", err);
       alert("Failed to submit task. Please try again.");

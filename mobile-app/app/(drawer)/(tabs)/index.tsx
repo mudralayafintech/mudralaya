@@ -517,13 +517,25 @@ export default function DashboardHome() {
                     </View>
 
                     <View style={styles.ongoingActions}>
-                      <TouchableOpacity style={styles.resumeBtn}>
-                        <Text style={styles.resumeBtnText}>Resume Task</Text>
-                        <ChevronRight size={16} color="#0f172a" />
-                      </TouchableOpacity>
-                      <TouchableOpacity style={styles.claimBtn}>
-                        <Text style={styles.claimBtnText}>Claim Reward</Text>
-                      </TouchableOpacity>
+                      {(data.ongoingTask.task_type === 'Mudralaya Custom' || data.ongoingTask.type === 'Mudralaya Custom') ? (
+                        <TouchableOpacity 
+                          style={[styles.resumeBtn, { flex: 1 }]}
+                          onPress={() => router.push('/(drawer)/(tabs)/tasks')}
+                        >
+                          <Text style={styles.resumeBtnText}>Submit Data</Text>
+                          <ChevronRight size={16} color="#0f172a" />
+                        </TouchableOpacity>
+                      ) : (
+                        <>
+                          <TouchableOpacity style={styles.resumeBtn}>
+                            <Text style={styles.resumeBtnText}>Resume Task</Text>
+                            <ChevronRight size={16} color="#0f172a" />
+                          </TouchableOpacity>
+                          <TouchableOpacity style={styles.claimBtn}>
+                            <Text style={styles.claimBtnText}>Claim Reward</Text>
+                          </TouchableOpacity>
+                        </>
+                      )}
                     </View>
                   </LinearGradient>
                 </TouchableOpacity>
@@ -583,7 +595,14 @@ export default function DashboardHome() {
                         </View>
                       </View>
 
-                      {isJoined ? (
+                      {(task.task_type === 'Mudralaya Custom' || task.type === 'Mudralaya Custom') ? (
+                        <TouchableOpacity
+                          style={styles.startBtn}
+                          onPress={() => router.push('/(drawer)/(tabs)/tasks')}
+                        >
+                          <Text style={styles.startBtnText}>Submit</Text>
+                        </TouchableOpacity>
+                      ) : isJoined ? (
                         <View style={styles.joinedBadge}>
                           <CheckCircle2 size={14} color="#16a34a" />
                           <Text style={styles.joinedText}>Joined</Text>
