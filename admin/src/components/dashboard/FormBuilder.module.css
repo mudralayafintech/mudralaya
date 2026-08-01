@@ -1,0 +1,386 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  background-color: #f0ebf8;
+  padding: 24px;
+  border-radius: 8px;
+  min-height: 500px;
+}
+
+.headerCard {
+  background: white;
+  border-radius: 8px;
+  padding: 24px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  border-top: 8px solid #673ab7;
+}
+
+.titleInput {
+  width: 100%;
+  font-size: 24px;
+  font-weight: 500;
+  border: none;
+  border-bottom: 1px solid #e0e0e0;
+  padding: 8px 0;
+  margin-bottom: 12px;
+  outline: none;
+  transition: border-bottom 0.2s;
+}
+
+.titleInput:focus {
+  border-bottom: 2px solid #673ab7;
+}
+
+.descInput {
+  width: 100%;
+  font-size: 14px;
+  border: none;
+  border-bottom: 1px solid #e0e0e0;
+  padding: 8px 0;
+  outline: none;
+  transition: border-bottom 0.2s;
+}
+
+.descInput:focus {
+  border-bottom: 2px solid #673ab7;
+}
+
+.textInput {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #dadce0;
+  border-radius: 4px;
+  font-size: 14px;
+  outline: none;
+  background-color: white;
+}
+
+.textInput:focus {
+  border: 2px solid #673ab7;
+  padding: 7px 11px;
+}
+
+.questionCard {
+  background: white;
+  border-radius: 8px;
+  padding: 24px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  position: relative;
+  border-left: 4px solid transparent;
+  transition: box-shadow 0.2s;
+}
+
+.questionCardActive {
+  border-left: 4px solid #4285f4;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
+.questionHeader {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.questionTitleInput {
+  flex: 1;
+  font-size: 16px;
+  padding: 12px;
+  background-color: #f8f9fa;
+  border: none;
+  border-bottom: 1px solid #9aa0a6;
+  border-radius: 4px 4px 0 0;
+  outline: none;
+}
+
+.questionTitleInput:focus {
+  border-bottom: 2px solid #673ab7;
+  background-color: #f1f3f4;
+}
+
+.typeSelect {
+  padding: 12px;
+  border: 1px solid #dadce0;
+  border-radius: 4px;
+  background-color: white;
+  font-size: 14px;
+  min-width: 200px;
+  outline: none;
+}
+
+.typeSelect:focus {
+  border: 2px solid #673ab7;
+  padding: 11px;
+}
+
+.optionsList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-left: 8px;
+}
+
+.optionItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.optionIcon {
+  color: #dadce0;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.optionCircle {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid #dadce0;
+}
+
+.optionSquare {
+  width: 16px;
+  height: 16px;
+  border: 2px solid #dadce0;
+  border-radius: 2px;
+}
+
+.optionInput {
+  flex: 1;
+  border: none;
+  border-bottom: 1px solid transparent;
+  padding: 8px 0;
+  font-size: 14px;
+  outline: none;
+}
+
+.optionInput:hover, .optionInput:focus {
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.optionInput:focus {
+  border-bottom: 2px solid #673ab7;
+}
+
+.removeOptionBtn {
+  background: none;
+  border: none;
+  color: #5f6368;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.removeOptionBtn:hover {
+  background-color: #f1f3f4;
+}
+
+.addOptionBtn {
+  background: none;
+  border: none;
+  color: #70757a;
+  cursor: pointer;
+  padding: 8px 0;
+  font-size: 14px;
+  text-align: left;
+}
+
+.addOptionBtn:hover {
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.addOptionFakeInput {
+  background: none;
+  border: none;
+  border-bottom: 1px solid transparent;
+  color: #70757a;
+  cursor: pointer;
+  font-size: 14px;
+  outline: none;
+  padding: 8px 0;
+  width: 100%;
+}
+
+.addOptionFakeInput:hover {
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.questionFooter {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding-top: 16px;
+  border-top: 1px solid #ebebeb;
+  gap: 16px;
+}
+
+.iconBtn {
+  background: none;
+  border: none;
+  color: #5f6368;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.iconBtn:hover {
+  background-color: #f1f3f4;
+}
+
+.divider {
+  width: 1px;
+  height: 24px;
+  background-color: #ebebeb;
+}
+
+.requiredToggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #202124;
+}
+
+/* Toggle Switch */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 34px;
+  height: 14px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: .4s;
+  border-radius: 34px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 20px;
+  width: 20px;
+  left: -2px;
+  bottom: -3px;
+  background-color: white;
+  transition: .4s;
+  border-radius: 50%;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.4);
+}
+
+input:checked + .slider {
+  background-color: #b3cce6;
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px #2196F3;
+}
+
+input:checked + .slider:before {
+  transform: translateX(20px);
+  background-color: #1a73e8;
+}
+
+.floatingToolbar {
+  position: sticky;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: white;
+  padding: 8px;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+  display: flex;
+  gap: 8px;
+  width: max-content;
+  z-index: 10;
+}
+
+.toolbarBtn {
+  background: none;
+  border: none;
+  color: #5f6368;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.toolbarBtn:hover {
+  background-color: #f1f3f4;
+  color: #202124;
+}
+
+.textPreview {
+  color: #70757a;
+  border-bottom: 1px dotted #dadce0;
+  padding: 8px 0;
+  width: 50%;
+  font-size: 14px;
+}
+
+.paragraphPreview {
+  color: #70757a;
+  border-bottom: 1px dotted #dadce0;
+  padding: 8px 0;
+  width: 80%;
+  font-size: 14px;
+  margin-top: 8px;
+}
+
+.fileUploadPreview {
+  border: 1px solid #dadce0;
+  border-radius: 4px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  color: #1a73e8;
+  font-size: 14px;
+  background-color: #f8f9fa;
+  width: max-content;
+}
+
+.saveBtn {
+  background-color: #1a73e8;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 10px 24px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  align-self: flex-end;
+}
+
+.saveBtn:hover {
+  background-color: #1557b0;
+}

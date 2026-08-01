@@ -43,6 +43,8 @@ import {
 import { useRouter } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import { StatusBar } from "expo-status-bar";
+import { CustomTaskModal } from "@/components/CustomTaskModal";
+import { decode } from "base64-arraybuffer";
 
 interface Task {
   id: string;
@@ -76,6 +78,7 @@ export default function TasksScreen() {
   const [activeTab, setActiveTab] = useState("All Task");
   const [expandedTaskId, setExpandedTaskId] = useState<string | null>(null);
   const [filterModalVisible, setFilterModalVisible] = useState(false);
+  const [activeCustomTask, setActiveCustomTask] = useState<Task | null>(null);
 
   // Filter states
   const [selectedProfessions, setSelectedProfessions] = useState<{
@@ -311,6 +314,12 @@ export default function TasksScreen() {
   };
 
   const handleSmartAction = (task: Task) => {
+    const isCustomTask = task.task_type === 'Mudralaya Custom' || task.type === 'Mudralaya Custom';
+    if (isCustomTask && (task.status === undefined || task.status === 'ongoing' || task.status === 'in_progress' || !task.status)) {
+      setActiveCustomTask(task);
+      return;
+    }
+
     const label = getSmartLabel(task);
     if (label === "Submit Proof") {
       handleUploadProof(task);
@@ -323,6 +332,68 @@ export default function TasksScreen() {
       );
     } else {
       handleTakeTask(task);
+    }
+  };
+
+  const handleCustomTaskSubmit = async (responses: Record<string, any>, fileUploads: Record<string, { uri: string, name: string, base64: string }>) => {
+    if (!activeCustomTask) return;
+    try {
+      setLoading(true);
+      
+      // Ensure the task is started first (dashboard-api handles it or we can call start-task)
+      if (activeCustomTask.status !== 'ongoing' && activeCustomTask.status !== 'in_progress') {
+        const { error: startError } = await supabase.functions.invoke("dashboard-api", {
+          body: { action: "start-task", taskId: activeCustomTask.id },
+        });
+        if (startError) throw startError;
+      }
+
+      // Upload files directly to Supabase storage
+      const finalResponses = { ...responses };
+      for (const [qId, fileData] of Object.entries(fileUploads)) {
+        const path = `custom-task-uploads/${activeCustomTask.id}/${Date.now()}_${fileData.name}`;
+        
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from("task-submissions")
+          .upload(path, decode(fileData.base64), { contentType: 'image/jpeg' });
+
+        if (uploadError) throw uploadError;
+
+        const { data: { publicUrl } } = supabase.storage
+          .from("task-submissions")
+          .getPublicUrl(uploadData.path);
+
+        finalResponses[qId] = publicUrl;
+      }
+
+      // Submit completed task
+      const { error: completeError } = await supabase.functions.invoke("dashboard-api", {
+        body: { 
+          action: "complete-task", 
+          taskId: activeCustomTask.id,
+          submissionData: { responses: finalResponses }
+        },
+      });
+
+      if (completeError) throw completeError;
+
+      setTasks((prev) =>
+        prev.map((t) =>
+          t.id === activeCustomTask.id ? { ...t, status: "completed" } : t
+        )
+      );
+
+      Alert.alert(
+        "Task Completed! ✅",
+        "Your task response has been submitted for review. You'll be notified once approved."
+      );
+      
+      setActiveCustomTask(null);
+    } catch (e: any) {
+      console.error(e);
+      Alert.alert("Submission Failed", e.message || "Could not submit task. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -974,6 +1045,13 @@ export default function TasksScreen() {
             </ScrollView>
           </View>
         </Modal>
+
+        <CustomTaskModal
+          task={activeCustomTask}
+          visible={!!activeCustomTask}
+          onClose={() => setActiveCustomTask(null)}
+          onSubmit={handleCustomTaskSubmit}
+        />
       </SafeAreaView>
     </View>
   );

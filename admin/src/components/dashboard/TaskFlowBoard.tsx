@@ -16,6 +16,7 @@ import {
   RefreshCw,
   Loader2,
   AlertCircle,
+  FileText,
 } from "lucide-react";
 import styles from "./TaskFlowBoard.module.css";
 
@@ -46,6 +47,7 @@ interface Participant {
   reward_earned: number;
   task_id: string;
   submission_image_url?: string;
+  submission_data?: any;
   created_at?: string;
   updated_at?: string;
 }
@@ -123,6 +125,8 @@ export default function TaskFlowBoard() {
   const [selectedStage, setSelectedStage] = useState<FlowStage | "all">("all");
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [lightboxImage, setLightboxImage] = useState<string | null>(null);
+  const [viewingData, setViewingData] = useState<any | null>(null);
+  const [viewingAllDataForTask, setViewingAllDataForTask] = useState<Task | null>(null);
 
   const supabase = createClient();
 
@@ -256,6 +260,53 @@ export default function TaskFlowBoard() {
     } finally {
       setActionLoading(null);
     }
+  };
+
+  const exportToCsv = (e: React.MouseEvent, task: Task) => {
+    e.stopPropagation();
+    const taskParts = allParticipants.filter((p) => p.task_id === task.id);
+    
+    if (taskParts.length === 0) {
+      alert("No data to export");
+      return;
+    }
+    
+    // Get all unique questions from all participants
+    const allQuestions = new Set<string>();
+    taskParts.forEach(p => {
+      if (p.submission_data?.responses) {
+        Object.keys(p.submission_data.responses).forEach(q => allQuestions.add(q));
+      }
+    });
+    
+    const headers = ["User Name", "Email", "Phone", "Status", ...Array.from(allQuestions)];
+    
+    const rows = taskParts.map(p => {
+      const row = [
+        p.users?.full_name || "Unknown",
+        p.users?.email_id || "",
+        p.users?.mobile_number || "",
+        p.status,
+      ];
+      
+      Array.from(allQuestions).forEach(q => {
+        const val = p.submission_data?.responses?.[q];
+        if (val === undefined || val === null) row.push("");
+        else if (typeof val === 'object') row.push(JSON.stringify(val).replace(/"/g, '""'));
+        else row.push(String(val).replace(/"/g, '""'));
+      });
+      
+      return row.map(cell => `"${cell}"`).join(",");
+    });
+    
+    const csvContent = "data:text/csv;charset=utf-8," + [headers.join(","), ...rows].join("\n");
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `${task.title.replace(/\s+/g, '_')}_data.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   /* ─── Render ─── */
@@ -481,13 +532,24 @@ export default function TaskFlowBoard() {
                         );
                       })}
                     </div>
-                    <button className={styles.expandToggle}>
-                      {isExpanded ? (
-                        <ChevronUp size={20} />
-                      ) : (
-                        <ChevronDown size={20} />
-                      )}
-                    </button>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <button 
+                        className={styles.evidenceBtn}
+                        style={{ color: '#059669', borderColor: '#059669', background: 'rgba(5, 150, 105, 0.05)', whiteSpace: 'nowrap', padding: '4px 10px', display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer', borderRadius: '6px', border: '1px solid', fontSize: '12px' }}
+                        onClick={(e) => { e.stopPropagation(); setViewingAllDataForTask(task); }}
+                        title="View all captured data in a table"
+                      >
+                        <FileText size={14} />
+                        See All Data
+                      </button>
+                      <button className={styles.expandToggle}>
+                        {isExpanded ? (
+                          <ChevronUp size={20} />
+                        ) : (
+                          <ChevronDown size={20} />
+                        )}
+                      </button>
+                    </div>
                   </div>
                 </div>
 
@@ -586,6 +648,21 @@ export default function TaskFlowBoard() {
                                     </button>
                                   )}
 
+                                  {/* Custom Form Data */}
+                                  {p.submission_data?.responses && (
+                                    <button
+                                      className={styles.evidenceBtn}
+                                      onClick={() =>
+                                        setViewingData(p.submission_data.responses)
+                                      }
+                                      title="View captured data"
+                                      style={{ color: '#8b5cf6', borderColor: '#8b5cf6', background: 'rgba(139, 92, 246, 0.05)' }}
+                                    >
+                                      <FileText size={14} />
+                                      View Data
+                                    </button>
+                                  )}
+
                                   {/* Action buttons for pending review */}
                                   {stage.key === "completed" && (
                                     <div className={styles.actionBtns}>
@@ -679,6 +756,105 @@ export default function TaskFlowBoard() {
           </div>
         </div>
       )}
+
+      {/* ─── Custom Data Modal ─── */}
+      {viewingData && (
+        <div className={styles.lightboxOverlay} onClick={() => setViewingData(null)}>
+          <div className={styles.lightboxContent} onClick={(e) => e.stopPropagation()} style={{ background: 'white', padding: '24px', borderRadius: '12px', maxWidth: '600px', width: '100%', maxHeight: '80vh', overflowY: 'auto' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', borderBottom: '1px solid #e2e8f0', paddingBottom: '12px' }}>
+              <h3 style={{ margin: 0, color: '#0f172a', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <FileText size={20} color="#8b5cf6" />
+                Captured Form Data
+              </h3>
+              <button onClick={() => setViewingData(null)} style={{ background: 'none', border: 'none', fontSize: '24px', cursor: 'pointer', color: '#64748b' }}>×</button>
+            </div>
+            
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              {Object.entries(viewingData).map(([question, answer], idx) => (
+                <div key={idx} style={{ background: '#f8fafc', padding: '12px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+                  <div style={{ fontWeight: 600, color: '#334155', marginBottom: '4px', fontSize: '13px' }}>{question}</div>
+                  <div style={{ color: '#0f172a', fontSize: '14px', whiteSpace: 'pre-wrap' }}>
+                    {typeof answer === 'object' ? JSON.stringify(answer, null, 2) : String(answer)}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ─── See All Data Modal ─── */}
+      {viewingAllDataForTask && (() => {
+        const taskParts = allParticipants.filter(p => p.task_id === viewingAllDataForTask.id);
+        const allQuestions = new Set<string>();
+        taskParts.forEach(p => {
+          if (p.submission_data?.responses) {
+            Object.keys(p.submission_data.responses).forEach(q => allQuestions.add(q));
+          }
+        });
+        const questionsArray = Array.from(allQuestions);
+
+        return (
+          <div className={styles.lightboxOverlay} onClick={() => setViewingAllDataForTask(null)}>
+            <div className={styles.lightboxContent} onClick={(e) => e.stopPropagation()} style={{ background: 'white', padding: '24px', borderRadius: '12px', maxWidth: '90vw', width: '100%', maxHeight: '90vh', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', borderBottom: '1px solid #e2e8f0', paddingBottom: '12px', flexShrink: 0 }}>
+                <div>
+                  <h3 style={{ margin: 0, color: '#0f172a', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <FileText size={20} color="#059669" />
+                    All Recorded Data
+                  </h3>
+                  <p style={{ margin: '4px 0 0', color: '#64748b', fontSize: '13px' }}>{viewingAllDataForTask.title}</p>
+                </div>
+                <button onClick={() => setViewingAllDataForTask(null)} style={{ background: 'none', border: 'none', fontSize: '24px', cursor: 'pointer', color: '#64748b' }}>×</button>
+              </div>
+              
+              {taskParts.length === 0 ? (
+                <div style={{ padding: '40px', textAlign: 'center', color: '#64748b' }}>No data recorded yet.</div>
+              ) : (
+                <div style={{ overflow: 'auto', flex: 1, border: '1px solid #e2e8f0', borderRadius: '8px' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: '800px' }}>
+                    <thead style={{ background: '#f8fafc', position: 'sticky', top: 0, zIndex: 10, boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}>
+                      <tr>
+                        <th style={{ padding: '12px 16px', borderBottom: '1px solid #e2e8f0', color: '#475569', fontWeight: 600, fontSize: '13px', whiteSpace: 'nowrap' }}>User Name</th>
+                        <th style={{ padding: '12px 16px', borderBottom: '1px solid #e2e8f0', color: '#475569', fontWeight: 600, fontSize: '13px', whiteSpace: 'nowrap' }}>Email</th>
+                        <th style={{ padding: '12px 16px', borderBottom: '1px solid #e2e8f0', color: '#475569', fontWeight: 600, fontSize: '13px', whiteSpace: 'nowrap' }}>Phone</th>
+                        <th style={{ padding: '12px 16px', borderBottom: '1px solid #e2e8f0', color: '#475569', fontWeight: 600, fontSize: '13px', whiteSpace: 'nowrap' }}>Status</th>
+                        {questionsArray.map((q, idx) => (
+                          <th key={idx} style={{ padding: '12px 16px', borderBottom: '1px solid #e2e8f0', color: '#475569', fontWeight: 600, fontSize: '13px', whiteSpace: 'nowrap' }}>{q}</th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {taskParts.map((p, idx) => (
+                        <tr key={idx} style={{ borderBottom: '1px solid #e2e8f0', background: idx % 2 === 0 ? 'white' : '#f8fafc' }}>
+                          <td style={{ padding: '12px 16px', color: '#0f172a', fontSize: '14px', whiteSpace: 'nowrap' }}>{p.users?.full_name || "Unknown"}</td>
+                          <td style={{ padding: '12px 16px', color: '#0f172a', fontSize: '14px', whiteSpace: 'nowrap' }}>{p.users?.email_id || "—"}</td>
+                          <td style={{ padding: '12px 16px', color: '#0f172a', fontSize: '14px', whiteSpace: 'nowrap' }}>{p.users?.mobile_number || "—"}</td>
+                          <td style={{ padding: '12px 16px', color: '#0f172a', fontSize: '14px', whiteSpace: 'nowrap' }}>
+                            <span style={{ padding: '2px 8px', borderRadius: '4px', fontSize: '12px', background: p.status === 'approved' ? '#dcfce7' : p.status === 'rejected' ? '#fee2e2' : p.status === 'completed' ? '#dbeafe' : '#fef3c7', color: p.status === 'approved' ? '#166534' : p.status === 'rejected' ? '#991b1b' : p.status === 'completed' ? '#1e40af' : '#92400e' }}>
+                              {p.status}
+                            </span>
+                          </td>
+                          {questionsArray.map((q, qIdx) => {
+                            const val = p.submission_data?.responses?.[q];
+                            return (
+                              <td key={qIdx} style={{ padding: '12px 16px', color: '#0f172a', fontSize: '14px', maxWidth: '300px' }}>
+                                <div style={{ overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical' }}>
+                                  {val === undefined || val === null ? "—" : typeof val === 'object' ? JSON.stringify(val) : String(val)}
+                                </div>
+                              </td>
+                            );
+                          })}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          </div>
+        );
+      })()}
     </div>
   );
 }

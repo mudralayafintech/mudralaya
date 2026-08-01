@@ -7,6 +7,7 @@ import clsx from "clsx";
 import DataTable from "./DataTable";
 import { PlusCircle, Users, Loader2 } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
+import FormBuilder, { FormConfig } from "./FormBuilder";
 
 interface Task {
   id: string;
@@ -38,6 +39,13 @@ export default function TaskManager() {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const ignoreLoading = loading;
   const [showCreateForm, setShowCreateForm] = useState(false);
+  const [showTaskOptions, setShowTaskOptions] = useState(false);
+  const [showCustomTaskPrompt, setShowCustomTaskPrompt] = useState(false);
+  const [showCustomTaskBuilder, setShowCustomTaskBuilder] = useState(false);
+  const [customTaskTitle, setCustomTaskTitle] = useState("");
+  const [hasCustomRewards, setHasCustomRewards] = useState(false);
+  const [customRewardFree, setCustomRewardFree] = useState<string>("");
+  const [customRewardMember, setCustomRewardMember] = useState<string>("");
 
   const [newTask, setNewTask] = useState({
     title: "",
@@ -63,6 +71,7 @@ export default function TaskManager() {
   const [loadingParticipants, setLoadingParticipants] = useState(false);
   const [showEditForm, setShowEditForm] = useState(false);
   const [editingTask, setEditingTask] = useState<any>(null);
+  const [editingCustomTaskConfig, setEditingCustomTaskConfig] = useState<FormConfig | null>(null);
 
   const supabase = createClient();
   const [uploadingPdfCreate, setUploadingPdfCreate] = useState(false);
@@ -179,6 +188,48 @@ export default function TaskManager() {
     }
   };
 
+  const handleSaveCustomTask = async (config: FormConfig) => {
+    try {
+      const taskData = {
+        title: config.title || customTaskTitle,
+        description: config.description || "",
+        reward_free: config.hasRewards ? (config.reward_free || 0) : 0,
+        reward_member: config.hasRewards ? (config.reward_member || 0) : 0,
+        reward_premium: config.hasRewards ? (config.reward_member || 0) : 0,
+        reward: config.hasRewards ? (config.reward_free || 0) : 0,
+        reward_min: null,
+        reward_max: null,
+        reward_info: "",
+        type: "Mudralaya Custom",
+        task_type: "Mudralaya Custom",
+        video_link: "",
+        pdf_url: "",
+        action_link: "",
+        icon_type: "group",
+        target_audience: ["All"],
+        steps: JSON.stringify(config),
+      };
+
+      if (editingTask && editingTask.id && editingCustomTaskConfig) {
+        await adminApiRequest("update-task", { ...editingTask, ...taskData });
+        alert("Custom Task Updated Successfully");
+      } else {
+        await adminApiRequest("create-task", taskData);
+        alert("Custom Task Created Successfully");
+      }
+      setShowCustomTaskBuilder(false);
+      setCustomTaskTitle("");
+      setHasCustomRewards(false);
+      setCustomRewardFree("");
+      setCustomRewardMember("");
+      setEditingTask(null);
+      setEditingCustomTaskConfig(null);
+      fetchTasks();
+    } catch (err) {
+      alert("Failed to save custom task: " + (err as Error).message);
+    }
+  };
+
   const handleViewProgress = async (task: Task) => {
     setSelectedTask(task);
     setParticipants([]);
@@ -233,6 +284,32 @@ export default function TaskManager() {
   };
 
   const handleEditTask = (task: Task) => {
+    if (task.task_type === 'Mudralaya Custom' || task.type === 'Mudralaya Custom') {
+      try {
+        const config = JSON.parse((task as any).steps || "{}");
+        const rewardFree = task.reward_free || task.reward || 0;
+        const rewardMember = (task as any).reward_member || 0;
+        
+        config.title = config.title || task.title;
+        config.hasRewards = rewardFree > 0 || rewardMember > 0;
+        config.reward_free = rewardFree;
+        config.reward_member = rewardMember;
+
+        setEditingCustomTaskConfig(config);
+        setCustomTaskTitle(config.title);
+        setEditingTask(task as any);
+        
+        setShowCustomTaskBuilder(true);
+        setShowCustomTaskPrompt(false);
+        setShowEditForm(false);
+        setShowCreateForm(false);
+        return;
+      } catch(e) {
+        console.error("Failed to parse custom task config", e);
+      }
+    }
+
+    setEditingCustomTaskConfig(null);
     setEditingTask({
       ...task,
       task_type: task.task_type || task.type,
@@ -295,13 +372,39 @@ export default function TaskManager() {
       key: "reward_free",
       label: "Reward",
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      format: (val: any) => (
-        <span className={styles.rewardBadge}>
-          ₹{Number(val).toLocaleString()}
-        </span>
-      ),
+      format: (_: any, row: any) => {
+        const free = row.reward_free || row.reward || 0;
+        const member = row.reward_member || row.reward_premium || 0;
+        
+        if (member > 0 && free > 0) {
+          return (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', alignItems: 'flex-start' }}>
+              <span className={styles.rewardBadge} style={{ fontSize: '12px', padding: '2px 8px' }}>M: ₹{Number(member).toLocaleString()}</span>
+              <span className={styles.rewardBadge} style={{ fontSize: '12px', padding: '2px 8px', background: '#f1f5f9', color: '#64748b' }}>F: ₹{Number(free).toLocaleString()}</span>
+            </div>
+          );
+        }
+        
+        const singleReward = Math.max(free, member);
+        return (
+          <div style={{ display: 'flex', alignItems: 'flex-start' }}>
+            <span className={styles.rewardBadge} style={{ fontSize: '12px', padding: '2px 8px' }}>
+              ₹{Number(singleReward).toLocaleString()}
+            </span>
+          </div>
+        );
+      },
     },
-    { key: "type", label: "Type" },
+    { 
+      key: "type", 
+      label: "Type",
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      format: (_: any, row: any) => (
+        <span style={{ fontSize: '13px', fontWeight: 500, color: '#475569' }}>
+          {row.task_type || row.type || "Standard"}
+        </span>
+      )
+    },
     {
       key: "actions",
       label: "Action",
@@ -334,17 +437,55 @@ export default function TaskManager() {
   ];
 
   const createButton = (
-    <button
-      className={styles.createBtn}
-      onClick={() => setShowCreateForm(!showCreateForm)}
-    >
-      <PlusCircle size={18} />
-      {showCreateForm ? "Cancel" : "Create Task"}
-    </button>
+    <div style={{ position: 'relative' }}>
+      <button
+        className={styles.createBtn}
+        onClick={() => setShowTaskOptions(!showTaskOptions)}
+      >
+        <PlusCircle size={18} />
+        Create Task
+      </button>
+      {showTaskOptions && (
+        <div style={{ position: 'absolute', top: '100%', right: 0, marginTop: '8px', background: 'white', borderRadius: '8px', boxShadow: '0 4px 12px rgba(0,0,0,0.15)', zIndex: 50, overflow: 'hidden', minWidth: '200px' }}>
+          <button
+            style={{ display: 'block', width: '100%', padding: '12px 16px', textAlign: 'left', border: 'none', background: 'white', cursor: 'pointer', borderBottom: '1px solid #f1f5f9' }}
+            onClick={() => { setShowCreateForm(true); setShowTaskOptions(false); setShowCustomTaskPrompt(false); setShowCustomTaskBuilder(false); }}
+          >
+            Normal Task
+          </button>
+          <button
+            style={{ display: 'block', width: '100%', padding: '12px 16px', textAlign: 'left', border: 'none', background: 'white', cursor: 'pointer' }}
+            onClick={() => { 
+              setCustomTaskTitle("");
+              setEditingTask(null);
+              setEditingCustomTaskConfig(null);
+              setShowCustomTaskBuilder(true); 
+              setShowTaskOptions(false); 
+              setShowCreateForm(false); 
+            }}
+          >
+            Mudralaya Custom Task
+          </button>
+        </div>
+      )}
+    </div>
   );
 
   return (
     <div className={styles.container}>
+      {showCustomTaskBuilder && (
+        <FormBuilder
+          initialTitle={customTaskTitle}
+          initialConfig={editingCustomTaskConfig || undefined}
+          onCancel={() => {
+            setShowCustomTaskBuilder(false);
+            setEditingTask(null);
+            setEditingCustomTaskConfig(null);
+          }}
+          onSave={handleSaveCustomTask}
+        />
+      )}
+
       {showCreateForm && (
         <div className={styles.formCard}>
           <div className={styles.cardHeader}>Create New Task</div>
@@ -849,9 +990,9 @@ export default function TaskManager() {
 
           <div className={styles.participantList}>
             {!selectedTask ? (
-              <div className="flex flex-col items-center justify-center h-48 text-gray-400">
-                <Users size={48} className="mb-2 opacity-20" />
-                <span className="text-sm">Select a task from the list</span>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '250px', color: '#9ca3af' }}>
+                <Users size={48} style={{ marginBottom: '12px', opacity: 0.3 }} />
+                <span style={{ fontSize: '14px', fontWeight: 500 }}>Select a task from the list</span>
               </div>
             ) : loadingParticipants ? (
               <div className="p-8 text-center text-gray-500 animate-pulse">
@@ -871,7 +1012,7 @@ export default function TaskManager() {
                           {p.users?.full_name || "Unknown User"}
                         </span>
                         <span className={styles.userEmail}>
-                          {p.users?.email_id}
+                          {p.users?.email_id} {p.users?.mobile_number || p.users?.phone ? `| ${p.users?.mobile_number || p.users?.phone}` : ''}
                         </span>
                         {p.reward_earned > 0 && (
                           <span className={styles.rewardText}>
@@ -934,6 +1075,19 @@ export default function TaskManager() {
                         )}
                       </div>
                     </div>
+                    {p.submission_data?.responses && (
+                      <div style={{ marginTop: '12px', padding: '10px', background: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0', fontSize: '12px' }}>
+                        <span style={{ fontSize: '11px', fontWeight: 'bold', color: '#64748b', display: 'block', marginBottom: '8px' }}>FORM RESPONSES:</span>
+                        {Object.entries(p.submission_data.responses).map(([question, answer], idx) => (
+                          <div key={idx} style={{ marginBottom: '6px' }}>
+                            <strong style={{ color: '#334155' }}>{question}:</strong> 
+                            <span style={{ color: '#0f172a', marginLeft: '4px' }}>
+                              {typeof answer === 'object' ? JSON.stringify(answer) : String(answer)}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                     {p.submission_image_url && (
                       <div className={styles.evidenceContainer} style={{ marginTop: '12px', padding: '10px', background: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
                         <span style={{ fontSize: '11px', fontWeight: 'bold', color: '#64748b', display: 'block', marginBottom: '8px' }}>SUBMITTED EVIDENCE:</span>

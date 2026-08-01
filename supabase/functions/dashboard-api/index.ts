@@ -122,13 +122,30 @@ serve(async (req: Request): Promise<Response> => {
         // Fetch user's specific status for these tasks
         const { data: userTasks } = await supabaseClient
           .from('user_tasks')
-          .select('task_id, status')
+          .select('task_id, status, created_at')
           .eq('user_id', user.id)
+          .order('created_at', { ascending: false })
 
         // Merge statuses
         result = allTasks?.map((t: any) => {
-          const ut = userTasks?.find((u: any) => u.task_id === t.id)
-          return { ...t, status: ut ? ut.status : 'new' }
+          const userTaskRecords = userTasks?.filter((u: any) => u.task_id === t.id) || []
+          
+          if (userTaskRecords.length === 0) {
+            return { ...t, status: 'new' }
+          }
+          
+          const isCustomTask = t.task_type === 'Mudralaya Custom' || (t.steps ? true : false);
+          
+          if (isCustomTask) {
+             const ongoingTask = userTaskRecords.find((u: any) => u.status === 'ongoing' || u.status === 'in_progress');
+             if (ongoingTask) {
+                return { ...t, status: 'ongoing' };
+             } else {
+                return { ...t, status: 'new' };
+             }
+          }
+          
+          return { ...t, status: userTaskRecords[0].status }
         }) || []
         break;
 
@@ -146,23 +163,45 @@ serve(async (req: Request): Promise<Response> => {
         const { taskId } = requestData
         if (!taskId) throw new Error('Task ID is required')
 
+        // Use Service Role key to bypass RLS policies for insertion and querying task
+        const supabaseAdmin = createClient(
+          Deno.env.get('SUPABASE_URL') ?? '',
+          Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+        )
+
+        // Fetch task details to check if it's a Custom Task
+        const { data: taskTypeDetails, error: taskTypeError } = await supabaseAdmin
+          .from('tasks')
+          .select('task_type, steps')
+          .eq('id', taskId)
+          .maybeSingle()
+          
+        if (taskTypeError) {
+          throw new Error('Failed to fetch task details: ' + taskTypeError.message);
+        }
+          
+        const isCustomTask = taskTypeDetails?.task_type === 'Mudralaya Custom' || 
+                             (taskTypeDetails?.steps ? true : false);
+
         // Check if already started
-        const { data: existing } = await supabaseClient
+        let query = supabaseClient
           .from('user_tasks')
           .select('*')
           .eq('user_id', user.id)
           .eq('task_id', taskId)
-          .single()
+          
+        if (isCustomTask) {
+          query = query.in('status', ['ongoing', 'in_progress'])
+        }
 
-        if (existing) {
+        const { data: existing } = await query
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .maybeSingle()
+
+        if (existing && (!isCustomTask || ['ongoing', 'in_progress'].includes(existing.status))) {
           result = existing
         } else {
-          // Use Service Role key to bypass RLS policies for insertion
-          const supabaseAdmin = createClient(
-            Deno.env.get('SUPABASE_URL') ?? '',
-            Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-          )
-
           const { data: newTask, error: startError } = await supabaseAdmin
             .from('user_tasks')
             .insert({
@@ -195,10 +234,13 @@ serve(async (req: Request): Promise<Response> => {
           .select('*')
           .eq('user_id', user.id)
           .eq('task_id', completeTaskId)
+          .in('status', ['ongoing', 'in_progress'])
+          .order('created_at', { ascending: false })
+          .limit(1)
           .maybeSingle()
 
         if (checkError) throw checkError
-        if (!existingUserTask) throw new Error('Task not started. Please start the task first.')
+        if (!existingUserTask) throw new Error('Task not started or already completed. Please start the task first.')
 
         // Get the task details to determine reward
         const { data: taskDetails, error: taskError } = await supabaseAdminComplete
@@ -234,8 +276,7 @@ serve(async (req: Request): Promise<Response> => {
             reward_earned: rewardAmount,
             updated_at: new Date().toISOString()
           })
-          .eq('user_id', user.id)
-          .eq('task_id', completeTaskId)
+          .eq('id', existingUserTask.id)
           .select()
           .single()
 
@@ -297,6 +338,20 @@ serve(async (req: Request): Promise<Response> => {
           ? (proofTaskDetails?.reward_member || proofTaskDetails?.reward_free || 0)
           : (proofTaskDetails?.reward_free || 0)
 
+        // Find the specific ongoing user_task to update
+        const { data: existingOngoing, error: findError } = await supabaseAdmin
+          .from('user_tasks')
+          .select('id')
+          .eq('user_id', user.id)
+          .eq('task_id', proofTaskId)
+          .in('status', ['ongoing', 'in_progress'])
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .maybeSingle()
+
+        if (findError) throw findError
+        if (!existingOngoing) throw new Error('No ongoing task found to submit proof for.')
+
         // Update user_tasks with proof and status = 'completed' (pending admin review)
         // Using 'completed' so it appears in admin's "Pending Review" pipeline
         const { data: proofTask, error: proofError } = await supabaseAdmin
@@ -307,8 +362,7 @@ serve(async (req: Request): Promise<Response> => {
             reward_earned: proofRewardAmount,
             updated_at: new Date().toISOString(),
           })
-          .eq('user_id', user.id)
-          .eq('task_id', proofTaskId)
+          .eq('id', existingOngoing.id)
           .select()
           .single()
 
@@ -332,17 +386,15 @@ serve(async (req: Request): Promise<Response> => {
 
   } catch (error: any) {
     console.error('API Error:', error)
-    const statusCode = error.message?.includes('Unauthorized') ? 401 
-      : error.message?.includes('not found') ? 404 
-      : 400
     return new Response(JSON.stringify({
+      success: false,
       error: error.message || 'An error occurred',
       details: 'Check function logs',
       receivedAction: req.url,
-      stack: Deno.env.get('DENO_ENV') === 'development' ? error.stack : undefined
+      stack: error.stack
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      status: statusCode,
+      status: 200,
     })
   }
 })

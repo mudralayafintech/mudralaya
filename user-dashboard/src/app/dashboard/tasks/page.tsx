@@ -21,6 +21,7 @@ import {
 import { createClient } from "@/utils/supabase/client";
 import TaskSubmissionModal from "@/components/dashboard/TaskSubmissionModal";
 import TaskStatusModal from "@/components/dashboard/TaskStatusModal";
+import CustomTaskRenderer from "@/components/dashboard/CustomTaskRenderer";
 import styles from "./tasks.module.css";
 
 interface Task {
@@ -84,7 +85,7 @@ export default function TasksPage() {
 
   const [sortOption, setSortOption] = useState("newest");
   const [activeTab, setActiveTab] = useState("All Task");
-  const [activeTaskType, setActiveTaskType] = useState<"Daily" | "Dedicated">(
+  const [activeTaskType, setActiveTaskType] = useState<"Daily" | "Dedicated" | "Custom">(
     "Daily",
   );
   const [expandedTaskId, setExpandedTaskId] = useState<string | null>(null);
@@ -125,13 +126,16 @@ export default function TasksPage() {
 
     try {
       const { data: { session } } = await supabase.auth.getSession();
-      const { error } = await supabase.functions.invoke("dashboard-api", {
+      const { data, error } = await supabase.functions.invoke("dashboard-api", {
         body: { action: "start-task", taskId: task.id },
         headers: session ? { Authorization: `Bearer ${session.access_token}` } : undefined
       });
 
       if (error) {
         console.error("Error starting task:", error);
+      } else if (data && data.success === false) {
+        console.error("Backend Error on start:", data.error, data.stack);
+        alert(`Backend Error on Start: ${data.error}\n\nPlease copy this and show the developer!`);
       } else {
         setTasks((prevTasks) =>
           prevTasks.map((t) =>
@@ -434,21 +438,18 @@ export default function TasksPage() {
         return false;
       }
 
-      // Task Type Filter (Daily/Dedicated buttons)
-      // Use task_type if available, otherwise fall back to checking category or type
+      // Task Type Filter (Daily/Dedicated/Custom buttons)
       const taskTypeRaw = task.task_type || task.type || task.category || "Daily";
       const isActuallyDedicated = taskTypeRaw === "Dedicated" || taskTypeRaw?.toLowerCase().includes("dedicated");
+      const isActuallyCustom = taskTypeRaw === 'Mudralaya Custom';
 
-      if (activeTaskType === "Daily") {
-        // Show Daily tasks (anything that's not explicitly Dedicated)
-        if (isActuallyDedicated) {
-          return false;
-        }
+      if (activeTaskType === "Custom") {
+        if (!isActuallyCustom) return false;
+      } else if (activeTaskType === "Dedicated") {
+        if (!isActuallyDedicated) return false;
       } else {
-        // Show Dedicated tasks only
-        if (!isActuallyDedicated) {
-          return false;
-        }
+        // Daily (Anything that isn't explicitly Custom or Dedicated)
+        if (isActuallyDedicated || isActuallyCustom) return false;
       }
 
       // Tab filter (All Task, Completed, Ongoing)
@@ -655,6 +656,28 @@ export default function TasksPage() {
                 Dedicated Task
               </button>
 
+              {/* Custom Task Button */}
+              <button
+                onClick={() => { setActiveTaskType("Custom"); setActiveTab("All Task"); }}
+                style={{
+                  padding: "10px 24px",
+                  borderRadius: "8px",
+                  border:
+                    activeTaskType === "Custom"
+                      ? "none"
+                      : "1px solid #e2e8f0",
+                  backgroundColor:
+                    activeTaskType === "Custom" ? "#8b5cf6" : "#fff",
+                  color: activeTaskType === "Custom" ? "#fff" : "#64748b",
+                  fontWeight: "600",
+                  cursor: "pointer",
+                  transition: "all 0.2s",
+                  fontSize: "14px",
+                }}
+              >
+                Custom Data Tasks
+              </button>
+
               {/* Spacer */}
               <div style={{ flex: 1 }} />
 
@@ -757,7 +780,8 @@ export default function TasksPage() {
                   <div className={styles.taskExpanded}>
                     <div className={styles.expandedSection}>
                       {!task.category?.toLowerCase().includes("dedicated") &&
-                        !task.title.toLowerCase().includes("dedicated") && (
+                        !task.title.toLowerCase().includes("dedicated") && 
+                        ((task.reward_free ?? 0) > 0 || (task.reward ?? 0) > 0 || (task.reward_member ?? 0) > 0 || (task.reward_premium ?? 0) > 0) && (
                           <div className={styles.rewardPricing}>
                             <div className={styles.priceItem}>
                               <div className={styles.badgeMembers}>
@@ -777,7 +801,7 @@ export default function TasksPage() {
                               <div
                                 className={`${styles.priceValue} ${styles.textGreen}`}
                               >
-                                ₹ {task.reward_free || task.reward || 600}
+                                ₹ {task.reward_free || task.reward || 0}
                               </div>
                             </div>
                           </div>
@@ -847,58 +871,109 @@ export default function TasksPage() {
                       </div>
                     )}
 
-                    {/* Image Submission Section */}
+                    {/* Submission Section */}
                     {(task.status === "ongoing" || task.status === "in_progress") && (
-                      <div className={styles.submissionSection} style={{ marginTop: '20px', padding: '16px', borderRadius: '12px', border: '1px dashed #cbd5e1', backgroundColor: '#f8fafc' }}>
-                        <h4 style={{ fontSize: '14px', fontWeight: '600', marginBottom: '12px', color: '#1e293b' }}>Task Evidence (Optional)</h4>
-                        <div className={styles.fileUploadWrapper} style={{ position: 'relative' }}>
-                          <input 
-                            type="file" 
-                            accept="image/*" 
-                            onChange={(e) => handleFileChange(task.id, e)}
-                            style={{ opacity: 0, position: 'absolute', inset: 0, cursor: 'pointer', zIndex: 2 }}
-                            disabled={isUploading}
-                          />
-                          <div className={styles.fileDisplay} style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '10px', backgroundColor: '#fff', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-                            <div style={{ padding: '8px', borderRadius: '6px', backgroundColor: '#eff6ff', color: '#2563eb' }}>
-                              <Upload size={18} />
-                            </div>
-                            <span style={{ fontSize: '13px', color: '#64748b' }}>
-                              {selectedImage[task.id] ? selectedImage[task.id]?.name : "Upload screenshot of task completion"}
-                            </span>
-                          </div>
-                        </div>
-                        {selectedImage[task.id] && (
-                          <div className={styles.imagePreview} style={{ marginTop: '12px' }}>
-                             {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img 
-                              src={URL.createObjectURL(selectedImage[task.id]!)} 
-                              alt="Submission Preview" 
-                              style={{ maxWidth: '100%', maxHeight: '200px', borderRadius: '8px', border: '1px solid #e2e8f0' }}
+                      (task.task_type === 'Mudralaya Custom' || task.type === 'Mudralaya Custom') ? (
+                        <CustomTaskRenderer 
+                          task={task} 
+                          onComplete={async (responses, imageUrl) => {
+                            try {
+                              const { data: { session } } = await supabase.auth.getSession();
+                              const { data, error } = await supabase.functions.invoke("dashboard-api", {
+                                body: {
+                                  action: "complete-task",
+                                  taskId: task.id,
+                                  submissionImageUrl: imageUrl,
+                                  submissionData: {
+                                    completed_at: new Date().toISOString(),
+                                    action_link_visited: task.action_link ? true : false,
+                                    responses: responses
+                                  },
+                                },
+                                headers: session ? { Authorization: `Bearer ${session.access_token}` } : undefined
+                              });
+
+                              if (error) {
+                                console.error("Error completing task:", error);
+                                alert("Failed to complete task. Please try again.");
+                                return;
+                              }
+                              
+                              if (data && data.success === false) {
+                                console.error("Backend Error:", data.error, data.stack);
+                                alert(`Backend Error: ${data.error}\n\nPlease copy this and show the developer!`);
+                                return;
+                              }
+                              const isCustom = task.task_type === 'Mudralaya Custom' || task.type === 'Mudralaya Custom' || !!task.steps;
+                              
+                              setTasks((prevTasks) =>
+                                prevTasks.map((t) =>
+                                  t.id === task.id ? { ...t, status: isCustom ? "new" : "completed" } : t,
+                                ),
+                              );
+                              alert(isCustom ? "Form submitted successfully! You can submit another response if you'd like." : "Task submitted successfully! Status: In Process");
+                            } catch (err) {
+                              console.error(err);
+                              alert("Failed to complete task.");
+                            }
+                          }}
+                          isUploading={isUploading}
+                          setIsUploading={setIsUploading}
+                        />
+                      ) : (
+                        <div className={styles.submissionSection} style={{ marginTop: '20px', padding: '16px', borderRadius: '12px', border: '1px dashed #cbd5e1', backgroundColor: '#f8fafc' }}>
+                          <h4 style={{ fontSize: '14px', fontWeight: '600', marginBottom: '12px', color: '#1e293b' }}>Task Evidence (Optional)</h4>
+                          <div className={styles.fileUploadWrapper} style={{ position: 'relative' }}>
+                            <input 
+                              type="file" 
+                              accept="image/*" 
+                              onChange={(e) => handleFileChange(task.id, e)}
+                              style={{ opacity: 0, position: 'absolute', inset: 0, cursor: 'pointer', zIndex: 2 }}
+                              disabled={isUploading}
                             />
+                            <div className={styles.fileDisplay} style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '10px', backgroundColor: '#fff', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+                              <div style={{ padding: '8px', borderRadius: '6px', backgroundColor: '#eff6ff', color: '#2563eb' }}>
+                                <Upload size={18} />
+                              </div>
+                              <span style={{ fontSize: '13px', color: '#64748b' }}>
+                                {selectedImage[task.id] ? selectedImage[task.id]?.name : "Upload screenshot of task completion"}
+                              </span>
+                            </div>
                           </div>
-                        )}
-                      </div>
+                          {selectedImage[task.id] && (
+                            <div className={styles.imagePreview} style={{ marginTop: '12px' }}>
+                               {/* eslint-disable-next-line @next/next/no-img-element */}
+                              <img 
+                                src={URL.createObjectURL(selectedImage[task.id]!)} 
+                                alt="Submission Preview" 
+                                style={{ maxWidth: '100%', maxHeight: '200px', borderRadius: '8px', border: '1px solid #e2e8f0' }}
+                              />
+                            </div>
+                          )}
+                        </div>
+                      )
                     )}
 
-                    <div className="mt-3" style={{ marginTop: "24px" }}>
-                      <button
-                        className={`${styles.btnTakeTask}`}
-                        onClick={() => handleSmartAction(task)}
-                        disabled={isUploading}
-                        style={{
-                          width: "100%",
-                          backgroundColor: getSmartButtonLabel(task) === "Complete Task" ? "#22c55e" 
-                            : getSmartButtonLabel(task) === "In Process" ? "#3b82f6"
-                            : getSmartButtonLabel(task) === "Task Rejected" ? "#ef4444"
-                            : getSmartButtonLabel(task) === "Reward Claimed" ? "#10b981"
-                            : undefined,
-                          cursor: isUploading ? "wait" : "pointer",
-                        }}
-                      >
-                        {isUploading ? "Uploading..." : getSmartButtonLabel(task)}
-                      </button>
-                    </div>
+                    {(!(task.status === "ongoing" || task.status === "in_progress") || (task.task_type !== 'Mudralaya Custom' && task.type !== 'Mudralaya Custom')) && (
+                      <div className="mt-3" style={{ marginTop: "24px" }}>
+                        <button
+                          className={`${styles.btnTakeTask}`}
+                          onClick={() => handleSmartAction(task)}
+                          disabled={isUploading}
+                          style={{
+                            width: "100%",
+                            backgroundColor: getSmartButtonLabel(task) === "Complete Task" ? "#22c55e" 
+                              : getSmartButtonLabel(task) === "In Process" ? "#3b82f6"
+                              : getSmartButtonLabel(task) === "Task Rejected" ? "#ef4444"
+                              : getSmartButtonLabel(task) === "Reward Claimed" ? "#10b981"
+                              : undefined,
+                            cursor: isUploading ? "wait" : "pointer",
+                          }}
+                        >
+                          {isUploading ? "Uploading..." : getSmartButtonLabel(task)}
+                        </button>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
